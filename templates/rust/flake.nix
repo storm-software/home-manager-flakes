@@ -10,7 +10,7 @@
 
     outputs = { self, storm, ... }:
     storm.lib.mkEnv {
-        toolchains = with storm.lib.toolchains; builds ++ rust;
+        toolchains = with storm.lib.toolchains; builds ++ node ++ rust;
         extras = with storm.pkgs; [ jq ];
         shellHook = ''
             echo "Welcome to this Nix-provided project env!"
