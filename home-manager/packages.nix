@@ -13,6 +13,7 @@ let
         pnpm
         cmake
         protobuf
+        capnproto
     ];
 
     configTools = with pkgs; [
@@ -48,6 +49,7 @@ let
         diff-so-fancy
         codeowners
         gitflow
+        lefthook
     ] ++ (with pkgs; [ difftastic git-annex git-crypt git-sync ]);
 
     javaTools = with pkgs; [
@@ -71,13 +73,9 @@ let
         comma
         coreutils
         findutils
-        gleam
         htmltest
-        hugo
-        keybase
         libiconv
         litestream
-        ncurses
         open-policy-agent
         openssl
         pikchr
@@ -90,25 +88,24 @@ let
         tailscale
         tree
         treefmt
-        vale
         wget
-        youtube-dl
-        yt-dlp
         zstd
         gcr
         pinentry-gnome3
         keepassxc
+        keybase
         keychain
         gnupg
-        devenv
         direnv
     ];
 
     nixTools = with pkgs; [
         cachix
-        lorri
+        devenv
+        nix-direnv
         nixfmt
         vulnix
+        statix
     ];
 
     pythonTools = with pkgs; [ python313 ] ++ (with pkgs.python313Packages; [ httpie pip virtualenv ]);
