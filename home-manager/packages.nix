@@ -62,10 +62,8 @@ let
         tilt
     ];
 
-    macTools = with pkgs.apple-sdk.frameworks; [
-        CoreServices
-        Foundation
-        Security
+    macTools = with pkgs; [
+        apple-sdk
     ];
 
     misc = with pkgs; [
@@ -97,7 +95,6 @@ let
         youtube-dl
         yt-dlp
         zstd
-
         gcr
         pinentry-gnome3
         keepassxc

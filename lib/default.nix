@@ -30,7 +30,7 @@ rec {
     elixir =
       let
         darwinDeps = darwinOnly ((with pkgs; [ terminal-notifier ])
-          ++ (with pkgs.apple-sdk.frameworks; [ CoreFoundation CoreServices ]));
+          ++ (with pkgs; [ apple-sdk ]));
         linuxDeps = linuxOnly (with pkgs; [ inotify-tools libnotify ]);
       in
       with pkgs; [ elixir ] ++ darwinDeps ++ linuxDeps;
