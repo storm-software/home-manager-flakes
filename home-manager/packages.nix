@@ -132,7 +132,6 @@ let
         wabt
         wapm
         wasmer
-        wasm3
         wasm-bindgen-cli_0_2_104
         wasm-pack
         wasm-text-gen
