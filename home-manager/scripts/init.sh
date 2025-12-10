@@ -5,6 +5,8 @@ fi
 
 . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 
+eval "$(atuin init zsh)"
+
 # Run the env.sh script (if it exists). That script is meant to contain secrets, tokens, and
 # other things you don't want to put in your Nix config. This is quite "impure" but a
 # reasonable workaround.

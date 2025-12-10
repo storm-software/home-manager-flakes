@@ -40,7 +40,7 @@ in
   };
 
   # Configure Nix itself (using an unstable version)
-  nix = import ./nix.nix { nix = pkgs.nixUnstable; };
+  nix = import ./nix.nix { inherit nix = pkgs.nixUnstable; };
 
   # Nixpkgs config
   nixpkgs = import ./nixpkgs.nix { inherit system; };

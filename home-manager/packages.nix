@@ -73,9 +73,8 @@ let
     open-policy-agent
     openssl
     pikchr
-    pinentry_mac
     pkg-config
-    reattach-to-user-namespace # for tmux
+    reattach-to-user-namespace
     skopeo
     sqlite
     statix

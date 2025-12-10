@@ -36,7 +36,7 @@ in
 
     (cd ~/nixpkgs && git grep $1)
   '')
-  (writeScriptBin "proj" ''
+  (writeScriptBin "starter" ''
     nix flake init --template github:storm-software/home-manager-flakes
   '')
   (writeScriptBin "wo" ''
