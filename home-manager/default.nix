@@ -1,4 +1,4 @@
-{ homeDirectory, pkgs, stateVersion, system, username, signingKey }:
+{ homeDirectory, pkgs, stateVersion, system, username, signingKey, gitUser }:
 
 let
   # The packages to load into the PATH
@@ -35,6 +35,6 @@ in
     nix = import ./nix.nix { inherit pkgs; };
     nixpkgs = import ./nixpkgs.nix { inherit system; };
 
-    programs = import ./programs.nix { inherit username signingKey homeDirectory pkgs; };
+    programs = import ./programs.nix { inherit username signingKey homeDirectory pkgs gitUser; };
     services = import ./services.nix { inherit homeDirectory pkgs; };
 }
