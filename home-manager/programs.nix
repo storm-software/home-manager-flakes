@@ -37,11 +37,6 @@
 
     jq.enable = true;
 
-    just = {
-        enable = true;
-        enableZshIntegration = true;
-    };
-
     neovim = import ./neovim.nix {
         inherit (pkgs) vimPlugins;
     };

@@ -8,6 +8,7 @@ let
 
     buildTools = with pkgs; [
         buf
+        just
         pnpm
         cmake
         protobuf
