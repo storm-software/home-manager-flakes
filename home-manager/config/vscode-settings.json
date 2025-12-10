@@ -13,11 +13,7 @@
     "**/CHANGELOG.json": true,
     "docs/spec.html": true,
     "**/node_modules/**": true,
-    "**/.tsbuildinfo": true,
-    "packages/compiler/templates/__snapshots__/**": true,
-    "packages/website/versioned_docs/**": true,
-    "packages/http-client-csharp/**/Generated/**": true,
-    "packages/samples/scratch/**": false // Those files are in gitignore but we still want to search for them
+    "**/.tsbuildinfo": true
   },
   "rust-analyzer.procMacro.ignored": {
     "napi-derive": ["napi"]
@@ -25,22 +21,17 @@
   "nix.enableLanguageServer": true,
   "nix.serverPath": "nixd",
   "nix.serverSettings": {
-    // check https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md for all nixd config
     "nixd": {
       "formatting": {
         "command": ["nixfmt"]
       },
       "options": {
-        // By default, this entry will be read from `import <nixpkgs> { }`.
-        // You can write arbitrary Nix expressions here, to produce valid "options" declaration result.
-        // Tip: for flake-based configuration, utilize `builtins.getFlake`
         "nixos": {
           "expr": "(builtins.getFlake \"${workspaceFolder}/flake.nix\").nixosConfigurations.<name>.options"
         },
         "home-manager": {
           "expr": "(builtins.getFlake \"${workspaceFolder}/flake.nix\").homeConfigurations.<name>.options"
         },
-        // Tip: use ${workspaceFolder} variable to define path
         "nix-darwin": {
           "expr": "(builtins.getFlake \"${workspaceFolder}/flake.nix\").darwinConfigurations.<name>.options"
         }
