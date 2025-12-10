@@ -21,13 +21,12 @@ let
     ];
 
     databaseTools = with pkgs; [
-        postgresql_14
+        postgresql_18
         refinery-cli
         materialize
     ];
 
     devOpsTools = with pkgs; [
-        dagger
         dapr-cli
         dive
         doctl
