@@ -111,7 +111,7 @@ let
         vulnix
     ];
 
-    pythonTools = with pkgs; [ python39 ] ++ (with pkgs.python39Packages; [ httpie pip virtualenv ]);
+    pythonTools = with pkgs; [ python313 ] ++ (with pkgs.python313Packages; [ httpie pip virtualenv ]);
 
     rubyTools = with pkgs; [
         rbenv
