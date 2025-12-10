@@ -62,7 +62,7 @@ let
         tilt
     ];
 
-    macTools = with pkgs.darwin.apple_sdk.frameworks; [
+    macTools = with pkgs.apple-sdk.frameworks; [
         CoreServices
         Foundation
         Security
