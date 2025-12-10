@@ -32,7 +32,7 @@ in
 
     xdg.autostart.enable = true;
 
-    nix = import ./nix.nix { inherit nix;};
+    nix = import ./nix.nix { inherit pkgs; };
     nixpkgs = import ./nixpkgs.nix { inherit system; };
 
     programs = import ./programs.nix { inherit username signingKey homeDirectory pkgs; };
