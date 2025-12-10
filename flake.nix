@@ -43,7 +43,7 @@
         inherit pkgs;
 
         modules =
-          [ (import ./home-manager { inherit homeDirectory pkgs stateVersion system username; }) ];
+          [ (import ./home-manager { inherit homeDirectory pkgs stateVersion system username gitUser signingKey; }) ];
       };
 
       lib = import ./lib {
