@@ -1,73 +1,73 @@
-{ homeDirectory
-, pkgs
-}:
+{ username, signingKey, homeDirectory, gitUser, pkgs }:
 
 {
-  # Fancy replacement for cat
-  bat.enable = true;
+    # Fancy replacement for cat
+    bat.enable = true;
 
-  # Navigate directory trees
-  broot = {
-    enable = true;
-    enableZshIntegration = true;
-  };
+    # Navigate directory trees
+    broot = {
+        enable = true;
+        enableZshIntegration = true;
+    };
 
-  direnv = {
-    enable = true;
-    enableZshIntegration = true;
+    direnv = {
+        enable = true;
+        enableZshIntegration = true;
 
-    nix-direnv.enable = true;
-  };
+        nix-direnv.enable = true;
+    };
 
-  fzf = {
-    enable = true;
-    enableZshIntegration = true;
-  };
+    fzf = {
+        enable = true;
+        enableZshIntegration = true;
+    };
 
-  gh = import ./gh.nix;
+    gh = import ./gh.nix { inherit gitUser; };
 
-  git = import ./git.nix { inherit pkgs; };
+    git = import ./git.nix { inherit signingKey gitUser pkgs; };
 
-  gpg.enable = true;
+    keepassxc = import ./keepassxc.nix { inherit pkgs; };
 
-  home-manager = {
-    enable = true;
-    path = "...";
-  };
+    gpg.enable = true;
 
-  jq.enable = true;
+    home-manager = {
+        enable = true;
+        path = "...";
+    };
 
-  just = {
-    enable = true;
-    enableZshIntegration = true;
-  };
+    jq.enable = true;
 
-  neovim = import ./neovim.nix {
-    inherit (pkgs) vimPlugins;
-  };
+    just = {
+        enable = true;
+        enableZshIntegration = true;
+    };
 
-  nix-index = {
-    enable = true;
-    enableZshIntegration = true;
-  };
+    neovim = import ./neovim.nix {
+        inherit (pkgs) vimPlugins;
+    };
 
-  nushell = { enable = true; };
+    nix-index = {
+        enable = true;
+        enableZshIntegration = true;
+    };
 
-  pandoc = {
-    enable = true;
-    defaults = { metadata = { author = "Storm Software"; }; };
-  };
+    nushell = { enable = true; };
 
-  tmux = import ./tmux.nix;
+    pandoc = {
+        enable = true;
+        defaults = { metadata = { author = "Storm Software"; }; };
+    };
 
-  ghostty = import ./ghostty.nix;
+    tmux = import ./tmux.nix;
 
-  atuin = import ./atuin.nix;
+    ghostty = import ./ghostty.nix;
 
-  vscode = import ./vscode.nix { inherit pkgs; };
+    atuin = import ./atuin.nix;
 
-  zsh = import ./zsh.nix {
-    inherit homeDirectory;
-    inherit (pkgs) substituteAll;
-  };
+    vscode = import ./vscode.nix { inherit pkgs; };
+
+    zsh = import ./zsh.nix {
+        inherit homeDirectory;
+        inherit (pkgs) substituteAll;
+    };
 }

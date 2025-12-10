@@ -58,7 +58,6 @@ let
     Security
   ];
 
-  # I'll categorize these later :)
   misc = with pkgs; [
     comma
     coreutils

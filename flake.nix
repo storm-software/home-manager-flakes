@@ -13,13 +13,18 @@
 
   outputs = { self, flake-utils, home-manager, nixpkgs, rust-overlay }:
     let
-      # Constants
       username = "development";
       system = "x86_64-linux";
       stateVersion = "25.11";
       homeDirectory = self.lib.getHomeDirectory username;
 
-      # System-specific Nixpkgs
+      # User specific settings
+      gitUser = {
+        name = "Pat Sullivan";
+        email = "pat@patsullivan.org";
+      };
+      signingKey = "67216ED35A5544A9";
+
       pkgs = import nixpkgs {
         inherit system;
         config = {

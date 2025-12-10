@@ -42,7 +42,7 @@ rec {
     go = with pkgs;
       [ go go2nix gotools ];
 
-    node = with pkgs; [ nodejs yarn ] ++ (with pkgs.nodePackages; [ pnpm ]);
+    node = with pkgs; [ nodejs_24 ] ++ (with pkgs.nodePackages; [ pnpm ]);
 
     protobuf = with pkgs; [ buf protobuf ];
 

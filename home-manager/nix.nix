@@ -1,7 +1,7 @@
-{ nix }:
+{ pkgs }:
 
 {
-  package = nix;
+  package = pkgs.nix;
 
   gc = {
     automatic = true;

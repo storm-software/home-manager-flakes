@@ -1,3 +1,5 @@
+{ pkgs }:
+
 {
   autostart = true;
   package = pkgs.keepassxc;

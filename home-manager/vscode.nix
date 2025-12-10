@@ -3,7 +3,6 @@
 let
   inherit (pkgs.vscode-utils) buildVscodeMarketplaceExtension;
 
-  # Helper function to cut down on boilerplate
   extension = { publisher, name, version, sha256 }:
     buildVscodeMarketplaceExtension {
       mktplcRef = { inherit name publisher sha256 version; };
