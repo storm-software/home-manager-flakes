@@ -24,7 +24,7 @@
 
     gh = import ./gh.nix { inherit gitUser; };
 
-    git = import ./git.nix { inherit signingKey gitUser pkgs; };
+    git = import ./git.nix { inherit signingKey gitUser pkgs homeDirectory; };
 
     keepassxc = import ./keepassxc.nix { inherit pkgs; };
 

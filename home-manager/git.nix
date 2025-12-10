@@ -1,11 +1,11 @@
-{ signingKey, gitUser, pkgs }:
+{ signingKey, gitUser, pkgs, homeDirectory }:
 
 {
     enable = true;
     package = pkgs.gitAndTools.gitFull;
 
-    delta = { enable = true; };
-    lfs = { enable = true; };
+    delta.enable = true;
+    lfs.enable = true;
 
     signing = {
         key = signingKey;
