@@ -31,7 +31,7 @@
 
     home-manager = {
         enable = true;
-        path = "...";
+        # path = "...";
     };
 
     jq.enable = true;
