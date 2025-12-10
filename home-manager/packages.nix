@@ -2,8 +2,7 @@
 
 let
     bin = import ./bin.nix {
-        inherit homeDirectory
-        inherit (pkgs) writeScriptBin;
+        inherit homeDirectory (pkgs) writeScriptBin;
         inherit (pkgs.lib) fakeHash;
     };
 
