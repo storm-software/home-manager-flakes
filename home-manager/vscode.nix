@@ -26,7 +26,7 @@ in
                 ms-azuretools.vscode-docker
                 redhat.vscode-yaml
                 rust-lang.rust-analyzer
-                silvenon.mdx
+                unifiedjs.vscode-mdx
                 tamasfe.even-better-toml
                 yzhang.markdown-all-in-one
                 davidanson.vscode-markdownlint
