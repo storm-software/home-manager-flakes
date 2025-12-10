@@ -8,7 +8,6 @@
     lfs = { enable = true; };
 
     signing = {
-        format = "openpgp";
         key = signingKey;
         signByDefault = true;
     };
@@ -26,7 +25,8 @@
         ".vscode/"
         "npm-debug.log"
     ];
-    aliases = (import ./aliases.nix).git;
+
+    aliases = (import ./aliases.nix { inherit homeDirectory; }).git;
 
     settings = {
         user = {
@@ -37,18 +37,18 @@
             editor = "code --wait";
             autocrlf = "input";
             whitespace = "trailing-space,space-before-tab";
+            askPass = ""; # needs to be empty to use terminal for ask password prompt
         };
         merge.tool = "vscode";
         help.autocorrect = true;
-
-        commit.gpgsign = "true";
-        gpg.program = "gpg2";
         lfs.enable = true;
-
+        branch.autosetuprebase = "always";
+        commit.gpgsign = true;
+        github.user = gitUser.name;
         protocol.keybase.allow = "always";
         credential.helper = "store";
         pull.rebase = true;
-        push.default = "simple";
+        push.default = "tracking";
         init.defaultBranch = "main";
     };
 }
