@@ -58,47 +58,57 @@
         default = starter;
 
         starter = {
-          path = ./template/starter;
+          path = ./templates/starter;
           description = "A minimal/starter development environment";
         };
 
         go = {
-          path = ./template/go;
+          path = ./templates/go;
           description = "A development environment for Go projects";
         };
 
         java = {
-          path = ./template/java;
+          path = ./templates/java;
           description = "A development environment for Java projects";
         };
 
         node = {
-          path = ./template/node;
+          path = ./templates/node;
           description = "A development environment for Node.js projects";
         };
 
         elixir = {
-          path = ./template/elixir;
+          path = ./templates/elixir;
           description = "A development environment for Elixir projects";
         };
 
         python = {
-          path = ./template/python;
+          path = ./templates/python;
           description = "A development environment for Python projects";
         };
 
         ruby = {
-          path = ./template/ruby;
+          path = ./templates/ruby;
           description = "A development environment for Ruby projects";
         };
 
         rust = {
-          path = ./template/rust;
+          path = ./templates/rust;
           description = "A development environment for Rust projects";
         };
 
+        wasm = {
+          path = ./templates/wasm;
+          description = "A development environment for WebAssembly projects";
+        };
+
+        kubernetes = {
+          path = ./templates/kubernetes;
+          description = "A development environment for Kubernetes projects";
+        };
+
         kitchen-sink = {
-          path = ./template/kitchen-sink;
+          path = ./templates/kitchen-sink;
           description = "A development environment with many popular languages/tools";
         };
       };

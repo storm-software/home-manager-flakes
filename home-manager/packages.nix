@@ -33,11 +33,16 @@ let
     ];
 
     gitTools = with pkgs; [
+        git-annex
+        git-crypt
+        git-sync
+        difftastic
         diff-so-fancy
         codeowners
         gitflow
+        pre-commit
         lefthook
-    ] ++ (with pkgs; [ difftastic git-annex git-crypt git-sync ]);
+    ];
 
     misc = with pkgs; [
         comma
