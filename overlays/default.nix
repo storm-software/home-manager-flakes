@@ -1,0 +1,27 @@
+{
+  buildGoLinux = final: prev: {
+    buildGoModule = prev.buildGoModule.override {
+      go = prev.go // {
+        CGO_ENABLED = 0;
+        GOOS = "linux";
+        GOARCH = "arm64";
+      };
+    };
+  };
+
+  # Overlays for dev environments
+  go = final: prev: {
+    go = prev.go_1_18;
+  };
+
+  node = final: prev: rec {
+    nodejs = prev.nodejs-24_x;
+    pnpm = prev.pnpm.override {
+      inherit nodejs;
+    };
+  };
+
+  rust = final: prev: {
+    devRust = prev.pkgs.rust-bin.beta.latest.default;
+  };
+}
