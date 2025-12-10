@@ -62,10 +62,10 @@ let
         tilt
     ];
 
-    macTools = with pkgs; [
-        apple-sdk
-        reattach-to-user-namespace
-    ];
+    # macTools = with pkgs; [
+    #     apple-sdk
+    #     reattach-to-user-namespace
+    # ];
 
     misc = with pkgs; [
         comma
@@ -153,7 +153,7 @@ bin
 ++ fonts
 ++ gitTools
 ++ kubernetesTools
-++ macTools
+# ++ macTools
 ++ misc
 ++ nixTools
 ++ pythonTools
