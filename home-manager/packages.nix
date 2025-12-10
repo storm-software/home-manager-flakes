@@ -39,12 +39,15 @@ let
         terragrunt
     ];
 
-    fonts = with pkgs.nerdfonts;
-        [ (override { fonts = [ "CascadiaCode" "FiraCode" "JetBrainsMono" ]; }) ];
+    fonts = with pkgs.nerdfonts; [
+        (override { fonts = [ "CascadiaCode" "FiraCode" "JetBrainsMono" ]; })
+    ];
 
-    gitTools = with pkgs.gitAndTools;
-        [ diff-so-fancy git-codeowners gitflow ]
-        ++ (with pkgs; [ difftastic git-annex git-crypt git-sync ]);
+    gitTools = with pkgs; [
+        diff-so-fancy
+        git-codeowners
+        gitflow
+    ] ++ (with pkgs; [ difftastic git-annex git-crypt git-sync ]);
 
     javaTools = with pkgs; [
         gradle
