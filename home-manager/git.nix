@@ -3,8 +3,6 @@
 {
     enable = true;
     package = pkgs.gitAndTools.gitFull;
-
-    delta.enable = true;
     lfs.enable = true;
 
     signing = {
@@ -25,8 +23,6 @@
         ".vscode/"
         "npm-debug.log"
     ];
-
-    aliases = (import ./aliases.nix { inherit homeDirectory; }).git;
 
     settings = {
         user = {
@@ -50,5 +46,6 @@
         pull.rebase = true;
         push.default = "tracking";
         init.defaultBranch = "main";
+        alias = (import ./aliases.nix { inherit homeDirectory; }).git;
     };
 }

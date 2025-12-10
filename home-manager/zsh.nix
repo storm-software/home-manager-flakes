@@ -2,9 +2,10 @@
 
 {
     enable = true;
-    enableAutosuggestions = true;
     enableCompletion = true;
     enableVteIntegration = true;
+
+    autosuggestions.enable = true;
 
     history = {
         append = true;

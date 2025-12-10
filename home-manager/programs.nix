@@ -37,6 +37,11 @@
 
     jq.enable = true;
 
+    delta = {
+        enable = true;
+        enableGitIntegration = true
+    };
+
     neovim = import ./neovim.nix {
         inherit (pkgs) vimPlugins;
     };
