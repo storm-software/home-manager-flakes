@@ -42,20 +42,50 @@ rec {
 
     protobuf = with pkgs; [ buf protobuf ];
 
+    python = with pkgs; [ python313 ] ++ (with pkgs.python313Packages; [ httpie pip virtualenv ]);
+
+    ruby = with pkgs; [
+        rbenv
+    ];
+
+    java = with pkgs; [
+        gradle
+        maven
+    ];
+
+    wasm = with pkgs; [
+        binaryen
+        wabt
+        wapm
+        wasmer
+        wasm-bindgen-cli_0_2_104
+        wasm-pack
+        wasm-text-gen
+        wasmtime
+        wast-refmt
+        webassemblyjs-cli
+        webassemblyjs-repl
+    ];
+
     rust = with pkgs; [
-      devRust
-      cargo-audit
-      cargo-cross
-      cargo-deny
-      cargo-edit
-      cargo-expand
-      cargo-fuzz
-      cargo-make
-      cargo-outdated
-      cargo-profiler
-      openssl
-      pkg-config
-      rust-analyzer
+        devRust
+        cargo
+        cargo-audit
+        cargo-cross
+        cargo-deny
+        cargo-edit
+        cargo-expand
+        cargo-fuzz
+        cargo-make
+        cargo-outdated
+        cargo-profiler
+        cargo-lambda
+        rustc
+        clippy
+        rustfmt
+        openssl
+        pkg-config
+        rust-analyzer
     ];
   };
 }

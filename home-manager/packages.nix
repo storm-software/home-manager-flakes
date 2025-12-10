@@ -9,9 +9,6 @@ let
 
     buildTools = with pkgs; [
         buf
-        just
-        pnpm
-        cmake
         protobuf
         capnproto
     ];
@@ -22,9 +19,10 @@ let
     ];
 
     databaseTools = with pkgs; [
+        sqlite
+        litestream
         postgresql_18
         refinery-cli
-        materialize
     ];
 
     devOpsTools = with pkgs; [
@@ -52,11 +50,6 @@ let
         lefthook
     ] ++ (with pkgs; [ difftastic git-annex git-crypt git-sync ]);
 
-    javaTools = with pkgs; [
-        gradle
-        maven
-    ];
-
     kubernetesTools = with pkgs; [
         kubectx
         kubectl
@@ -75,13 +68,11 @@ let
         findutils
         htmltest
         libiconv
-        litestream
         open-policy-agent
         openssl
         pikchr
         pkg-config
         skopeo
-        sqlite
         statix
         stow
         subversion
@@ -108,38 +99,11 @@ let
         statix
     ];
 
-    pythonTools = with pkgs; [ python313 ] ++ (with pkgs.python313Packages; [ httpie pip virtualenv ]);
-
-    rubyTools = with pkgs; [
-        rbenv
-    ];
-
     rustTools = with pkgs; [
-        rustc
-        cargo
-        clippy
-        rustfmt
-        rust-analyzer
-        cargo-deny
-        cargo-lambda
         sqlx-cli
     ];
 
     virtualizationTools = with pkgs; [ vagrant qemu ];
-
-    wasmTools = with pkgs; [
-        binaryen
-        wabt
-        wapm
-        wasmer
-        wasm-bindgen-cli_0_2_104
-        wasm-pack
-        wasm-text-gen
-        wasmtime
-        wast-refmt
-        webassemblyjs-cli
-        webassemblyjs-repl
-    ];
 in
 bin
 ++ buildTools
@@ -152,7 +116,6 @@ bin
 # ++ macTools
 ++ misc
 ++ nixTools
-++ pythonTools
+# ++ pythonTools
 ++ rustTools
 ++ virtualizationTools
-++ wasmTools
