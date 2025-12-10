@@ -9,9 +9,8 @@
     };
   };
 
-  # Overlays for dev environments
   go = final: prev: {
-    go = prev.go_1_18;
+    go = prev.go_1_25;
   };
 
   node = final: prev: rec {

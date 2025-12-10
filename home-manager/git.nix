@@ -46,7 +46,7 @@
         lfs.enable = true;
 
         protocol.keybase.allow = "always";
-        credential.helper = "keepassxc";
+        credential.helper = "store";
         pull.rebase = true;
         push.default = "simple";
         init.defaultBranch = "main";
