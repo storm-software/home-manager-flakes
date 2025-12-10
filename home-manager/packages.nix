@@ -118,7 +118,13 @@ let
     ];
 
     rustTools = with pkgs; [
-        cargo-web
+        rustc
+        cargo
+        clippy
+        rustfmt
+        rust-analyzer
+        cargo-deny
+        cargo-lambda
         sqlx-cli
     ];
 
@@ -127,10 +133,10 @@ let
     wasmTools = with pkgs; [
         binaryen
         wabt
-        wapm-cli
+        wapm
         wasmer
         wasm3
-        wasm-bindgen-cli
+        wasm-bindgen-cli_0_2_104
         wasm-pack
         wasm-text-gen
         wasmtime
