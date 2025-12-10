@@ -37,6 +37,23 @@
 
       inherit (flake-utils.lib) eachDefaultSystem;
       inherit (home-manager.lib) homeManagerConfiguration;
+
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+
+      forEachSupportedSystem =
+        f:
+        nixpkgs.lib.genAttrs supportedSystems (
+          system:
+          f {
+            inherit system;
+            pkgs = import nixpkgs { inherit system; };
+          }
+        );
     in
     {
       homeConfigurations.${username} = homeManagerConfiguration {
@@ -54,6 +71,93 @@
 
       inherit pkgs;
 
+      devShells = forEachSupportedSystem (
+        { pkgs, system }:
+        {
+          default =
+            let
+              getSystem = "SYSTEM=$(nix eval --impure --raw --expr 'builtins.currentSystem')";
+              forEachDir = exec: ''
+                for dir in */; do
+                  (
+                    cd "''${dir}"
+
+                    ${exec}
+                  )
+                done
+              '';
+              script =
+                name: runtimeInputs: text:
+                pkgs.writeShellApplication {
+                  inherit name runtimeInputs text;
+                  bashOptions = [
+                    "errexit"
+                    "pipefail"
+                  ];
+                };
+              in
+              pkgs.mkShellNoCC {
+                packages =
+                  with pkgs;
+                  [
+                    (script "build" [ ] ''
+                      ${getSystem}
+
+                      ${forEachDir ''
+                        echo "building ''${dir}"
+                        nix build ".#devShells.''${SYSTEM}.default"
+                      ''}
+                    '')
+                    (script "check" [ nixfmt ] (forEachDir ''
+                      echo "checking ''${dir}"
+                      nix flake check --all-systems --no-build
+                    ''))
+                    (script "format" [ nixfmt ] ''
+                      git ls-files '*.nix' | xargs nix fmt
+                    '')
+                    (script "check-formatting" [ nixfmt ] ''
+                      git ls-files '*.nix' | xargs nixfmt --check
+                    '')
+                  ]
+                  ++ [ self.formatter.${system} ];
+              };
+        }
+      );
+
+      formatter = forEachSupportedSystem ({ pkgs, ... }: pkgs.nixfmt);
+
+      packages = forEachSupportedSystem (
+        { pkgs, ... }:
+        rec {
+          default = dvt;
+          dvt = pkgs.writeShellApplication {
+            name = "dvt";
+            bashOptions = [
+              "errexit"
+              "pipefail"
+            ];
+            text = ''
+              if [ -z "''${1}" ]; then
+                echo "No template specified..."
+                exit 1
+              fi
+
+              TEMPLATE=$1
+
+              nix \
+                --experimental-features 'nix-command flakes' \
+                flake init \
+                --template \
+                "github:storm-software/home-manager-flakes#''${TEMPLATE}"
+            '';
+          };
+        }
+      );
+    }
+
+    // 
+
+    {
       templates = rec {
         default = starter;
 
@@ -112,16 +216,5 @@
           description = "A development environment with many popular languages/tools";
         };
       };
-    } // eachDefaultSystem (system: {
-      devShells.default =
-        let
-          pkgs = import nixpkgs { inherit system; };
-          format = pkgs.writeScriptBin "format" ''
-            ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt **/*.nix
-          '';
-        in
-        pkgs.mkShell {
-          buildInputs = [ format ];
-        };
-    });
+    };
 }
