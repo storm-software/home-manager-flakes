@@ -42,7 +42,6 @@ let
         fira-code
         fira-mono
         jetbrains-mono
-        source-code-pro
     ];
 
     gitTools = with pkgs; [
