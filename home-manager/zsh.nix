@@ -5,7 +5,7 @@
     enableCompletion = true;
     enableVteIntegration = true;
 
-    autosuggestion.enable = true;
+    autosuggestion.enable = false;
 
     history = {
         append = true;
