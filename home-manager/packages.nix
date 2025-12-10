@@ -46,7 +46,7 @@ let
 
     gitTools = with pkgs; [
         diff-so-fancy
-        git-codeowners
+        codeowners
         gitflow
     ] ++ (with pkgs; [ difftastic git-annex git-crypt git-sync ]);
 
