@@ -64,6 +64,7 @@ let
 
     macTools = with pkgs; [
         apple-sdk
+        reattach-to-user-namespace
     ];
 
     misc = with pkgs; [
@@ -81,7 +82,6 @@ let
         openssl
         pikchr
         pkg-config
-        reattach-to-user-namespace
         skopeo
         sqlite
         statix
