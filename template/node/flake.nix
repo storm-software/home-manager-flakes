@@ -1,5 +1,5 @@
 {
-  description = "Starter - Local Development Environment";
+  description = "NodeJS - Local Development Environment";
 
   inputs = { storm.url = "github:storm-software/home-manager-flakes"; };
 

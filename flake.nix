@@ -59,7 +59,47 @@
 
         starter = {
           path = ./template/starter;
-          description = "Project starter template";
+          description = "A minimal/starter development environment";
+        };
+
+        go = {
+          path = ./template/go;
+          description = "A development environment for Go projects";
+        };
+
+        java = {
+          path = ./template/java;
+          description = "A development environment for Java projects";
+        };
+
+        node = {
+          path = ./template/node;
+          description = "A development environment for Node.js projects";
+        };
+
+        elixir = {
+          path = ./template/elixir;
+          description = "A development environment for Elixir projects";
+        };
+
+        python = {
+          path = ./template/python;
+          description = "A development environment for Python projects";
+        };
+
+        ruby = {
+          path = ./template/ruby;
+          description = "A development environment for Ruby projects";
+        };
+
+        rust = {
+          path = ./template/rust;
+          description = "A development environment for Rust projects";
+        };
+
+        kitchen-sink = {
+          path = ./template/kitchen-sink;
+          description = "A development environment with many popular languages/tools";
         };
       };
     } // eachDefaultSystem (system: {

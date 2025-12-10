@@ -27,6 +27,23 @@ rec {
     });
 
   toolchains = {
+    builds = with pkgs; [
+        cue
+        dhall
+        buildkit
+        cmake
+        buf
+        protobuf
+        capnproto
+    ];
+
+    kubernetes = with pkgs; [
+        kubectx
+        kubectl
+        minikube
+        tilt
+    ];
+
     elixir =
       let
         darwinDeps = darwinOnly ((with pkgs; [ terminal-notifier ])
@@ -39,8 +56,6 @@ rec {
       [ go go2nix gotools ];
 
     node = with pkgs; [ nodejs_24 ] ++ (with pkgs.nodePackages; [ pnpm ]);
-
-    protobuf = with pkgs; [ buf protobuf ];
 
     python = with pkgs; [ python313 ] ++ (with pkgs.python313Packages; [ httpie pip virtualenv ]);
 

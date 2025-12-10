@@ -7,17 +7,6 @@ let
         inherit (pkgs.lib) fakeHash;
     };
 
-    buildTools = with pkgs; [
-        buf
-        protobuf
-        capnproto
-    ];
-
-    configTools = with pkgs; [
-        cue
-        dhall
-    ];
-
     databaseTools = with pkgs; [
         sqlite
         litestream
@@ -49,18 +38,6 @@ let
         gitflow
         lefthook
     ] ++ (with pkgs; [ difftastic git-annex git-crypt git-sync ]);
-
-    kubernetesTools = with pkgs; [
-        kubectx
-        kubectl
-        minikube
-        tilt
-    ];
-
-    # macTools = with pkgs; [
-    #     apple-sdk
-    #     reattach-to-user-namespace
-    # ];
 
     misc = with pkgs; [
         comma
@@ -99,23 +76,13 @@ let
         statix
     ];
 
-    rustTools = with pkgs; [
-        sqlx-cli
-    ];
-
     virtualizationTools = with pkgs; [ vagrant qemu ];
 in
 bin
-++ buildTools
-++ configTools
+++ fonts
 ++ databaseTools
 ++ devOpsTools
-++ fonts
 ++ gitTools
-++ kubernetesTools
-# ++ macTools
-++ misc
 ++ nixTools
-# ++ pythonTools
-++ rustTools
 ++ virtualizationTools
+++ misc
