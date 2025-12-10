@@ -39,7 +39,7 @@
 
     delta = {
         enable = true;
-        enableGitIntegration = true
+        enableGitIntegration = true;
     };
 
     neovim = import ./neovim.nix {
