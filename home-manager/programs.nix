@@ -64,7 +64,7 @@
 
     atuin = import ./atuin.nix;
 
-    vscode = import ./vscode.nix { inherit pkgs; };
+    vscode = import ./vscode.nix { inherit username pkgs; };
 
     zsh = import ./zsh.nix {
         inherit homeDirectory;

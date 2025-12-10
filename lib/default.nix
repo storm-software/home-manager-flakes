@@ -11,11 +11,7 @@ rec {
   getHomeDirectory = username:
     if isDarwin then "/Users/${username}" else "/home/${username}";
 
-  mkEnv =
-    { toolchains ? [ ]
-    , extras ? [ ]
-    , shellHook ? ""
-    }:
+  mkEnv = { toolchains ? [ ], extras ? [ ], shellHook ? "" }:
 
     eachDefaultSystem (system:
     let

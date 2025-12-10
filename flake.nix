@@ -34,7 +34,6 @@
         overlays = [ (import rust-overlay) ] ++ (with self.overlays; [ go node rust ]);
       };
 
-      # Inheritance helpers
       inherit (flake-utils.lib) eachDefaultSystem;
       inherit (home-manager.lib) homeManagerConfiguration;
     in
