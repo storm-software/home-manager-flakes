@@ -29,6 +29,7 @@
         inherit system;
         config = {
           allowUnfree = true;
+          allowUnsupportedSystem = true;
           xdg = { configHome = homeDirectory; };
         };
         overlays = [ (import rust-overlay) ] ++ (with self.overlays; [ go node rust ]);

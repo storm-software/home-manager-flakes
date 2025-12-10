@@ -13,5 +13,6 @@
     sandbox = true;
     substituters = [ "https://cache.nixos.org" ];
     experimental-features = [ "flakes" "nix-command" ];
+    system-features = [ "big-parallel" "kvm" "recursive-nix" ];
   };
 }
