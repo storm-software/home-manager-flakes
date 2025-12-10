@@ -1,10 +1,7 @@
 { homeDirectory, pkgs }:
 
 let
-    bin = import ./bin.nix {
-        inherit homeDirectory (pkgs) writeScriptBin;
-        inherit (pkgs.lib) fakeHash;
-    };
+    bin = import ./bin.nix { inherit homeDirectory (pkgs) writeScriptBin (pkgs.lib) fakeHash; };
 
     buildTools = with pkgs; [
         buf
