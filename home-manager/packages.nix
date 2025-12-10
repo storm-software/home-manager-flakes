@@ -38,8 +38,11 @@ let
         terragrunt
     ];
 
-    fonts = with pkgs.nerdfonts; [
-        (override { fonts = [ "CascadiaCode" "FiraCode" "JetBrainsMono" ]; })
+    fonts = with pkgs.nerd-fonts; [
+        fira-code
+        fira-mono
+        jetbrains-mono
+        source-code-pro
     ];
 
     gitTools = with pkgs; [
