@@ -10,7 +10,7 @@
   };
 
   settings = {    
-    trusted-users = [ "root" "development" ]
+    trusted-users = [ "root" "development" ];
     substituters = [ "https://cache.nixos.org" ];
     experimental-features = [ "flakes" "nix-command" ];
     system-features = [ "big-parallel" "kvm" "recursive-nix" ];
