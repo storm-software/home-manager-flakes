@@ -11,8 +11,8 @@
 
   settings = {
     sandbox = true;
-    allowUnfree = true;
-    allowBroken = true;
+    allow-unfree = true;
+    allow-broken = true;
     substituters = [ "https://cache.nixos.org" ];
     experimental-features = [ "flakes" "nix-command" ];
     system-features = [ "big-parallel" "kvm" "recursive-nix" ];
