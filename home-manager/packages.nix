@@ -27,6 +27,7 @@ let
     ];
 
     fonts = with pkgs.nerd-fonts; [
+        hack
         fira-code
         fira-mono
         jetbrains-mono
