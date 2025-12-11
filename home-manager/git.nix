@@ -36,14 +36,15 @@
             askPass = ""; # needs to be empty to use terminal for ask password prompt
         };
         merge.tool = "vscode";
-        help.autocorrect = true;
-        lfs.enable = true;
+        help.autocorrect = "true";
+        lfs.enable = "true";
         branch.autosetuprebase = "always";
-        commit.gpgsign = true;
         github.user = gitUser.name;
         protocol.keybase.allow = "always";
-        credential.helper = "store";
-        pull.rebase = true;
+        commit.gpgsign = "true";
+        gpg.program = "gpg2";
+        credential.helper = "keepassxc";
+        pull.rebase = "true";
         push.default = "tracking";
         init.defaultBranch = "main";
         alias = (import ./aliases.nix { inherit homeDirectory; }).git;
