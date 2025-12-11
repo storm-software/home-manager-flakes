@@ -9,7 +9,27 @@
 
     oh-my-zsh = {
         custom = ".oh-my-zsh/custom";
-        theme = "drofloh";
+        theme = "storm-software";
+        plugins = [
+            "git"
+            "gh"
+            "github"
+            "nix-shell"
+            "terraform"
+            "pulumi"
+            "vscode"
+            "tmux"
+            "rust"
+            "npm"
+            "node"
+            "kate"
+            "direnv"
+            "archlinux"
+            "postgres"
+            "opentofu"
+            "battery"
+            "pnpm-shell-completion"
+        ]
 
         extraConfig = ''
         if [ -e ${homeDirectory}/.nix-profile/etc/profile.d/nix.sh ]; then . ${homeDirectory}/.nix-profile/etc/profile.d/nix.sh; fi
