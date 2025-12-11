@@ -29,7 +29,7 @@
             "opentofu"
             "battery"
             "pnpm-shell-completion"
-        ]
+        ];
 
         extraConfig = ''
         if [ -e ${homeDirectory}/.nix-profile/etc/profile.d/nix.sh ]; then . ${homeDirectory}/.nix-profile/etc/profile.d/nix.sh; fi
@@ -51,4 +51,3 @@
     initExtra = (builtins.readFile ./scripts/init.sh);
     shellAliases = (import ./aliases.nix { inherit homeDirectory; }).shell;
 }
-
