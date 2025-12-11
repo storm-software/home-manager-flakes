@@ -23,7 +23,7 @@ rec {
                 buildInputs = toolchains ++ extras;
                 inherit shellHook;
 
-                env;
+                env = env;
             };
         };
     });
