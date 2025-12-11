@@ -9,10 +9,8 @@
     dates = [ "daily" ];
   };
 
-  settings = {
-    sandbox = true;
-    allow-unfree = true;
-    allow-broken = true;
+  settings = {    
+    trusted-users = [ "root" "development" ]
     substituters = [ "https://cache.nixos.org" ];
     experimental-features = [ "flakes" "nix-command" ];
     system-features = [ "big-parallel" "kvm" "recursive-nix" ];
