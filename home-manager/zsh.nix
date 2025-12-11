@@ -7,6 +7,17 @@
 
     autosuggestion.enable = true;
 
+    oh-my-zsh = {
+        custom = ".oh-my-zsh/custom";
+        theme = "drofloh";
+
+        extraConfig = ''
+        if [ -e ${homeDirectory}/.nix-profile/etc/profile.d/nix.sh ]; then . ${homeDirectory}/.nix-profile/etc/profile.d/nix.sh; fi
+        eval "$(atuin init zsh)"
+            '';
+        enable = true;
+    };
+
     history = {
         append = true;
         share = true;
