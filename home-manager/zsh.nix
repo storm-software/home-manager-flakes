@@ -8,7 +8,7 @@
     autosuggestion.enable = true;
 
     oh-my-zsh = {
-        custom = ".oh-my-zsh/custom";
+        custom = "${homeDirectory}/.oh-my-zsh/custom";
         theme = "storm-software";
         plugins = [
             "git"
