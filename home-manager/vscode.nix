@@ -12,7 +12,8 @@ in
     enable = true;
     package = pkgs.vscode;
     profiles = {
-        ${username} = {
+        development = {
+            enableUpdateCheck = true;
             enableExtensionUpdateCheck = true;
             extensions = with pkgs.vscode-extensions; [
                 # Provided by Nixpkgs
