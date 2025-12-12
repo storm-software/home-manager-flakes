@@ -35,6 +35,10 @@ in
                 editorconfig.editorconfig
                 firsttris.vscode-jest-runner
                 mikestead.dotenv
+                brettm12345.nixfmt-vscode
+                pkief.material-icon-theme
+                ms-vscode.makefile-tools
+                golang.go
 
                 # Not in Nixpkgs
                 (extension {
@@ -50,18 +54,6 @@ in
                     sha256 = "sha256:47d19f63826b8d3dbc2ef96aab1987433088c9da72c8763bd38b0c1f38eb76d1";
                 })
                 (extension {
-                    publisher = "golang";
-                    name = "Go";
-                    version = "0.35.1";
-                    sha256 = "sha256-MHQrFxqSkcpQXiZQoK8e+xVgRjl3Db3n72hrQrT98lg=";
-                })
-                (extension {
-                    publisher = "ms-vscode";
-                    name = "makefile-tools";
-                    version = "0.5.0";
-                    sha256 = "sha256-oBYABz6qdV9g7WdHycL1LrEaYG5be3e4hlo4ILhX4KI=";
-                })
-                (extension {
                     publisher = "nickgo";
                     name = "cuelang";
                     version = "0.0.1";
@@ -72,18 +64,6 @@ in
                     name = "vscode-buf";
                     version = "0.5.0";
                     sha256 = "sha256-ePvmHgb6Vdpq1oHcqZcfVT4c/XYZqxJ6FGVuKAbQOCg=";
-                })
-                (extension {
-                    publisher = "brettm12345";
-                    name = "nixfmt-vscode";
-                    version = "0.0.1";
-                    sha256 = "sha256-8yglQDUc0CXG2EMi2/HXDJsxmXJ4YHvjNjTMnQwrgx8=";
-                })
-                (extension {
-                    publisher = "PKief";
-                    name = "material-icon-theme";
-                    version = "4.19.0";
-                    sha256 = "sha256-RBXs7S0iyuutUn11hFqc0VyTs4NFDFLBRvY0u8id86s=";
                 })
                 (extension {
                     publisher = "ms-vscode";
