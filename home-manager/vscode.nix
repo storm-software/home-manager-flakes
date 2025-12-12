@@ -12,7 +12,7 @@ in
     enable = true;
     package = pkgs.vscode;
     profiles = {
-        "${username}" = {
+        ${username} = {
             extensions = with pkgs.vscode-extensions; [
                 # Provided by Nixpkgs
                 bbenoist.nix
