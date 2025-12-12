@@ -31,7 +31,6 @@ in
                 unifiedjs.vscode-mdx
                 tamasfe.even-better-toml
                 yzhang.markdown-all-in-one
-                davidanson.vscode-markdownlint
                 streetsidesoftware.code-spell-checker
                 editorconfig.editorconfig
                 firsttris.vscode-jest-runner
