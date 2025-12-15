@@ -55,7 +55,6 @@ in
         github.copilot
         github.copilot-chat
         github.vscode-pull-request-github
-        github.remotehub
 
         # Not in Nixpkgs
         (extension {
