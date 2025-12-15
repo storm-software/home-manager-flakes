@@ -31,11 +31,11 @@
 
   keepassxc = import ./keepassxc.nix { inherit pkgs; };
 
-  git-credential-keepassxc = {
-    enable = true;
-    hosts = [ "github.com" ];
-    groups = [ "Git" ];
-  };
+  #   git-credential-keepassxc = {
+  #     enable = true;
+  #     hosts = [ "github.com" ];
+  #     groups = [ "Git" ];
+  #   };
 
   git = import ./git.nix {
     inherit

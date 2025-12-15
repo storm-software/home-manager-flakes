@@ -1,19 +1,21 @@
 { gitUser }:
 
 {
-    gitCredentialHelper = {
-      enable = true;
-    };
+  gitCredentialHelper = {
+    enable = true;
+  };
 
-    settings = {
-      git_protocol = "https";
-      editor = "code";
-    };
+  prompt = "enabled";
 
-    hosts = {
-      "github.com" = {
-        gitProtocol = "https";
-        user = gitUser.name;
-      };
+  settings = {
+    git_protocol = "https";
+    editor = "code";
+  };
+
+  hosts = {
+    "github.com" = {
+      gitProtocol = "https";
+      user = gitUser.name;
     };
-  }
+  };
+}

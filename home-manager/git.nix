@@ -47,7 +47,11 @@
     github.user = gitUser.name;
     commit.gpgsign = "true";
     gpg.program = "gpg2";
-    credential.helper = "keepassxc --git-groups";
+    credential = {
+      helper = "keepassxc";
+      credentialstore = "gpg";
+      "https://github.com.helper" = "!/usr/bin/gh auth git-credential";
+    };
     pull.rebase = "true";
     push.default = "tracking";
     init.defaultBranch = "main";
