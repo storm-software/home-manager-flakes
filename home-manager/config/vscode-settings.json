@@ -70,7 +70,7 @@
     ]
   ],
   "evenBetterToml.taplo.configFile.enabled": true,
-  "evenBetterToml.taplo.configFile.path": "./node_modules/@storm-software/toml/config.toml",
+  "evenBetterToml.taplo.configFile.path": "./node_modules/@storm-software/linting-tools/taplo/config.toml",
   "prettier.requireConfig": true,
   "prettier.bracketSameLine": true,
   "prettier.configPath": "./node_modules/@storm-software/prettier/config.json",
