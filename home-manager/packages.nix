@@ -55,11 +55,9 @@ let
     libiconv
     open-policy-agent
     openssl
-    openssl_3
     pikchr
     pkg-config
     skopeo
-    statix
     stow
     subversion
     tailscale
