@@ -34,9 +34,11 @@ let
   ];
 
   gitTools = with pkgs; [
+    gitFull
     git-annex
     git-crypt
     git-sync
+    git-lfs
     difftastic
     diff-so-fancy
     codeowners
@@ -53,6 +55,7 @@ let
     libiconv
     open-policy-agent
     openssl
+    openssl_3
     pikchr
     pkg-config
     skopeo
@@ -67,7 +70,6 @@ let
     gcr
     pinentry-gnome3
     keepassxc
-    git-credential-keepassxc
     keybase
     keychain
     gnupg
