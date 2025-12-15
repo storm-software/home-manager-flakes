@@ -1,9 +1,11 @@
 { pkgs }:
 
 {
+  enable = true;
   autostart = true;
   package = pkgs.keepassxc;
   settings = {
+    General.ConfigVersion = 2;
     Browser.Enabled = true;
     GUI = {
       AdvancedSettings = true;
@@ -13,5 +15,4 @@
     };
     SSHAgent.Enabled = true;
   };
-  enable = true;
 }
