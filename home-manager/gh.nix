@@ -5,8 +5,6 @@
     enable = true;
   };
 
-  prompt = "enabled";
-
   settings = {
     git_protocol = "https";
     editor = "code";
