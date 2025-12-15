@@ -69,6 +69,8 @@
       "(?:twMerge|twJoin)\\(([^\\);]*)[\\);]"
     ]
   ],
+  "evenBetterToml.taplo.configFile.enabled": true,
+  "evenBetterToml.taplo.configFile.path": "./node_modules/@storm-software/toml/config.toml",
   "prettier.requireConfig": true,
   "prettier.bracketSameLine": true,
   "prettier.configPath": "./node_modules/@storm-software/prettier/config.json",
