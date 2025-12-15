@@ -39,6 +39,8 @@ in
                 pkief.material-icon-theme
                 ms-vscode.makefile-tools
                 golang.go
+                github.copilot
+                github.copilot-chat
 
                 # Not in Nixpkgs
                 (extension {
