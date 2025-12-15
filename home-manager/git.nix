@@ -50,7 +50,6 @@
     credential = {
       helper = "keepassxc";
       credentialstore = "gpg";
-      "https://github.com.helper" = "!/usr/bin/gh auth git-credential";
     };
     pull.rebase = "true";
     push.default = "tracking";
