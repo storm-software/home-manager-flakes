@@ -29,6 +29,14 @@
 
   gh = import ./gh.nix { inherit gitUser; };
 
+  keepassxc = import ./keepassxc.nix { inherit pkgs; };
+
+  git-credential-keepassxc = {
+    enable = true;
+    hosts = [ "github.com" ];
+    groups = [ "Git" ];
+  };
+
   git = import ./git.nix {
     inherit
       signingKey
@@ -36,14 +44,6 @@
       pkgs
       homeDirectory
       ;
-  };
-
-  keepassxc = import ./keepassxc.nix { inherit pkgs; };
-
-  git-credential-keepassxc = {
-    enable = true;
-    hosts = [ "github.com" ];
-    groups = [ "Git" ];
   };
 
   gpg.enable = true;
