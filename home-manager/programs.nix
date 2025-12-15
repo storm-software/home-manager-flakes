@@ -43,7 +43,7 @@
   git-credential-keepassxc = {
     enable = true;
     hosts = [ "github.com" ];
-    groups = [ "development" ];
+    groups = [ "Git" ];
   };
 
   gpg.enable = true;

@@ -47,6 +47,7 @@
     github.user = gitUser.name;
     commit.gpgsign = "true";
     gpg.program = "gpg2";
+    credential.helper = "keepassxc --git-groups";
     pull.rebase = "true";
     push.default = "tracking";
     init.defaultBranch = "main";
