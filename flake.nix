@@ -18,6 +18,7 @@
       flake-utils,
       home-manager,
       nixpkgs,
+      nixpkgs-unstable,
       rust-overlay,
     }:
     let
