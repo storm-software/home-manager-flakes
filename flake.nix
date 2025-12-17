@@ -62,14 +62,6 @@
             configHome = homeDirectory;
           };
         };
-        overlays = [
-          (import rust-overlay)
-        ]
-        ++ (with self.overlays; [
-          go
-          node
-          rust
-        ]);
       };
 
       inherit (flake-utils.lib) eachDefaultSystem;
@@ -118,6 +110,7 @@
       overlays = import ./overlays;
 
       inherit pkgs;
+      inherit pkgs-unstable;
 
       devShells = forEachSupportedSystem (
         { pkgs, system }:
