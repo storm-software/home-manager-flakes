@@ -4,6 +4,7 @@
   homeDirectory,
   gitUser,
   pkgs,
+  pkgs-unstable,
 }:
 
 {
@@ -88,7 +89,7 @@
 
   atuin = import ./atuin.nix;
 
-  vscode = import ./vscode.nix { inherit username pkgs; };
+  vscode = import ./vscode.nix { inherit username pkgs pkgs-unstable; };
 
   zsh = import ./zsh.nix {
     inherit homeDirectory;

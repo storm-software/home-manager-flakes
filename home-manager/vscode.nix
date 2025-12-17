@@ -1,4 +1,8 @@
-{ username, pkgs }:
+{
+  username,
+  pkgs,
+  pkgs-unstable,
+}:
 
 let
   inherit (pkgs.vscode-utils) buildVscodeMarketplaceExtension;
@@ -23,7 +27,7 @@ let
 in
 {
   enable = true;
-  package = pkgs.vscode;
+  package = pkgs-unstable.vscode;
   profiles = {
     default = {
       enableUpdateCheck = true;

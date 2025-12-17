@@ -8,10 +8,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:NixOS/nixpkgs";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs = { self, flake-utils, home-manager, nixpkgs, rust-overlay }:
+  outputs =
+    {
+      self,
+      flake-utils,
+      home-manager,
+      nixpkgs,
+      rust-overlay,
+    }:
     let
       username = "development";
       system = "x86_64-linux";
@@ -30,9 +38,37 @@
         config = {
           allowUnfree = true;
           allowUnsupportedSystem = true;
-          xdg = { configHome = homeDirectory; };
+          xdg = {
+            configHome = homeDirectory;
+          };
         };
-        overlays = [ (import rust-overlay) ] ++ (with self.overlays; [ go node rust ]);
+        overlays = [
+          (import rust-overlay)
+        ]
+        ++ (with self.overlays; [
+          go
+          node
+          rust
+        ]);
+      };
+
+      pkgs-unstable = import nixpkgs-unstable {
+        inherit system;
+        config = {
+          allowUnfree = true;
+          allowUnsupportedSystem = true;
+          xdg = {
+            configHome = homeDirectory;
+          };
+        };
+        overlays = [
+          (import rust-overlay)
+        ]
+        ++ (with self.overlays; [
+          go
+          node
+          rust
+        ]);
       };
 
       inherit (flake-utils.lib) eachDefaultSystem;
@@ -58,9 +94,21 @@
     {
       homeConfigurations.${username} = homeManagerConfiguration {
         inherit pkgs;
-
-        modules =
-          [ (import ./home-manager { inherit homeDirectory pkgs stateVersion system username gitUser signingKey; }) ];
+        inherit pkgs-unstable;
+        modules = [
+          (import ./home-manager {
+            inherit
+              homeDirectory
+              pkgs
+              pkgs-unstable
+              stateVersion
+              system
+              username
+              gitUser
+              signingKey
+              ;
+          })
+        ];
       };
 
       lib = import ./lib {
@@ -95,32 +143,32 @@
                     "pipefail"
                   ];
                 };
-              in
-              pkgs.mkShellNoCC {
-                packages =
-                  with pkgs;
-                  [
-                    (script "build" [ ] ''
-                      ${getSystem}
+            in
+            pkgs.mkShellNoCC {
+              packages =
+                with pkgs;
+                [
+                  (script "build" [ ] ''
+                    ${getSystem}
 
-                      ${forEachDir ''
-                        echo "building ''${dir}"
-                        nix build ".#devShells.''${SYSTEM}.default"
-                      ''}
-                    '')
-                    (script "check" [ nixfmt ] (forEachDir ''
-                      echo "checking ''${dir}"
-                      nix flake check --all-systems --no-build
-                    ''))
-                    (script "format" [ nixfmt ] ''
-                      git ls-files '*.nix' | xargs nix fmt
-                    '')
-                    (script "check-formatting" [ nixfmt ] ''
-                      git ls-files '*.nix' | xargs nixfmt --check
-                    '')
-                  ]
-                  ++ [ self.formatter.${system} ];
-              };
+                    ${forEachDir ''
+                      echo "building ''${dir}"
+                      nix build ".#devShells.''${SYSTEM}.default"
+                    ''}
+                  '')
+                  (script "check" [ nixfmt ] (forEachDir ''
+                    echo "checking ''${dir}"
+                    nix flake check --all-systems --no-build
+                  ''))
+                  (script "format" [ nixfmt ] ''
+                    git ls-files '*.nix' | xargs nix fmt
+                  '')
+                  (script "check-formatting" [ nixfmt ] ''
+                    git ls-files '*.nix' | xargs nixfmt --check
+                  '')
+                ]
+                ++ [ self.formatter.${system} ];
+            };
         }
       );
 
@@ -155,66 +203,66 @@
       );
     }
 
-    // 
+    //
 
-    {
-      templates = rec {
-        default = starter;
+      {
+        templates = rec {
+          default = starter;
 
-        starter = {
-          path = ./templates/starter;
-          description = "A minimal/starter development environment";
-        };
+          starter = {
+            path = ./templates/starter;
+            description = "A minimal/starter development environment";
+          };
 
-        go = {
-          path = ./templates/go;
-          description = "A development environment for Go projects";
-        };
+          go = {
+            path = ./templates/go;
+            description = "A development environment for Go projects";
+          };
 
-        java = {
-          path = ./templates/java;
-          description = "A development environment for Java projects";
-        };
+          java = {
+            path = ./templates/java;
+            description = "A development environment for Java projects";
+          };
 
-        node = {
-          path = ./templates/node;
-          description = "A development environment for Node.js projects";
-        };
+          node = {
+            path = ./templates/node;
+            description = "A development environment for Node.js projects";
+          };
 
-        elixir = {
-          path = ./templates/elixir;
-          description = "A development environment for Elixir projects";
-        };
+          elixir = {
+            path = ./templates/elixir;
+            description = "A development environment for Elixir projects";
+          };
 
-        python = {
-          path = ./templates/python;
-          description = "A development environment for Python projects";
-        };
+          python = {
+            path = ./templates/python;
+            description = "A development environment for Python projects";
+          };
 
-        ruby = {
-          path = ./templates/ruby;
-          description = "A development environment for Ruby projects";
-        };
+          ruby = {
+            path = ./templates/ruby;
+            description = "A development environment for Ruby projects";
+          };
 
-        rust = {
-          path = ./templates/rust;
-          description = "A development environment for Rust projects";
-        };
+          rust = {
+            path = ./templates/rust;
+            description = "A development environment for Rust projects";
+          };
 
-        wasm = {
-          path = ./templates/wasm;
-          description = "A development environment for WebAssembly projects";
-        };
+          wasm = {
+            path = ./templates/wasm;
+            description = "A development environment for WebAssembly projects";
+          };
 
-        kubernetes = {
-          path = ./templates/kubernetes;
-          description = "A development environment for Kubernetes projects";
-        };
+          kubernetes = {
+            path = ./templates/kubernetes;
+            description = "A development environment for Kubernetes projects";
+          };
 
-        kitchen-sink = {
-          path = ./templates/kitchen-sink;
-          description = "A development environment with many popular languages/tools";
+          kitchen-sink = {
+            path = ./templates/kitchen-sink;
+            description = "A development environment with many popular languages/tools";
+          };
         };
       };
-    };
 }
