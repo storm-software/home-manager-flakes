@@ -83,9 +83,9 @@
     };
   };
 
-  tmux = import ./tmux.nix;
+  #   tmux = import ./tmux.nix;
 
-  ghostty = import ./ghostty.nix;
+  #   ghostty = import ./ghostty.nix;
 
   atuin = import ./atuin.nix;
 
