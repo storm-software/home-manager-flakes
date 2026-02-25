@@ -7,7 +7,7 @@
 
   autosuggestion = {
     enable = true;
-    highlight = "fg=#159478,bold";
+    highlight = "fg=#a3f2e0,bold";
   };
 
   oh-my-zsh = {
