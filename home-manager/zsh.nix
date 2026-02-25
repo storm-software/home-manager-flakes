@@ -51,6 +51,6 @@
     extended = true;
   };
 
-  initExtra = (builtins.readFile ./scripts/init.sh);
+  initContent = (builtins.readFile ./scripts/init.sh);
   shellAliases = (import ./aliases.nix { inherit homeDirectory; }).shell;
 }
