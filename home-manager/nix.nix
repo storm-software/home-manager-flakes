@@ -25,5 +25,6 @@
       "recursive-nix"
     ];
     stalled-download-timeout = 25000;
+    connect-timeout = 120000;
   };
 }
