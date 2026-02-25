@@ -24,5 +24,6 @@
       "kvm"
       "recursive-nix"
     ];
+    stalled-download-timeout = 25000;
   };
 }
