@@ -18,17 +18,17 @@ let
     refinery-cli
   ];
 
-  devOpsTools = with pkgs; [
-    dapr-cli
-    dive
-    doctl
-    doppler
-    flyctl
-    heroku
-    packer
-    pulumi
-    terraform
-    terragrunt
+  devOpsTools = [
+    pkgs.dapr-cli
+    pkgs.dive
+    pkgs.doctl
+    pkgs.doppler
+    pkgs.flyctl
+    pkgs.heroku
+    pkgs.packer
+    pkgsUnstable.pulumi
+    pkgs.terraform
+    pkgs.terragrunt
   ];
 
   fonts = with pkgs.nerd-fonts; [
