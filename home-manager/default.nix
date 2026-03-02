@@ -2,7 +2,6 @@
   homeDirectory,
   pkgs,
   pkgs-unstable,
-  pkgs-previous,
   stateVersion,
   system,
   username,
@@ -12,7 +11,7 @@
 
 let
   # The packages to load into the PATH
-  packages = import ./packages.nix { inherit homeDirectory pkgs pkgs-previous; };
+  packages = import ./packages.nix { inherit homeDirectory pkgs nixpkgs-unstable; };
 in
 {
   fonts = {

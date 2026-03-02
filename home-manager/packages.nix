@@ -1,7 +1,7 @@
 {
   homeDirectory,
   pkgs,
-  pkgs-previous,
+  pkgs-unstable,
 }:
 
 let
@@ -79,8 +79,8 @@ let
   ];
 
   nixTools = [
-    pkgs.cachix
-    pkgs-previous.devenv
+    pkgs-unstable.cachix
+    pkgs-unstable.devenv
     pkgs.nix-direnv
     pkgs.nixfmt
     pkgs.vulnix
