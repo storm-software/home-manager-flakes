@@ -1,6 +1,7 @@
 {
   homeDirectory,
   pkgs,
+  pkgs-previous,
 }:
 
 let
@@ -77,13 +78,13 @@ let
     direnv
   ];
 
-  nixTools = with pkgs; [
-    cachix
-    devenv
-    nix-direnv
-    nixfmt
-    vulnix
-    statix
+  nixTools = [
+    pkgs.cachix
+    pkgs-previous.devenv
+    pkgs.nix-direnv
+    pkgs.nixfmt
+    pkgs.vulnix
+    pkgs.statix
   ];
 
   virtualizationTools = with pkgs; [
