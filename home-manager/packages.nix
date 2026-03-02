@@ -1,4 +1,8 @@
-{ homeDirectory, pkgs }:
+{
+  homeDirectory,
+  pkgs,
+  pkgs-unstable,
+}:
 
 let
   bin = import ./bin.nix {
@@ -74,13 +78,13 @@ let
     direnv
   ];
 
-  nixTools = with pkgs; [
-    cachix
-    devenv
-    nix-direnv
-    nixfmt
-    vulnix
-    statix
+  nixTools = [
+    pkgs-unstable.cachix
+    pkgs-unstable.devenv
+    pkgs.nix-direnv
+    pkgs.nixfmt
+    pkgs.vulnix
+    pkgs.statix
   ];
 
   virtualizationTools = with pkgs; [

@@ -97,6 +97,7 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "files.associations": {
+    "*.json": "jsonc",
     "*.hbs": "handlebars",
     "*.acid": "acidic",
     "*.acidic": "acidic"
@@ -121,7 +122,7 @@
   },
   "[typescript]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit",
       "quickfix.biome": "explicit",
