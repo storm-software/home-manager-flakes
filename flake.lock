@@ -40,15 +40,31 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1772445641,
-        "narHash": "sha256-YhFBv2NNlf2j9dS9wvV7rvFGAtGV8BvqeFrJPqCRGyE=",
+        "lastModified": 1772446320,
+        "narHash": "sha256-yzE+v6+97EetHw0c3JI67OArmCb6pw6HOw4fwc7X6eQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "5895e4358b6b320f10687f8c1fc66cc13f1f043f",
+        "rev": "81e440a3cef88d985f957074fdac45727ff21858",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-stable": {
+      "locked": {
+        "lastModified": 1772445607,
+        "narHash": "sha256-IfhrRN0ngeQAb5xVhKpNuMkACVNmlU2x8xxt1+dmTlA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3c85114a44de58ad39aebe16a78b3dabc2ae2fd1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "release-25.11",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -90,6 +106,7 @@
         "flake-utils": "flake-utils",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-stable": "nixpkgs-stable",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "rust-overlay": "rust-overlay"
       }
