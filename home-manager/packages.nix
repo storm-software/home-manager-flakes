@@ -78,13 +78,16 @@ let
     direnv
   ];
 
-  nixTools = [
-    pkgs-unstable.cachix
-    pkgs-unstable.devenv
-    pkgs.nix-direnv
-    pkgs.nixfmt
-    pkgs.vulnix
-    pkgs.statix
+  nixTools = with pkgs; [
+    nix-direnv
+    nixfmt
+    vulnix
+    statix
+  ];
+
+  devenvTools = with pkgs-unstable; [
+    cachix
+    devenv
   ];
 
   virtualizationTools = with pkgs; [
@@ -92,4 +95,12 @@ let
     qemu
   ];
 in
-bin ++ fonts ++ databaseTools ++ devOpsTools ++ gitTools ++ nixTools ++ virtualizationTools ++ misc
+bin
+++ fonts
+++ databaseTools
+++ devOpsTools
+++ gitTools
+++ nixTools
+++ devenvTools
+++ virtualizationTools
+++ misc
