@@ -1,7 +1,7 @@
 {
   homeDirectory,
   pkgs,
-  pkgs-unstable,
+  pkgsUnstable,
 }:
 
 let
@@ -26,6 +26,7 @@ let
     flyctl
     heroku
     packer
+    pulumi
     terraform
     terragrunt
   ];
@@ -85,7 +86,7 @@ let
     statix
   ];
 
-  devenvTools = with pkgs-unstable; [
+  devenvTools = with pkgsUnstable; [
     cachix
     devenv
   ];

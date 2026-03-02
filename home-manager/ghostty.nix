@@ -34,7 +34,7 @@
         "ctrl+l=goto_split:right"
       ];
     };
-    
+
     systemd.enable = true;
     enableZshIntegration = true;
     enable = true;

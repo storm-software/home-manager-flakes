@@ -34,7 +34,7 @@
       };
       signingKey = "67216ED35A5544A9";
 
-      pkgs-unstable = import nixpkgs-unstable {
+      pkgsUnstable = import nixpkgs-unstable {
         inherit system;
         config = {
           allowUnfree = true;
@@ -87,12 +87,13 @@
     {
       homeConfigurations.${username} = homeManagerConfiguration {
         inherit pkgs;
+        inherit pkgsUnstable;
         modules = [
           (import ./home-manager {
             inherit
               homeDirectory
               pkgs
-              pkgs-unstable
+              pkgsUnstable
               stateVersion
               system
               username
@@ -110,7 +111,7 @@
       overlays = import ./overlays;
 
       inherit pkgs;
-      inherit pkgs-unstable;
+      inherit pkgsUnstable;
 
       devShells = forEachSupportedSystem (
         { pkgs, system }:

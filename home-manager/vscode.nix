@@ -1,7 +1,7 @@
 {
   username,
   pkgs,
-  pkgs-unstable,
+  pkgsUnstable,
 }:
 
 let
@@ -27,7 +27,7 @@ let
 in
 {
   enable = true;
-  package = pkgs-unstable.vscode;
+  package = pkgsUnstable.vscode;
   profiles = {
     default = {
       enableUpdateCheck = true;

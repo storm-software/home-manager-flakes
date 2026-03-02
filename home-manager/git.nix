@@ -25,7 +25,6 @@
     "built-in-stubs.jar"
     "dumb.rdb"
     ".elixir_ls/"
-    ".vscode/"
     "npm-debug.log"
   ];
 
