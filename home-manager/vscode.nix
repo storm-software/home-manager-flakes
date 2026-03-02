@@ -99,6 +99,8 @@ in
         })
       ];
       userSettings = builtins.fromJSON (builtins.readFile ./config/vscode-settings.json);
+      enableMcpIntegration = true;
+      userMcp = builtins.fromJSON (builtins.readFile ./config/vscode-mcp.json);
     };
   };
 }

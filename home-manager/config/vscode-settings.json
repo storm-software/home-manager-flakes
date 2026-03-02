@@ -140,18 +140,15 @@
   },
   "[json]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.wordWrap": "on"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "[jsonc]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.wordWrap": "on"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "[json5]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.wordWrap": "on"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "[markdown]": {
     "editor.formatOnSave": true,
@@ -200,5 +197,16 @@
     "editor.defaultFormatter": "brettm12345.nixfmt-vscode"
   },
   "nxConsole.generateAiAgentRules": true,
-  "chat.useAgentSkills": true
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "chat.mcp.gallery.enabled": true,
+  "chat.useAgentSkills": true,
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": true,
+    "scminput": false
+  }
 }
