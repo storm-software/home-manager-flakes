@@ -11,7 +11,7 @@
 
 let
   # The packages to load into the PATH
-  packages = import ./packages.nix { inherit homeDirectory pkgs pkgs-unstable; };
+  packages = import ./packages.nix { inherit homeDirectory pkgs; };
 in
 {
   fonts = {

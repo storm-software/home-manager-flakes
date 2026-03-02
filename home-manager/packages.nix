@@ -1,7 +1,6 @@
 {
   homeDirectory,
   pkgs,
-  pkgs-unstable,
 }:
 
 let
@@ -78,13 +77,13 @@ let
     direnv
   ];
 
-  nixTools = [
-    pkgs-unstable.cachix
-    pkgs-unstable.devenv
-    pkgs.nix-direnv
-    pkgs.nixfmt
-    pkgs.vulnix
-    pkgs.statix
+  nixTools = with pkgs; [
+    cachix
+    devenv
+    nix-direnv
+    nixfmt
+    vulnix
+    statix
   ];
 
   virtualizationTools = with pkgs; [
