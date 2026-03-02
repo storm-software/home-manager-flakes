@@ -87,7 +87,6 @@
     {
       homeConfigurations.${username} = homeManagerConfiguration {
         inherit pkgs;
-        inherit pkgsUnstable;
         modules = [
           (import ./home-manager {
             inherit
