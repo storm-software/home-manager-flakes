@@ -81,8 +81,8 @@ let
   ];
 
   nixTools = [
-    pkgsStable.cachix
-    pkgsStable.devenv
+    pkgsUnstable.cachix
+    pkgsUnstable.devenv
     pkgs.nix-direnv
     pkgs.nixfmt
     pkgs.vulnix
