@@ -27,7 +27,7 @@ let
 in
 {
   enable = true;
-  package = pkgsUnstable.vscode;
+  package = pkgs.vscode;
   profiles = {
     default = {
       enableUpdateCheck = true;

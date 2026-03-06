@@ -88,7 +88,6 @@
   "eslint.codeAction.showDocumentation": {
     "enable": true
   },
-  "eslint.experimental.useFlatConfig": true,
   "eslint.useFlatConfig": true,
   "eslint.format.enable": true,
   "eslint.autoFixOnSave": true,
