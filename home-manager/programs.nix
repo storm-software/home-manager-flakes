@@ -61,9 +61,9 @@
     enableGitIntegration = true;
   };
 
-  neovim = import ./neovim.nix {
-    inherit (pkgs) vimPlugins;
-  };
+  #   neovim = import ./neovim.nix {
+  #     inherit (pkgs) vimPlugins;
+  #   };
 
   nix-index = {
     enable = true;

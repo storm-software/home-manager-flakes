@@ -9,6 +9,8 @@
     "**/.next-dev/**": true,
     "**/dist/**": true,
     "**/dist-dev/**": true,
+    "**/out-tsc/**": true,
+    "**/tmp/**": true,
     "**/.docusaurus/**": true,
     "**/CHANGELOG.json": true,
     "docs/spec.html": true,
@@ -52,7 +54,7 @@
     "url": "https://json.schemastore.org/github-action.json",
     "fileMatch": [".github/actions/setup/action.yml"]
   },
-  "workbench.colorTheme": "GitHub Dark Dimmed",
+  "workbench.colorTheme": "Experimental Dark",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.colorCustomizations": {
     "statusBar.background": "#1d232a",
@@ -86,7 +88,10 @@
   "eslint.codeAction.showDocumentation": {
     "enable": true
   },
+  "eslint.experimental.useFlatConfig": true,
   "eslint.useFlatConfig": true,
+  "eslint.format.enable": true,
+  "eslint.autoFixOnSave": true,
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
   "editor.tabCompletion": "on",
