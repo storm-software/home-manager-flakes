@@ -47,7 +47,7 @@
     ## Nix stuff. Inspired by: https://alexfedoseev.com/blog/post/nix-time.
 
     # Reload the Home Manager configuration (after git push)
-    xx = "home-manager switch --flake github:storm-software/home-manager-flakes && source ${homeDirectory}/.zshrc";
+    xx = "home-manager switch -b backup --flake github:storm-software/home-manager-flakes && source ${homeDirectory}/.zshrc";
 
     # Run Nix garbage collection
     xgc = "nix-env --delete-generations old && nix-store --gc";

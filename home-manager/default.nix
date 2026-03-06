@@ -52,7 +52,7 @@ in
 
     shell.enableZshIntegration = true;
     shellAliases = {
-      reload-home-manager-config = "home-manager switch --flake ${builtins.toString ./.}";
+      reload-home-manager-config = "home-manager switch -b backup --flake ${builtins.toString ./.}";
     };
   };
 
