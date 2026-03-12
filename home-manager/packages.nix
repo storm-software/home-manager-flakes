@@ -12,21 +12,21 @@ let
     inherit (pkgs.lib) fakeHash;
   };
 
-  databaseTools = with pkgs; [
-    sqlite
-    litestream
-    postgresql_18
-    refinery-cli
-  ];
+  # databaseTools = with pkgs; [
+  # sqlite
+  # litestream
+  # postgresql_18
+  # refinery-cli
+  # ];
 
   devOpsTools = [
-    pkgs.dapr-cli
-    pkgs.dive
-    pkgs.doctl
-    pkgs.doppler
-    pkgs.flyctl
-    pkgs.heroku
-    pkgs.packer
+    # pkgs.dapr-cli
+    # pkgs.dive
+    # pkgs.doctl
+    # pkgs.doppler
+    # pkgs.flyctl
+    # pkgs.heroku
+    # pkgs.packer
     pkgsUnstable.pulumi
     pkgs.terraform
     pkgs.terragrunt
@@ -59,19 +59,19 @@ let
     findutils
     htmltest
     libiconv
-    open-policy-agent
-    openssl
-    pikchr
-    pkg-config
-    skopeo
-    stow
-    subversion
-    tailscale
+    # open-policy-agent
+    # openssl
+    # pikchr
+    # pkg-config
+    # skopeo
+    # stow
+    # subversion
+    # tailscale
     tree
     treefmt
     wget
     zstd
-    gcr
+    # gcr
     pinentry-gnome3
     keepassxc
     keybase
@@ -80,18 +80,21 @@ let
     direnv
   ];
 
-  nixTools = [
-    pkgs.cachix
-    pkgs.devenv
-    pkgs.nix-direnv
-    pkgs.nixfmt
-    pkgs.vulnix
-    pkgs.statix
+  nixTools = with pkgs; [
+    nix-direnv
+    nixfmt
+    vulnix
+    statix
   ];
 
-  virtualizationTools = with pkgs; [
-    vagrant
-    qemu
+  devenvTools = with pkgsUnstable; [
+    cachix
+    devenv
   ];
+
+  # virtualizationTools = with pkgs; [
+  # vagrant
+  # qemu
+  # ];
 in
-bin ++ fonts ++ databaseTools ++ devOpsTools ++ gitTools ++ nixTools ++ virtualizationTools ++ misc
+bin ++ fonts ++ devOpsTools ++ gitTools ++ nixTools ++ devenvTools ++ misc

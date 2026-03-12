@@ -44,8 +44,8 @@
   history = {
     append = true;
     share = true;
-    save = 90000;
-    size = 90000;
+    save = 900000;
+    size = 900000;
     ignoreDups = true;
     saveNoDups = true;
     extended = true;

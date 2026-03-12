@@ -1,4 +1,8 @@
-{ homeDirectory, pkgs }:
+{
+  homeDirectory,
+  username,
+  pkgs,
+}:
 
 {
   # git-sync = {
@@ -44,6 +48,113 @@
       program = "pinentry-gnome3";
     };
     enableSshSupport = true;
+    enableScDaemon = true;
     enableZshIntegration = true;
+  };
+
+  home-manager.autoExpire = {
+    enable = true;
+    frequency = "weekly";
+    store.cleanup = true;
+    timestamp = "-7 days";
+  };
+
+  #   pantalaimon = {
+  #     enable = false;
+  #     settings = {
+  #       Default = {
+  #         LogLevel = "Debug";
+  #         SSL = true;
+  #       };
+  #       local-matrix = {
+  #         Homeserver = "https://matrix.org";
+  #         ListenAddress = "127.0.0.1";
+  #         ListenPort = 8008;
+  #       };
+  #     };
+  #   };
+
+  protonmail-bridge = {
+    enable = true;
+    extraPackages = with pkgs; [
+      pass
+      gnome-keyring
+    ];
+    logLevel = "info";
+  };
+
+  syncthing = {
+    enable = false;
+    guiAddress = "127.0.0.1:8384";
+    cert = "${homeDirectory}/.cert/syncthing/cert.pem";
+    key = "${homeDirectory}/.cert/syncthing/key.pem";
+    settings = {
+      defaultFolderPath = "${homeDirectory}/sync";
+      defaultFolderRescanIntervalS = 3600;
+      defaultFolderType = "readwrite";
+      gui = {
+        theme = "black";
+        user = "${username}";
+        metricsWithoutAuth = false;
+      };
+      options = {
+        listenAddresses = [ "default" ];
+        globalAnnounceEnabled = true;
+        localAnnounceEnabled = true;
+        relaysEnabled = true;
+        natEnabled = true;
+        urAccepted = -1;
+        globalAnnounceServers = [ "default" ];
+        localAnnouncePort = 21027;
+        localAnnounceMCAddr = "[ff12::8384]:21027";
+        maxSendKbps = 0;
+        maxRecvKbps = 0;
+        reconnectionIntervalS = 60;
+        relayReconnectIntervalM = 10;
+        startBrowser = true;
+        natLeaseMinutes = 60;
+        natRenewalMinutes = 30;
+        natTimeoutSeconds = 10;
+        urSeen = 3;
+        urUniqueID = "";
+        urURL = "https://data.syncthing.net/newdata";
+        urPostInsecurely = false;
+        urInitialDelayS = 1800;
+        autoUpgradeIntervalH = 12;
+        upgradeToPreReleases = false;
+        keepTemporariesH = 24;
+        cacheIgnoredFiles = false;
+        progressUpdateIntervalS = 5;
+        limitBandwidthInLan = false;
+        minHomeDiskFree = {
+          unit = "%";
+          value = 1;
+        };
+        releasesURL = "https://upgrades.syncthing.net/meta.json";
+        overwriteRemoteDeviceNamesOnConnect = false;
+        tempIndexMinBlocks = 10;
+        trafficClass = 0;
+        setLowPriority = true;
+        maxFolderConcurrency = 0;
+        crashReportingURL = "https://crash.syncthing.net/newcrash";
+        crashReportingEnabled = true;
+        stunKeepaliveStartS = 180;
+        stunKeepaliveMinS = 20;
+        stunServers = [ "default" ];
+        maxConcurrentIncomingRequestKiB = 0;
+        announceLANAddresses = true;
+        sendFullIndexOnUpgrade = false;
+        auditEnabled = false;
+        auditFile = "";
+        connectionLimitEnough = 0;
+        connectionLimitMax = 0;
+        connectionPriorityTcpLan = 10;
+        connectionPriorityQuicLan = 20;
+        connectionPriorityTcpWan = 30;
+        connectionPriorityQuicWan = 40;
+        connectionPriorityRelay = 50;
+        connectionPriorityUpgradeThreshold = 0;
+      };
+    };
   };
 }

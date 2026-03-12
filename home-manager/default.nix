@@ -71,5 +71,5 @@ in
       gitUser
       ;
   };
-  services = import ./services.nix { inherit homeDirectory pkgs; };
+  services = import ./services.nix { inherit homeDirectory username pkgs; };
 }

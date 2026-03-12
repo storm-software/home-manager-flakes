@@ -23,11 +23,6 @@
     nix-direnv.enable = true;
   };
 
-  fzf = {
-    enable = true;
-    enableZshIntegration = true;
-  };
-
   gh = import ./gh.nix { inherit gitUser; };
 
   keepassxc = import ./keepassxc.nix { inherit pkgs; };
@@ -61,10 +56,6 @@
     enableGitIntegration = true;
   };
 
-  #   neovim = import ./neovim.nix {
-  #     inherit (pkgs) vimPlugins;
-  #   };
-
   nix-index = {
     enable = true;
     enableZshIntegration = true;
@@ -83,16 +74,30 @@
     };
   };
 
-  #   tmux = import ./tmux.nix;
+  tmux = import ./tmux.nix;
 
-  #   ghostty = import ./ghostty.nix;
+  fzf = import ./fzf.nix;
+
+  ghostty = import ./ghostty.nix;
 
   atuin = import ./atuin.nix;
+
+  carapace = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  man.enable = true;
 
   vscode = import ./vscode.nix { inherit username pkgs pkgsUnstable; };
 
   zsh = import ./zsh.nix {
     inherit homeDirectory;
     inherit (pkgs) substituteAll;
+  };
+
+  zoxide = {
+    enable = true;
+    enableZshIntegration = true;
   };
 }
