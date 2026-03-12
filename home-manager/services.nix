@@ -52,6 +52,11 @@
     enableZshIntegration = true;
   };
 
+  ssh-agent = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   home-manager.autoExpire = {
     enable = true;
     frequency = "weekly";

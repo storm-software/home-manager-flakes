@@ -25,6 +25,10 @@
 
   gh = import ./gh.nix { inherit gitUser; };
 
+  ssh = {
+    enable = true;
+  };
+
   keepassxc = import ./keepassxc.nix { inherit pkgs; };
 
   #   git-credential-keepassxc = {
