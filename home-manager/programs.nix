@@ -92,7 +92,7 @@
 
   fzf = import ./fzf.nix;
 
-  ghostty = import ./ghostty.nix;
+  #   ghostty = import ./ghostty.nix;
 
   atuin = import ./atuin.nix;
 

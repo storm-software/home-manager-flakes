@@ -30,8 +30,9 @@ in
   package = pkgsUnstable.vscode;
   profiles = {
     default = {
-      enableUpdateCheck = true;
-      enableExtensionUpdateCheck = true;
+      enableUpdateCheck = false;
+      enableExtensionUpdateCheck = false;
+      mutableExtensionsDir = true;
       extensions = with pkgsUnstable.vscode-extensions; [
         # Provided by Nixpkgs
         bbenoist.nix
