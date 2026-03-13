@@ -25,18 +25,19 @@
 
   gh = import ./gh.nix { inherit gitUser; };
 
-  ssh = {
-    enable = true;
-    matchBlocks."*" = {
-      forwardAgent = true;
-      addKeysToAgent = "yes";
-      compression = false;
-      serverAliveInterval = 0;
-      serverAliveCountMax = 3;
-      hashKnownHosts = false;
-      userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
-    };
-  };
+  #   ssh = {
+  #     enable = true;
+  #     enableDefaultConfig = false;
+  #     matchBlocks."*" = {
+  #       forwardAgent = true;
+  #       addKeysToAgent = "yes";
+  #       compression = false;
+  #       serverAliveInterval = 0;
+  #       serverAliveCountMax = 3;
+  #       hashKnownHosts = false;
+  #       userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
+  #     };
+  #   };
 
   keepassxc = import ./keepassxc.nix { inherit pkgs; };
 
