@@ -28,11 +28,11 @@ in
 {
   enable = true;
   package = pkgsUnstable.vscode;
+  mutableExtensionsDir = true;
   profiles = {
     default = {
       enableUpdateCheck = false;
       enableExtensionUpdateCheck = false;
-      mutableExtensionsDir = true;
       extensions = with pkgsUnstable.vscode-extensions; [
         # Provided by Nixpkgs
         bbenoist.nix
