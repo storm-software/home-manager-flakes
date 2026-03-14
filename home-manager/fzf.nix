@@ -12,11 +12,11 @@
     "fg+" = "#cdd9e5";
     "bg+" = "#2d333b";
     "hl+" = "#56d4dd";
-    info = "#539bf5";
-    prompt = "#6cb6ff";
-    pointer = "#f47067";
+    info = "#1fb2a6";
+    prompt = "#39c5cf";
+    pointer = "#1fb2a6";
     marker = "#39c5cf";
-    spinner = "#b083f0";
+    spinner = "#1fb2a6";
     header = "#1fb2a6";
   };
   tmux.enableShellIntegration = true;
