@@ -49,8 +49,6 @@ let
     diff-so-fancy
     codeowners
     gitflow
-    pre-commit
-    lefthook
   ];
 
   misc = with pkgs; [

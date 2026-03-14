@@ -40,7 +40,6 @@ in
         davidanson.vscode-markdownlint
         dbaeumer.vscode-eslint
         donjayamanne.githistory
-        eamodio.gitlens
         esbenp.prettier-vscode
         formulahendry.auto-close-tag
         kamikillerto.vscode-colorize
