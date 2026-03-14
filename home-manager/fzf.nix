@@ -4,7 +4,6 @@
   defaultOptions = [
     "--height 60%"
     "--border"
-    "--scheme history"
     "--style full"
   ];
   colors = {

@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, homeDirectory }:
 
 {
   enable = true;
@@ -8,6 +8,7 @@
     General = {
       ConfigVersion = 2;
       BackupBeforeSave = true;
+      DefaultDatabaseFileName = "${homeDirectory}/sync/vault/vault.kdbx";
       OpenPreviousDatabasesOnStartup = true;
       RememberLastDatabases = true;
       RememberLastKeyFiles = true;
