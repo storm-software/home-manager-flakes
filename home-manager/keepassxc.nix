@@ -8,6 +8,10 @@
     General = {
       ConfigVersion = 2;
       BackupBeforeSave = true;
+      OpenPreviousDatabasesOnStartup = true;
+      RememberLastDatabases = true;
+      RememberLastKeyFiles = true;
+      NumberOfRememberedLastDatabases = 5;
       BackupFilePathPattern = "{DB_FILENAME}.backup.kdbx";
     };
     Browser = {
@@ -19,8 +23,12 @@
       ApplicationTheme = "light";
       HidePasswords = true;
       CheckForUpdatesIncludeBetas = true;
+      LaunchAtStartup = true;
     };
-    SSHAgent.Enabled = true;
+    SSHAgent = {
+      Enabled = true;
+      UseOpenSSH = true;
+    };
     Security = {
       HideTotpPreviewPanel = true;
       IconDownloadFallback = true;

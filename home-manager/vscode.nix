@@ -37,6 +37,7 @@ in
         # Provided by Nixpkgs
         bbenoist.nix
         bierner.markdown-mermaid
+        davidanson.vscode-markdownlint
         dbaeumer.vscode-eslint
         donjayamanne.githistory
         eamodio.gitlens
