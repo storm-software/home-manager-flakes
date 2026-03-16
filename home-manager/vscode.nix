@@ -39,7 +39,7 @@ in
         bierner.markdown-mermaid
         davidanson.vscode-markdownlint
         dbaeumer.vscode-eslint
-        eamodio.gitlens
+        # eamodio.gitlens
         donjayamanne.githistory
         esbenp.prettier-vscode
         formulahendry.auto-close-tag
