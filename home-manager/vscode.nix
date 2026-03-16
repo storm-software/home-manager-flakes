@@ -5,7 +5,7 @@
 }:
 
 let
-  inherit (pkgs.vscode-utils) buildVscodeMarketplaceExtension;
+  inherit (pkgsUnstable.vscode-utils) buildVscodeMarketplaceExtension;
 
   extension =
     {
@@ -27,13 +27,13 @@ let
 in
 {
   enable = true;
-  package = pkgs.vscode;
+  package = pkgsUnstable.vscode;
   mutableExtensionsDir = true;
   profiles = {
     default = {
       enableUpdateCheck = false;
       enableExtensionUpdateCheck = false;
-      extensions = with pkgs.vscode-extensions; [
+      extensions = with pkgsUnstable.vscode-extensions; [
         # Provided by Nixpkgs
         bbenoist.nix
         bierner.markdown-mermaid
