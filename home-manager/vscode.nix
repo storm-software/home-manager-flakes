@@ -69,8 +69,8 @@ in
         (extension {
           publisher = "nrwl";
           name = "angular-console";
-          version = "18.81.0";
-          sha256 = "sha256:47d19f63826b8d3dbc2ef96aab1987433088c9da72c8763bd38b0c1f38eb76d1";
+          version = "18.91.0";
+          sha256 = "sha256:ad2d0f1ec8e20441ad257355ad033fbc6d97b177b472da2791945e3eacbef182";
         })
         (extension {
           publisher = "nickgo";
