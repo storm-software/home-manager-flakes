@@ -26,6 +26,6 @@
     ];
     stalled-download-timeout = 25000;
     connect-timeout = 0;
-    download-buffer-size = 18446744073709551615;
+    download-buffer-size = 4611686018427387904;
   };
 }
