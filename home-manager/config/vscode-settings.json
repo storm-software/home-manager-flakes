@@ -2,6 +2,7 @@
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "search.exclude": {
+    "**/.git/**": true,
     "**/bower_components": true,
     "**/*.code-search": true,
     "**/.tamagui": true,
@@ -75,11 +76,11 @@
   "evenBetterToml.taplo.configFile.path": "./node_modules/@storm-software/linting-tools/taplo/config.toml",
   "prettier.requireConfig": true,
   "prettier.bracketSameLine": true,
-  "prettier.configPath": "./node_modules/@storm-software/prettier/config.json",
+  "prettier.configPath": "./node_modules/@storm-software/prettier/recommended.json",
   "prettier.ignorePath": "./node_modules/@storm-software/prettier/.prettierignore",
   "prettier.enableDebugLogs": false,
   "prettier.enable": true,
-  "markdownlint.configFile": "./node_modules/@storm-software/markdownlint/config/base.markdownlint-cli2.jsonc",
+  "markdownlint.configFile": "./node_modules/@storm-software/markdownlint/config/recommended.markdownlint-cli2.jsonc",
   "eslint.debug": false,
   "eslint.codeAction.disableRuleComment": {
     "enable": true,
