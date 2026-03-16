@@ -42,7 +42,6 @@ in
         donjayamanne.githistory
         esbenp.prettier-vscode
         formulahendry.auto-close-tag
-        kamikillerto.vscode-colorize
         ms-azuretools.vscode-docker
         redhat.vscode-yaml
         rust-lang.rust-analyzer
