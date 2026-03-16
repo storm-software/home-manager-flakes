@@ -25,7 +25,7 @@
       "recursive-nix"
     ];
     stalled-download-timeout = 25000;
-    connect-timeout = 120000;
-    download-buffer-size = 104857600;
+    connect-timeout = 0;
+    download-buffer-size = 18446744073709551615;
   };
 }
