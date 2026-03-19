@@ -27,7 +27,7 @@ let
 in
 {
   enable = true;
-  package = pkgsUnstable.vscode;
+  package = pkgs.vscode;
   mutableExtensionsDir = true;
   profiles = {
     default = {
@@ -57,7 +57,7 @@ in
         pkgsUnstable.vscode-extensions.pkief.material-icon-theme
         pkgsUnstable.vscode-extensions.ms-vscode.makefile-tools
         pkgsUnstable.vscode-extensions.golang.go
-        pkgs.vscode-extensions.github.copilot-chat
+        pkgsUnstable.vscode-extensions.github.copilot-chat
         pkgsUnstable.vscode-extensions.github.vscode-pull-request-github
 
         # Not in Nixpkgs
