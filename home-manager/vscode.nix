@@ -39,7 +39,7 @@ in
         bierner.markdown-mermaid
         davidanson.vscode-markdownlint
         dbaeumer.vscode-eslint
-        # eamodio.gitlens
+        eamodio.gitlens
         donjayamanne.githistory
         esbenp.prettier-vscode
         formulahendry.auto-close-tag
@@ -67,12 +67,12 @@ in
           version = "1.0.0";
           sha256 = "sha256:98230157165121bdc96a8d57492ec4411417dd8dafae4a409b2ea5752a996bd7";
         })
-        # (extension {
-        #   publisher = "nrwl";
-        #   name = "angular-console";
-        #   version = "18.91.0";
-        #   sha256 = "sha256:ad2d0f1ec8e20441ad257355ad033fbc6d97b177b472da2791945e3eacbef182";
-        # })
+        (extension {
+          publisher = "nrwl";
+          name = "angular-console";
+          version = "18.91.0";
+          sha256 = "sha256:ad2d0f1ec8e20441ad257355ad033fbc6d97b177b472da2791945e3eacbef182";
+        })
         (extension {
           publisher = "nickgo";
           name = "cuelang";
