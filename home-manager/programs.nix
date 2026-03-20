@@ -39,7 +39,7 @@
   #     };
   #   };
 
-  keepassxc = import ./keepassxc.nix { inherit homeDirectory pkgs; };
+  keepassxc = import ./keepassxc.nix { inherit homeDirectory pkgs pkgsUnstable; };
 
   #   git-credential-keepassxc = {
   #     enable = true;
