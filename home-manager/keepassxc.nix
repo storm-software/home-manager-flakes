@@ -1,9 +1,13 @@
-{ pkgs, homeDirectory }:
+{
+  pkgs,
+  pkgsUnstable,
+  homeDirectory,
+}:
 
 {
   enable = true;
   autostart = true;
-  package = pkgs.keepassxc;
+  package = pkgsUnstable.keepassxc;
   settings = {
     General = {
       ConfigVersion = 2;
