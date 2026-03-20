@@ -27,38 +27,38 @@ let
 in
 {
   enable = true;
-  package = pkgs.vscode;
+  package = pkgsUnstable.vscode;
   mutableExtensionsDir = true;
   profiles = {
     default = {
       enableUpdateCheck = false;
       enableExtensionUpdateCheck = false;
-      extensions = [
+      extensions = with pkgsUnstable.vscode-extensions; [
         # Provided by Nixpkgs
-        pkgsUnstable.vscode-extensions.bbenoist.nix
-        pkgsUnstable.vscode-extensions.bierner.markdown-mermaid
-        pkgsUnstable.vscode-extensions.davidanson.vscode-markdownlint
-        pkgsUnstable.vscode-extensions.dbaeumer.vscode-eslint
-        pkgsUnstable.vscode-extensions.eamodio.gitlens
-        pkgsUnstable.vscode-extensions.donjayamanne.githistory
-        pkgsUnstable.vscode-extensions.esbenp.prettier-vscode
-        pkgsUnstable.vscode-extensions.formulahendry.auto-close-tag
-        pkgsUnstable.vscode-extensions.ms-azuretools.vscode-docker
-        pkgsUnstable.vscode-extensions.redhat.vscode-yaml
-        pkgsUnstable.vscode-extensions.rust-lang.rust-analyzer
-        pkgsUnstable.vscode-extensions.unifiedjs.vscode-mdx
-        pkgsUnstable.vscode-extensions.tamasfe.even-better-toml
-        pkgsUnstable.vscode-extensions.yzhang.markdown-all-in-one
-        pkgsUnstable.vscode-extensions.streetsidesoftware.code-spell-checker
-        pkgsUnstable.vscode-extensions.editorconfig.editorconfig
-        pkgsUnstable.vscode-extensions.firsttris.vscode-jest-runner
-        pkgsUnstable.vscode-extensions.mikestead.dotenv
-        pkgsUnstable.vscode-extensions.brettm12345.nixfmt-vscode
-        pkgsUnstable.vscode-extensions.pkief.material-icon-theme
-        pkgsUnstable.vscode-extensions.ms-vscode.makefile-tools
-        pkgsUnstable.vscode-extensions.golang.go
-        pkgsUnstable.vscode-extensions.github.copilot-chat
-        pkgsUnstable.vscode-extensions.github.vscode-pull-request-github
+        bbenoist.nix
+        bierner.markdown-mermaid
+        davidanson.vscode-markdownlint
+        dbaeumer.vscode-eslint
+        eamodio.gitlens
+        donjayamanne.githistory
+        esbenp.prettier-vscode
+        formulahendry.auto-close-tag
+        ms-azuretools.vscode-docker
+        redhat.vscode-yaml
+        rust-lang.rust-analyzer
+        unifiedjs.vscode-mdx
+        tamasfe.even-better-toml
+        yzhang.markdown-all-in-one
+        streetsidesoftware.code-spell-checker
+        editorconfig.editorconfig
+        firsttris.vscode-jest-runner
+        mikestead.dotenv
+        brettm12345.nixfmt-vscode
+        pkief.material-icon-theme
+        ms-vscode.makefile-tools
+        golang.go
+        github.copilot-chat
+        github.vscode-pull-request-github
 
         # Not in Nixpkgs
         (extension {
