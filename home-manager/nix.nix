@@ -24,8 +24,8 @@
       "kvm"
       "recursive-nix"
     ];
-    stalled-download-timeout = 25000;
-    connect-timeout = 0;
-    download-buffer-size = 4611686018427387904;
+    # stalled-download-timeout = 25000;
+    # connect-timeout = 0;
+    # download-buffer-size = 4611686018427387904;
   };
 }
