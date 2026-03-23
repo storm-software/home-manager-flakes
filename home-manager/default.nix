@@ -2,7 +2,6 @@
   homeDirectory,
   pkgs,
   pkgsUnstable,
-  pkgsStable,
   stateVersion,
   system,
   username,
@@ -17,7 +16,6 @@ let
       homeDirectory
       pkgs
       pkgsUnstable
-      pkgsStable
       ;
   };
 in

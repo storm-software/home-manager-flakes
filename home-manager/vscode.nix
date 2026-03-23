@@ -5,7 +5,7 @@
 }:
 
 let
-  inherit (pkgs.vscode-utils) buildVscodeMarketplaceExtension;
+  inherit (pkgsUnstable.vscode-utils) buildVscodeMarketplaceExtension;
 
   extension =
     {
@@ -27,14 +27,13 @@ let
 in
 {
   enable = true;
-  package = pkgs.vscode;
+  package = pkgsUnstable.vscode;
   mutableExtensionsDir = true;
   profiles = {
     default = {
       enableUpdateCheck = false;
       enableExtensionUpdateCheck = false;
-      extensions = with pkgs.vscode-extensions; [
-        # Provided by Nixpkgs
+      extensions = with pkgsUnstable.vscode-extensions; [
         bbenoist.nix
         bierner.markdown-mermaid
         davidanson.vscode-markdownlint
@@ -60,7 +59,6 @@ in
         github.copilot-chat
         github.vscode-pull-request-github
 
-        # Not in Nixpkgs
         (extension {
           publisher = "antfu";
           name = "pnpm-catalog-lens";

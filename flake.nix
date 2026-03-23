@@ -9,7 +9,6 @@
     };
     nixpkgs.url = "github:NixOS/nixpkgs";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/release-25.11";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
@@ -20,13 +19,12 @@
       home-manager,
       nixpkgs,
       nixpkgs-unstable,
-      nixpkgs-stable,
       rust-overlay,
     }:
     let
       username = "development";
       system = "x86_64-linux";
-      stateVersion = "25.11";
+      stateVersion = "26.05";
       homeDirectory = self.lib.getHomeDirectory username;
 
       # User specific settings
@@ -37,17 +35,6 @@
       signingKey = "67216ED35A5544A9";
 
       pkgsUnstable = import nixpkgs-unstable {
-        inherit system;
-        config = {
-          allowUnfree = true;
-          allowUnsupportedSystem = true;
-          xdg = {
-            configHome = homeDirectory;
-          };
-        };
-      };
-
-      pkgsStable = import nixpkgs-stable {
         inherit system;
         config = {
           allowUnfree = true;
@@ -106,7 +93,6 @@
               homeDirectory
               pkgs
               pkgsUnstable
-              pkgsStable
               stateVersion
               system
               username
@@ -125,7 +111,6 @@
 
       inherit pkgs;
       inherit pkgsUnstable;
-      inherit pkgsStable;
 
       devShells = forEachSupportedSystem (
         { pkgs, system }:

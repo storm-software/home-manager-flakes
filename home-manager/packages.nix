@@ -2,7 +2,6 @@
   homeDirectory,
   pkgs,
   pkgsUnstable,
-  pkgsStable,
 }:
 
 let
@@ -51,14 +50,15 @@ let
     gitflow
   ];
 
-  misc = with pkgs; [
+  misc = with pkgsUnstable; [
+    code-cursor
     comma
     coreutils
     findutils
     htmltest
     libiconv
-    # open-policy-agent
-    # openssl
+    open-policy-agent
+    openssl
     # pikchr
     # pkg-config
     # skopeo
@@ -69,7 +69,6 @@ let
     treefmt
     wget
     zstd
-    # gcr
     pinentry-gnome3
     keepassxc
     keybase
