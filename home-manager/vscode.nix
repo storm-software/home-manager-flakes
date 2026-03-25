@@ -1,7 +1,7 @@
 {
   username,
   pkgs,
-  pkgs,
+  pkgsUnstable,
 }:
 
 let
