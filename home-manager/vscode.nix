@@ -1,11 +1,11 @@
 {
   username,
   pkgs,
-  pkgsUnstable,
+  pkgs,
 }:
 
 let
-  inherit (pkgsUnstable.vscode-utils) buildVscodeMarketplaceExtension;
+  inherit (pkgs.vscode-utils) buildVscodeMarketplaceExtension;
 
   extension =
     {
@@ -27,13 +27,13 @@ let
 in
 {
   enable = true;
-  package = pkgsUnstable.vscode;
+  package = pkgs.vscode;
   mutableExtensionsDir = true;
   profiles = {
     default = {
       enableUpdateCheck = false;
       enableExtensionUpdateCheck = false;
-      extensions = with pkgsUnstable.vscode-extensions; [
+      extensions = with pkgs.vscode-extensions; [
         bbenoist.nix
         bierner.markdown-mermaid
         davidanson.vscode-markdownlint
@@ -60,17 +60,23 @@ in
         github.vscode-pull-request-github
 
         (extension {
+          publisher = "datakurre";
+          name = "devenv";
+          version = "0.5.0";
+          sha256 = "sha256:e73c4388be4385ea0f32923a00a7004c837df631b611af4efe48dd4e896dfeb4";
+        })
+        (extension {
           publisher = "antfu";
           name = "pnpm-catalog-lens";
           version = "1.0.0";
           sha256 = "sha256:98230157165121bdc96a8d57492ec4411417dd8dafae4a409b2ea5752a996bd7";
         })
-        (extension {
-          publisher = "nrwl";
-          name = "angular-console";
-          version = "18.91.0";
-          sha256 = "sha256:ad2d0f1ec8e20441ad257355ad033fbc6d97b177b472da2791945e3eacbef182";
-        })
+        # (extension {
+        #   publisher = "nrwl";
+        #   name = "angular-console";
+        #   version = "18.91.0";
+        #   sha256 = "sha256:ad2d0f1ec8e20441ad257355ad033fbc6d97b177b472da2791945e3eacbef182";
+        # })
         (extension {
           publisher = "nickgo";
           name = "cuelang";
