@@ -1,8 +1,11 @@
 {
   enable = true;
   defaultFonts = {
-    monospace = "Martian Mono";
-    sansSerif = "Ubuntu Sans";
-    serif = "Ubuntu";
+    monospace = [
+      "Martian Mono"
+      "Ubuntu Mono"
+    ];
+    sansSerif = [ "Ubuntu Sans" ];
+    serif = [ "Ubuntu" ];
   };
 }
