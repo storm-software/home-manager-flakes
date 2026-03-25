@@ -32,7 +32,8 @@
     # General
     "," = "comma";
     cat = "bat";
-    conf = "code ~/.config/nixpkgs";
+    code = "code-insiders";
+    conf = "code-insiders ~/.config/nixpkgs";
     dc = "docker compose";
     diff = "diff --color=auto";
     grep = "grep --color=auto";
