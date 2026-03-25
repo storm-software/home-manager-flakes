@@ -43,7 +43,7 @@
   git-credential-keepassxc = {
     enable = true;
     package = pkgsUnstable.git-credential-keepassxc;
-    hosts = [ "https://github.com" ];
+    # hosts = [ "https://github.com" ];
   };
 
   git = import ./git.nix {
