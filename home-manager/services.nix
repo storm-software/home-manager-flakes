@@ -53,6 +53,14 @@
     enableZshIntegration = true;
   };
 
+  cachix-agent = {
+    enable = true;
+    credentialsFile = "${homeDirectory}/.cachix/auth-token";
+    name = "storm-software";
+    profile = "development";
+    package = pkgsUnstable.cachix;
+  };
+
   #   ssh-agent = {
   #     enable = true;
   #     enableZshIntegration = true;

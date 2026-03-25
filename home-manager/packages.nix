@@ -32,10 +32,15 @@ let
   ];
 
   fonts = with pkgs.nerd-fonts; [
+    "m+"
     hack
     fira-code
     fira-mono
     jetbrains-mono
+    ubuntu
+    ubuntu-sans
+    space-mono
+    martian-mono
   ];
 
   gitTools = with pkgs; [
