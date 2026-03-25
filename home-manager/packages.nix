@@ -32,7 +32,6 @@ let
   ];
 
   fonts = with pkgs.nerd-fonts; [
-    "m+"
     hack
     fira-code
     fira-mono
