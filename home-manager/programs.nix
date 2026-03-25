@@ -106,7 +106,8 @@
 
   man.enable = true;
 
-  vscode = import ./vscode.nix { inherit username pkgs pkgsUnstable; };
+  # Disabling vscode for now since it causes a lot of issues with the extension manager
+  #   vscode = import ./vscode.nix { inherit username pkgs pkgsUnstable; };
 
   zsh = import ./zsh.nix {
     inherit homeDirectory;

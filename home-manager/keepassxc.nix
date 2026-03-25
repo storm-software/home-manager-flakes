@@ -30,7 +30,10 @@
       CheckForUpdatesIncludeBetas = true;
       LaunchAtStartup = true;
     };
-    SSHAgent.Enabled = true;
+    SSHAgent = {
+      Enabled = true;
+      UseOpenSSH = true;
+    };
     Security = {
       HideTotpPreviewPanel = true;
       IconDownloadFallback = true;
