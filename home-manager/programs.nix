@@ -61,8 +61,6 @@
     enable = true;
   };
 
-  news.display = "show";
-
   jq.enable = true;
 
   delta = {

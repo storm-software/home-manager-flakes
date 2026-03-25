@@ -37,6 +37,8 @@ in
     };
   };
 
+  news.display = "show";
+
   xdg.autostart.enable = true;
 
   nix = import ./nix.nix { inherit pkgs; };
