@@ -27,6 +27,6 @@
     stalled-download-timeout = 25000;
     connect-timeout = 0;
     download-buffer-size = 4611686018427387904;
-    home-manager.backupFileExtension = "backup";
+    auto-optimise-store = true;
   };
 }
