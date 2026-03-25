@@ -8,6 +8,20 @@
   autosuggestion = {
     enable = true;
     highlight = "fg=#a3f2e0,bold";
+    strategy = [
+      "history"
+      "completion"
+    ];
+  };
+
+  syntaxHighlighting = {
+    enable = true;
+    highlighters = [
+      "main"
+      "command"
+      "pattern"
+      "root"
+    ];
   };
 
   oh-my-zsh = {
@@ -17,7 +31,6 @@
       "git"
       "gh"
       "github"
-      "nix-shell"
       "terraform"
       "pulumi"
       "vscode"
@@ -26,12 +39,16 @@
       "npm"
       "node"
       "kate"
-      "direnv"
+      "tmux"
+      "systemd"
+      "repo"
+      "fzf"
+      "dotenv"
       "archlinux"
-      "postgres"
       "opentofu"
       "battery"
       "pnpm-shell-completion"
+      "zoxide"
     ];
 
     extraConfig = ''

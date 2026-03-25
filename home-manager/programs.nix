@@ -91,7 +91,7 @@
     };
   };
 
-  tmux = import ./tmux.nix;
+  tmux = import ./tmux.nix { inherit homeDirectory pkgs pkgsUnstable; };
 
   fzf = import ./fzf.nix;
 

@@ -43,6 +43,9 @@
             configHome = homeDirectory;
           };
         };
+        overlays = [
+          (import rust-overlay)
+        ];
       };
 
       pkgs = import nixpkgs {
@@ -56,12 +59,12 @@
         };
         overlays = [
           (import rust-overlay)
-        ]
-        ++ (with self.overlays; [
-          go
-          node
-          rust
-        ]);
+        ];
+        # ++ (with self.overlays; [
+        #   go
+        #   node
+        #   rust
+        # ]);
       };
 
       inherit (flake-utils.lib) eachDefaultSystem;
