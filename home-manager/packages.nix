@@ -50,7 +50,7 @@ let
     gitflow
   ];
 
-  misc = with pkgsUnstable; [
+  misc = with pkgs; [
     code-cursor
     comma
     coreutils

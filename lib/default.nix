@@ -75,7 +75,7 @@ rec {
 
     node =
       with pkgs;
-      [ nodejs_25 ]
+      [ nodejs_latest ]
       ++ (with pkgs.nodePackages; [
         pnpm
         typescript

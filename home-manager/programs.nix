@@ -73,9 +73,14 @@
     enableZshIntegration = true;
   };
 
-  nushell = {
+  nix-your-shell = {
     enable = true;
+    enableZshIntegration = true;
   };
+
+  #   nushell = {
+  #     enable = true;
+  #   };
 
   pandoc = {
     enable = true;
@@ -90,7 +95,7 @@
 
   fzf = import ./fzf.nix;
 
-  ghostty = import ./ghostty.nix;
+  #   ghostty = import ./ghostty.nix;
 
   atuin = import ./atuin.nix;
 

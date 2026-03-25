@@ -14,7 +14,7 @@
   };
 
   node = final: prev: rec {
-    nodejs = prev.nodejs_25;
+    nodejs = prev.nodejs_latest;
     pnpm = prev.pnpm.override {
       inherit nodejs;
     };
