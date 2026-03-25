@@ -70,7 +70,6 @@ let
     wget
     zstd
     pinentry-gnome3
-    keepassxc
     keybase
     keychain
     gnupg

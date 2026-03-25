@@ -63,7 +63,7 @@
     commit.gpgsign = "true";
     gpg.program = "gpg2";
     credential = {
-      helper = "keepassxc --git-groups";
+      helper = "keepassxc";
       #   credentialstore = "gpg";
     };
     pull.rebase = "true";
