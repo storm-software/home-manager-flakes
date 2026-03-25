@@ -18,9 +18,7 @@
     enable = true;
     highlighters = [
       "main"
-      "command"
       "pattern"
-      "root"
     ];
   };
 

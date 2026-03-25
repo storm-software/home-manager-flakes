@@ -45,8 +45,8 @@
     maxCacheTtlSsh = 7200;
     grabKeyboardAndMouse = true;
     pinentry = {
-      package = pkgsUnstable.keepassxc;
-      program = "keepassxc";
+      package = pkgsUnstable.pinentry-gnome3;
+      program = "pinentry-gnome3";
     };
     enableSshSupport = true;
     enableScDaemon = true;
