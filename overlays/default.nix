@@ -13,12 +13,12 @@
     go = prev.go_1_25;
   };
 
-  node = final: prev: rec {
-    nodejs = prev.nodejs_25;
-    pnpm = prev.pnpm.override {
-      inherit nodejs;
-    };
-  };
+  #   node = final: prev: rec {
+  #     nodejs = prev.nodejs_25;
+  #     pnpm = prev.pnpm.override {
+  #       inherit nodejs;
+  #     };
+  #   };
 
   rust = final: prev: {
     devRust = prev.pkgs.rust-bin.beta.latest.default;

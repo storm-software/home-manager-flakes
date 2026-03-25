@@ -1,9 +1,12 @@
 {
   description = "Starter - Local Development Environment";
 
-  inputs = { storm.url = "github:storm-software/home-manager-flakes"; };
+  inputs = {
+    storm.url = "github:storm-software/home-manager-flakes";
+  };
 
-  outputs = { self, storm, ... }:
+  outputs =
+    { self, storm, ... }:
     storm.lib.mkEnv {
       toolchains = with storm.lib.toolchains; builds;
       extras = with storm.pkgs; [ jq ];

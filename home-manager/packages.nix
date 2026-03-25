@@ -59,12 +59,12 @@ let
     libiconv
     open-policy-agent
     openssl
-    # pikchr
-    # pkg-config
-    # skopeo
-    # stow
-    # subversion
-    # tailscale
+    pikchr
+    pkg-config
+    skopeo
+    stow
+    subversion
+    tailscale
     tree
     treefmt
     wget

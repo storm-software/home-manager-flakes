@@ -23,29 +23,28 @@
     nix-direnv.enable = true;
   };
 
-  gh = import ./gh.nix { inherit gitUser; };
+  #   gh = import ./gh.nix { inherit gitUser; };
 
-  ssh = {
-    enable = true;
-    #   enableDefaultConfig = false;
-    matchBlocks."*" = {
-      forwardAgent = true;
-      addKeysToAgent = "yes";
-      compression = false;
-      serverAliveInterval = 0;
-      serverAliveCountMax = 3;
-      hashKnownHosts = false;
-      userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
-    };
-  };
+  #   ssh = {
+  #     enable = true;
+  #     enableDefaultConfig = false;
+  #     matchBlocks."*" = {
+  #       forwardAgent = true;
+  #       addKeysToAgent = "yes";
+  #       serverAliveInterval = 0;
+  #       serverAliveCountMax = 3;
+  #       hashKnownHosts = false;
+  #       userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
+  #     };
+  #   };
 
   keepassxc = import ./keepassxc.nix { inherit homeDirectory pkgs pkgsUnstable; };
 
-  #   git-credential-keepassxc = {
-  #     enable = true;
-  #     hosts = [ "github.com" ];
-  #     groups = [ "Git" ];
-  #   };
+  git-credential-keepassxc = {
+    enable = true;
+    hosts = [ "https://github.com" ];
+    groups = [ "Git" ];
+  };
 
   git = import ./git.nix {
     inherit

@@ -24,7 +24,7 @@
     let
       username = "development";
       system = "x86_64-linux";
-      stateVersion = "26.05";
+      stateVersion = "25.11";
       homeDirectory = self.lib.getHomeDirectory username;
 
       # User specific settings

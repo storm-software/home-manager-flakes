@@ -10,9 +10,25 @@
   package = pkgs.gitFull;
   lfs.enable = true;
 
+  maintenance = {
+    enable = true;
+    repositories = [
+      "${homeDirectory}/repos/storm-ops"
+      "${homeDirectory}/repos/stryke"
+      "${homeDirectory}/repos/powerlines"
+      "${homeDirectory}/repos/earthquake"
+      "${homeDirectory}/repos/acidic"
+      "${homeDirectory}/repos/shell-shock"
+      "${homeDirectory}/repos/storm-dev"
+      "${homeDirectory}/repos/media-kit"
+      "${homeDirectory}/repos/home-manager-flakes"
+    ];
+  };
+
   signing = {
     key = signingKey;
     signByDefault = true;
+    format = "openpgp";
   };
 
   ignores = [
@@ -37,7 +53,7 @@
       editor = "code --wait";
       autocrlf = "input";
       whitespace = "trailing-space,space-before-tab";
-      askPass = ""; # needs to be empty to use terminal for ask password prompt
+      #   askPass = ""; # needs to be empty to use terminal for ask password prompt
     };
     merge.tool = "vscode";
     help.autocorrect = "true";
@@ -47,8 +63,8 @@
     commit.gpgsign = "true";
     gpg.program = "gpg2";
     credential = {
-      helper = "keepassxc";
-      credentialstore = "gpg";
+      helper = "keepassxc --git-groups";
+      #   credentialstore = "gpg";
     };
     pull.rebase = "true";
     push.default = "tracking";
