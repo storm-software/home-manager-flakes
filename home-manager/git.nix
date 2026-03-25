@@ -62,10 +62,10 @@
     github.user = gitUser.name;
     commit.gpgsign = "true";
     gpg.program = "gpg2";
-    credential = {
-      helper = "keepassxc";
-      #   credentialstore = "gpg";
-    };
+    # credential = {
+    #   helper = "keepassxc";
+    #   #   credentialstore = "gpg";
+    # };
     pull.rebase = "true";
     push.default = "tracking";
     init.defaultBranch = "main";
