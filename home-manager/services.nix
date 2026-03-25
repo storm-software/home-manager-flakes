@@ -2,6 +2,7 @@
   homeDirectory,
   username,
   pkgs,
+  pkgsUnstable,
 }:
 
 {
