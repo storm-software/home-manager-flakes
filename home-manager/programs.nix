@@ -23,13 +23,13 @@
     nix-direnv.enable = true;
   };
 
-#   gh = import ./gh.nix { inherit gitUser; };
+  gh = import ./gh.nix { inherit gitUser; };
 
-#   git-credential-oauth = {
-#     enable = true;
-#     package = pkgsUnstable.git-credential-keepassxc;
-#     # hosts = [ "https://github.com" ];
-#   };
+  #   git-credential-oauth = {
+  #     enable = true;
+  #     package = pkgsUnstable.git-credential-keepassxc;
+  #     # hosts = [ "https://github.com" ];
+  #   };
 
   ssh = {
     enable = true;
@@ -46,12 +46,12 @@
 
   keepassxc = import ./keepassxc.nix { inherit homeDirectory pkgs pkgsUnstable; };
 
-  git-credential-keepassxc = {
-    enable = true;
-    package = pkgs.git-credential-keepassxc;
-    groups = [ "Vault - Root" ];
-    # hosts = [ "https://github.com" ];
-  };
+  #   git-credential-keepassxc = {
+  #     enable = true;
+  #     package = pkgs.git-credential-keepassxc;
+  #     groups = [ "Vault - Root" ];
+  #     # hosts = [ "https://github.com" ];
+  #   };
 
   git = import ./git.nix {
     inherit
