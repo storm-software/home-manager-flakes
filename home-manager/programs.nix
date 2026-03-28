@@ -25,11 +25,9 @@
 
   gh = import ./gh.nix { inherit gitUser; };
 
-  #   git-credential-oauth = {
-  #     enable = true;
-  #     package = pkgsUnstable.git-credential-keepassxc;
-  #     # hosts = [ "https://github.com" ];
-  #   };
+  git-credential-oauth = {
+    enable = true;
+  };
 
   ssh = {
     enable = true;
