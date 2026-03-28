@@ -33,7 +33,6 @@
     SSHAgent = {
       Enabled = true;
       UseOpenSSH = true;
-      AuthSockOverride = "/run/user/1001/ssh-agent";
     };
     Security = {
       HideTotpPreviewPanel = true;

@@ -74,21 +74,17 @@ let
     zstd
     pinentry-gnome3
     keybase
-    keychain
     gnupg
     direnv
   ];
 
-  nixTools = with pkgs; [
-    nix-direnv
-    nixfmt
-    vulnix
-    statix
-  ];
-
-  devenvTools = with pkgsUnstable; [
-    cachix
-    devenv
+  nixTools = [
+    pkgs.nix-direnv
+    pkgs.nixfmt
+    pkgs.vulnix
+    pkgs.statix
+    pkgsUnstable.cachix
+    pkgsUnstable.devenv
   ];
 
   # virtualizationTools = with pkgs; [

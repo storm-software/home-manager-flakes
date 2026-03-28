@@ -57,7 +57,6 @@
   ssh-agent = {
     enable = true;
     enableZshIntegration = true;
-    socket = "/run/user/1001/ssh-agent";
   };
 
   keybase = {
