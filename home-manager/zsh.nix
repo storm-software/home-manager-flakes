@@ -14,13 +14,13 @@
     ];
   };
 
-  syntaxHighlighting = {
-    enable = true;
-    highlighters = [
-      "main"
-      "pattern"
-    ];
-  };
+#   syntaxHighlighting = {
+#     enable = true;
+#     highlighters = [
+#       "main"
+#       "pattern"
+#     ];
+#   };
 
   oh-my-zsh = {
     custom = "${homeDirectory}/.oh-my-zsh/custom";
@@ -29,8 +29,6 @@
       "git"
       "gh"
       "github"
-      "terraform"
-      "pulumi"
       "vscode"
       "tmux"
       "rust"
@@ -43,7 +41,6 @@
       "fzf"
       "dotenv"
       "archlinux"
-      "opentofu"
       "battery"
       "pnpm-shell-completion"
       "zoxide"

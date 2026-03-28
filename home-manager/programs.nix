@@ -23,26 +23,33 @@
     nix-direnv.enable = true;
   };
 
-  #   gh = import ./gh.nix { inherit gitUser; };
+  gh = import ./gh.nix { inherit gitUser; };
 
-  #   ssh = {
-  #     enable = true;
-  #     enableDefaultConfig = false;
-  #     matchBlocks."*" = {
-  #       forwardAgent = true;
-  #       addKeysToAgent = "yes";
-  #       serverAliveInterval = 0;
-  #       serverAliveCountMax = 3;
-  #       hashKnownHosts = false;
-  #       userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
-  #     };
-  #   };
+  git-credential-oauth = {
+    enable = true;
+    package = pkgsUnstable.git-credential-keepassxc;
+    # hosts = [ "https://github.com" ];
+  };
+
+  ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+    matchBlocks."*" = {
+      forwardAgent = true;
+      addKeysToAgent = "yes";
+      serverAliveInterval = 0;
+      serverAliveCountMax = 3;
+      hashKnownHosts = false;
+      userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
+    };
+  };
 
   keepassxc = import ./keepassxc.nix { inherit homeDirectory pkgs pkgsUnstable; };
 
   git-credential-keepassxc = {
     enable = true;
-    package = pkgsUnstable.git-credential-keepassxc;
+    package = pkgs.git-credential-keepassxc;
+    groups = [ "Vault - Root" ];
     # hosts = [ "https://github.com" ];
   };
 
@@ -55,7 +62,12 @@
       ;
   };
 
-  gpg.enable = true;
+  gpg = {
+    enable = true;
+    homedir = "${homeDirectory}/.gnupg";
+    mutableKeys = true;
+    mutableTrust = true;
+  };
 
   home-manager = {
     enable = true;

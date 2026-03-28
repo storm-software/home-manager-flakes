@@ -40,9 +40,10 @@
 
   gpg-agent = {
     enable = true;
-    defaultCacheTtl = 1800;
-    maxCacheTtl = 7200;
-    maxCacheTtlSsh = 7200;
+    defaultCacheTtl = 7200;
+    defaultCacheTtlSsh = 7200;
+    maxCacheTtl = 14400;
+    maxCacheTtlSsh = 14400;
     grabKeyboardAndMouse = true;
     pinentry = {
       package = pkgsUnstable.pinentry-gnome3;
@@ -53,17 +54,14 @@
     enableZshIntegration = true;
   };
 
-  #   cachix-agent = {
-  #     enable = true;
-  #     credentialsFile = "${homeDirectory}/.cachix/auth-token";
-  #     name = "storm-software";
-  #     profile = "development";
-  #     package = pkgsUnstable.cachix;
-  #   };
-
   ssh-agent = {
     enable = true;
     enableZshIntegration = true;
+    socket = "/run/user/1001/ssh-agent";
+  };
+
+  keybase = {
+    enable = true;
   };
 
   home-manager.autoExpire = {

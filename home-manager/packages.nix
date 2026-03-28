@@ -18,18 +18,18 @@ let
   # refinery-cli
   # ];
 
-  devOpsTools = [
-    # pkgs.dapr-cli
-    # pkgs.dive
-    # pkgs.doctl
-    # pkgs.doppler
-    # pkgs.flyctl
-    # pkgs.heroku
-    # pkgs.packer
-    pkgsUnstable.pulumi
-    pkgs.terraform
-    pkgs.terragrunt
-  ];
+#   devOpsTools = [
+#     # pkgs.dapr-cli
+#     # pkgs.dive
+#     # pkgs.doctl
+#     # pkgs.doppler
+#     # pkgs.flyctl
+#     # pkgs.heroku
+#     pkgs.packer
+#     pkgsUnstable.pulumi
+#     pkgs.terraform
+#     pkgs.terragrunt
+#   ];
 
   fonts = with pkgs.nerd-fonts; [
     hack
@@ -55,7 +55,6 @@ let
   ];
 
   misc = with pkgs; [
-    code-cursor
     comma
     coreutils
     findutils
@@ -97,4 +96,4 @@ let
   # qemu
   # ];
 in
-bin ++ fonts ++ devOpsTools ++ gitTools ++ nixTools ++ devenvTools ++ misc
+bin ++ fonts ++ gitTools ++ nixTools ++ misc
