@@ -38,21 +38,23 @@
   #     };
   # };
 
-  gpg-agent = {
-    enable = true;
-    defaultCacheTtl = 7200;
-    defaultCacheTtlSsh = 7200;
-    maxCacheTtl = 14400;
-    maxCacheTtlSsh = 14400;
-    grabKeyboardAndMouse = true;
-    pinentry = {
-      package = pkgsUnstable.pinentry-gnome3;
-      program = "pinentry-gnome3";
-    };
-    enableSshSupport = true;
-    enableScDaemon = true;
-    enableZshIntegration = true;
-  };
+  gnome-keyring.enable = false;
+
+#   gpg-agent = {
+#     enable = true;
+#     defaultCacheTtl = 7200;
+#     defaultCacheTtlSsh = 7200;
+#     maxCacheTtl = 14400;
+#     maxCacheTtlSsh = 14400;
+#     grabKeyboardAndMouse = true;
+#     pinentry = {
+#       package = pkgsUnstable.pinentry-gnome3;
+#       program = "pinentry-gnome3";
+#     };
+#     enableSshSupport = true;
+#     enableScDaemon = true;
+#     enableZshIntegration = true;
+#   };
 
 #   ssh-agent = {
 #     enable = true;
@@ -87,9 +89,8 @@
 
   protonmail-bridge = {
     enable = true;
-    extraPackages = with pkgs; [
-      pass
-      gnome-keyring
+    extraPackages = with pkgsUnstable; [
+      keepassxc
     ];
     logLevel = "info";
   };

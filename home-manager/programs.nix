@@ -29,18 +29,18 @@
     enable = true;
   };
 
-#   ssh = {
-#     enable = true;
-#     enableDefaultConfig = false;
-#     matchBlocks."*" = {
-#       forwardAgent = true;
-#       addKeysToAgent = "yes";
-#       serverAliveInterval = 0;
-#       serverAliveCountMax = 3;
-#       hashKnownHosts = false;
-#       userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
-#     };
-#   };
+  ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+    matchBlocks."*" = {
+      forwardAgent = true;
+      addKeysToAgent = "yes";
+      serverAliveInterval = 0;
+      serverAliveCountMax = 3;
+      hashKnownHosts = false;
+      userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
+    };
+  };
 
   keepassxc = import ./keepassxc.nix { inherit homeDirectory pkgs pkgsUnstable; };
 
@@ -60,12 +60,12 @@
       ;
   };
 
-  gpg = {
-    enable = true;
-    homedir = "${homeDirectory}/.gnupg";
-    mutableKeys = true;
-    mutableTrust = true;
-  };
+#   gpg = {
+#     enable = true;
+#     homedir = "${homeDirectory}/.gnupg";
+#     mutableKeys = true;
+#     mutableTrust = true;
+#   };
 
   home-manager = {
     enable = true;

@@ -73,8 +73,9 @@ let
     wget
     zstd
     pinentry-gnome3
+    keychain
     keybase
-    gnupg
+    # gnupg
     direnv
   ];
 
