@@ -25,10 +25,6 @@
 
   gh = import ./gh.nix { inherit gitUser; };
 
-  git-credential-oauth = {
-    enable = true;
-  };
-
   ssh = {
     enable = true;
     enableDefaultConfig = false;
@@ -60,12 +56,12 @@
       ;
   };
 
-#   gpg = {
-#     enable = true;
-#     homedir = "${homeDirectory}/.gnupg";
-#     mutableKeys = true;
-#     mutableTrust = true;
-#   };
+  gpg = {
+    enable = true;
+    homedir = "${homeDirectory}/.gnupg";
+    mutableKeys = true;
+    mutableTrust = true;
+  };
 
   home-manager = {
     enable = true;

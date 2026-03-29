@@ -61,7 +61,7 @@
     branch.autosetuprebase = "always";
     github.user = gitUser.name;
     commit.gpgsign = "true";
-    gpg.program = "keybase";
+    gpg.program = "gpg";
     # credential = {
     #   helper = "keepassxc";
     #   credentialstore = "gpg";

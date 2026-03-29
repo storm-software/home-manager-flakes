@@ -38,32 +38,32 @@
   #     };
   # };
 
-  gnome-keyring.enable = false;
+#   gnome-keyring.enable = false;
 
-#   gpg-agent = {
-#     enable = true;
-#     defaultCacheTtl = 7200;
-#     defaultCacheTtlSsh = 7200;
-#     maxCacheTtl = 14400;
-#     maxCacheTtlSsh = 14400;
-#     grabKeyboardAndMouse = true;
-#     pinentry = {
-#       package = pkgsUnstable.pinentry-gnome3;
-#       program = "pinentry-gnome3";
-#     };
-#     enableSshSupport = true;
-#     enableScDaemon = true;
-#     enableZshIntegration = true;
-#   };
-
-#   ssh-agent = {
-#     enable = true;
-#     enableZshIntegration = true;
-#   };
-
-  keybase = {
+  gpg-agent = {
     enable = true;
+    defaultCacheTtl = 7200;
+    defaultCacheTtlSsh = 7200;
+    maxCacheTtl = 14400;
+    maxCacheTtlSsh = 14400;
+    grabKeyboardAndMouse = true;
+    pinentry = {
+      package = pkgsUnstable.pinentry-gnome3;
+      program = "pinentry-gnome3";
+    };
+    enableSshSupport = true;
+    enableScDaemon = true;
+    enableZshIntegration = true;
   };
+
+  ssh-agent = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+#   keybase = {
+#     enable = true;
+#   };
 
   home-manager.autoExpire = {
     enable = true;
