@@ -7,7 +7,7 @@
 
   settings = {
     git_protocol = "https";
-    editor = "code";
+    editor = "code-insiders";
   };
 
   hosts = {

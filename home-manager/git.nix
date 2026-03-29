@@ -50,7 +50,7 @@
       email = gitUser.email;
     };
     core = {
-      editor = "code --wait";
+      editor = "code-insiders --wait";
       autocrlf = "input";
       whitespace = "trailing-space,space-before-tab";
       #   askPass = ""; # needs to be empty to use terminal for ask password prompt

@@ -54,10 +54,10 @@
     enableZshIntegration = true;
   };
 
-  ssh-agent = {
-    enable = true;
-    enableZshIntegration = true;
-  };
+#   ssh-agent = {
+#     enable = true;
+#     enableZshIntegration = true;
+#   };
 
   keybase = {
     enable = true;
