@@ -38,8 +38,6 @@
   #     };
   # };
 
-#   gnome-keyring.enable = false;
-
   gpg-agent = {
     enable = true;
     defaultCacheTtl = 7200;
