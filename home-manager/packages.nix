@@ -74,7 +74,7 @@ let
     zstd
     pinentry-gnome3
     keychain
-    keybase
+    # keybase
     gnupg
     direnv
   ];
