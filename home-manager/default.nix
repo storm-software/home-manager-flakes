@@ -24,7 +24,6 @@ let
 in
 {
   meta = {
-    description = "Home Manager configuration for Storm Software";
     maintainers = with lib.maintainers; [ sullivanpj ];
     teams = with lib.teams; [ storm ];
   };
