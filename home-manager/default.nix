@@ -6,7 +6,7 @@
 
 let
   # The packages to load into the PATH
-  packages = import ./packages.nix { inherit pkgs pkgsUnstable currentUser; };
+  packages = import ./packages.nix { inherit pkgs pkgsUnstable; };
   lib = {
     teams = {
       storm = {
