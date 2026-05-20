@@ -1,8 +1,5 @@
 {
-  username,
-  signingKey,
-  homeDirectory,
-  gitUser,
+  currentUser,
   pkgs,
   pkgsUnstable,
 }:
@@ -23,7 +20,7 @@
     nix-direnv.enable = true;
   };
 
-  gh = import ./gh.nix { inherit gitUser; };
+  gh = import ./gh.nix { inherit currentUser; };
 
   ssh = {
     enable = true;
@@ -34,11 +31,11 @@
       serverAliveInterval = 0;
       serverAliveCountMax = 3;
       hashKnownHosts = false;
-      userKnownHostsFile = "${homeDirectory}/.ssh/known_hosts";
+      userKnownHostsFile = "${currentUser.system.homeDirectory}/.ssh/known_hosts";
     };
   };
 
-  keepassxc = import ./keepassxc.nix { inherit homeDirectory pkgs pkgsUnstable; };
+  keepassxc = import ./keepassxc.nix { inherit currentUser pkgsUnstable; };
 
   #   git-credential-keepassxc = {
   #     enable = true;
@@ -47,18 +44,11 @@
   #     # hosts = [ "https://github.com" ];
   #   };
 
-  git = import ./git.nix {
-    inherit
-      signingKey
-      gitUser
-      pkgs
-      homeDirectory
-      ;
-  };
+  git = import ./git.nix { inherit currentUser pkgs; };
 
   gpg = {
     enable = true;
-    homedir = "${homeDirectory}/.gnupg";
+    homedir = "${currentUser.system.homeDirectory}/.gnupg";
     mutableKeys = true;
     mutableTrust = true;
   };
@@ -84,10 +74,6 @@
     enableZshIntegration = true;
   };
 
-  #   nushell = {
-  #     enable = true;
-  #   };
-
   pandoc = {
     enable = true;
     defaults = {
@@ -97,9 +83,35 @@
     };
   };
 
-  tmux = import ./tmux.nix { inherit homeDirectory pkgs pkgsUnstable; };
+  tmux = import ./tmux.nix { inherit pkgs; };
 
   fzf = import ./fzf.nix;
+
+  fd = {
+    enable = true;
+    hidden = true;
+    ignores = [
+      ".git"
+      ".nx"
+      ".devenv"
+      ".tamagui"
+      ".next"
+      ".next-dev"
+      ".docusaurus"
+      ".tsbuildinfo"
+      "node_modules"
+      "bower_components"
+      "coverage"
+      "out"
+      "out-dev"
+      "dist"
+      "dist-dev"
+      "public"
+      "public-dev"
+      "storybook-static"
+      "storybook-static-dev"
+    ];
+  };
 
   ghostty = import ./ghostty.nix;
 
@@ -116,7 +128,7 @@
   #   vscode = import ./vscode.nix { inherit username pkgs pkgsUnstable; };
 
   zsh = import ./zsh.nix {
-    inherit homeDirectory;
+    inherit currentUser;
     inherit (pkgs) substituteAll;
   };
 

@@ -1,7 +1,6 @@
 {
-  pkgs,
   pkgsUnstable,
-  homeDirectory,
+  currentUser,
 }:
 
 {
@@ -12,7 +11,7 @@
     General = {
       ConfigVersion = 2;
       BackupBeforeSave = true;
-      DefaultDatabaseFileName = "${homeDirectory}/sync/vault/vault.kdbx";
+      DefaultDatabaseFileName = "${currentUser.system.homeDirectory}/sync/vault/vault.kdbx";
       OpenPreviousDatabasesOnStartup = true;
       RememberLastDatabases = true;
       RememberLastKeyFiles = true;

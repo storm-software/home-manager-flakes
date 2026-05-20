@@ -1,5 +1,3 @@
-{ system }:
-
 {
   config = {
     allowUnfree = true;

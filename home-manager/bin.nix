@@ -1,6 +1,5 @@
 {
   fakeHash,
-  homeDirectory,
   writeScriptBin,
 }:
 

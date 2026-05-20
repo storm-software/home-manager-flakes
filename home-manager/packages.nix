@@ -1,35 +1,13 @@
 {
-  homeDirectory,
   pkgs,
   pkgsUnstable,
 }:
 
 let
   bin = import ./bin.nix {
-    inherit homeDirectory;
     inherit (pkgs) writeScriptBin;
     inherit (pkgs.lib) fakeHash;
   };
-
-  # databaseTools = with pkgs; [
-  # sqlite
-  # litestream
-  # postgresql_18
-  # refinery-cli
-  # ];
-
-#   devOpsTools = [
-#     # pkgs.dapr-cli
-#     # pkgs.dive
-#     # pkgs.doctl
-#     # pkgs.doppler
-#     # pkgs.flyctl
-#     # pkgs.heroku
-#     pkgs.packer
-#     pkgsUnstable.pulumi
-#     pkgs.terraform
-#     pkgs.terragrunt
-#   ];
 
   fonts = with pkgs.nerd-fonts; [
     hack
@@ -51,7 +29,6 @@ let
     difftastic
     diff-so-fancy
     codeowners
-    gitflow
   ];
 
   misc = with pkgs; [
@@ -82,10 +59,5 @@ let
     pkgsUnstable.cachix
     pkgsUnstable.devenv
   ];
-
-  # virtualizationTools = with pkgs; [
-  # vagrant
-  # qemu
-  # ];
 in
 bin ++ fonts ++ gitTools ++ nixTools ++ misc

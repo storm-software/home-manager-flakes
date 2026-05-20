@@ -1,6 +1,5 @@
 {
-  homeDirectory,
-  username,
+  currentUser,
   pkgs,
   pkgsUnstable,
 }:
@@ -54,15 +53,6 @@
     enableZshIntegration = true;
   };
 
-#   ssh-agent = {
-#     enable = true;
-#     enableZshIntegration = true;
-#   };
-
-#   keybase = {
-#     enable = true;
-#   };
-
   home-manager.autoExpire = {
     enable = true;
     frequency = "weekly";
@@ -96,15 +86,15 @@
   syncthing = {
     enable = false;
     guiAddress = "127.0.0.1:8384";
-    cert = "${homeDirectory}/.cert/syncthing/cert.pem";
-    key = "${homeDirectory}/.cert/syncthing/key.pem";
+    cert = "${currentUser.system.homeDirectory}/.cert/syncthing/cert.pem";
+    key = "${currentUser.system.homeDirectory}/.cert/syncthing/key.pem";
     settings = {
-      defaultFolderPath = "${homeDirectory}/sync";
+      defaultFolderPath = "${currentUser.system.homeDirectory}/sync";
       defaultFolderRescanIntervalS = 3600;
       defaultFolderType = "readwrite";
       gui = {
         theme = "black";
-        user = "${username}";
+        user = "${currentUser.system.username}";
         metricsWithoutAuth = false;
       };
       options = {

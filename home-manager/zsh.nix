@@ -1,4 +1,4 @@
-{ homeDirectory, substituteAll }:
+{ currentUser, substituteAll }:
 
 {
   enable = true;
@@ -14,16 +14,8 @@
     ];
   };
 
-#   syntaxHighlighting = {
-#     enable = true;
-#     highlighters = [
-#       "main"
-#       "pattern"
-#     ];
-#   };
-
   oh-my-zsh = {
-    custom = "${homeDirectory}/.oh-my-zsh/custom";
+    custom = "${currentUser.system.homeDirectory}/.oh-my-zsh/custom";
     theme = "storm-software";
     plugins = [
       "git"
@@ -47,7 +39,8 @@
     ];
 
     extraConfig = ''
-      if [ -e ${homeDirectory}/.nix-profile/etc/profile.d/nix.sh ]; then . ${homeDirectory}/.nix-profile/etc/profile.d/nix.sh; fi
+      if [ -e ${currentUser.system.homeDirectory}/.nix-profile/etc/profile.d/nix.sh ]; then . ${currentUser.system.homeDirectory}/.nix-profile/etc/profile.d/nix.sh; fi
+      eval "$(devenv hook zsh)"
       eval "$(atuin init zsh)"
     '';
     enable = true;
@@ -64,5 +57,5 @@
   };
 
   initContent = (builtins.readFile ./scripts/init.sh);
-  shellAliases = (import ./aliases.nix { inherit homeDirectory; }).shell;
+  shellAliases = (import ./aliases.nix { inherit currentUser; }).shell;
 }

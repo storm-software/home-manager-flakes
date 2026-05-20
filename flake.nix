@@ -22,17 +22,19 @@
       rust-overlay,
     }:
     let
-      username = "development";
-      system = "x86_64-linux";
-      stateVersion = "25.11";
-      homeDirectory = self.lib.getHomeDirectory username;
-
       # User specific settings
-      gitUser = {
-        name = "Pat Sullivan";
+      currentUser = {
+        name = "sullivanpj";
+        displayName = "Pat Sullivan";
         email = "pat@patsullivan.org";
+        signingKey = "67216ED35A5544A9";
+        system = {
+            username = "development";
+            homeDirectory = self.lib.getHomeDirectory "development";
+        };
       };
-      signingKey = "67216ED35A5544A9";
+
+      system = "x86_64-linux";
 
       pkgsUnstable = import nixpkgs-unstable {
         inherit system;
@@ -40,7 +42,7 @@
           allowUnfree = true;
           allowUnsupportedSystem = true;
           xdg = {
-            configHome = homeDirectory;
+            configHome = currentUser.system.homeDirectory;
           };
         };
         overlays = [
@@ -54,17 +56,12 @@
           allowUnfree = true;
           allowUnsupportedSystem = true;
           xdg = {
-            configHome = homeDirectory;
+            configHome = currentUser.system.homeDirectory;
           };
         };
         overlays = [
           (import rust-overlay)
         ];
-        # ++ (with self.overlays; [
-        #   go
-        #   node
-        #   rust
-        # ]);
       };
 
       inherit (flake-utils.lib) eachDefaultSystem;
@@ -88,19 +85,14 @@
         );
     in
     {
-      homeConfigurations.${username} = homeManagerConfiguration {
+      homeConfigurations.${currentUser.system.username} = homeManagerConfiguration {
         inherit pkgs;
         modules = [
           (import ./home-manager {
             inherit
-              homeDirectory
               pkgs
               pkgsUnstable
-              stateVersion
-              system
-              username
-              gitUser
-              signingKey
+              currentUser
               ;
           })
         ];

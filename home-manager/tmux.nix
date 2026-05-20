@@ -1,8 +1,4 @@
-{
-  pkgs,
-  pkgsUnstable,
-  homeDirectory,
-}:
+{ pkgs }:
 
 {
   enable = true;

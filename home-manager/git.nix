@@ -1,8 +1,6 @@
 {
-  signingKey,
-  gitUser,
   pkgs,
-  homeDirectory,
+  currentUser
 }:
 
 {
@@ -13,20 +11,20 @@
   maintenance = {
     enable = true;
     repositories = [
-      "${homeDirectory}/repos/storm-ops"
-      "${homeDirectory}/repos/stryke"
-      "${homeDirectory}/repos/powerlines"
-      "${homeDirectory}/repos/earthquake"
-      "${homeDirectory}/repos/acidic"
-      "${homeDirectory}/repos/shell-shock"
-      "${homeDirectory}/repos/storm-dev"
-      "${homeDirectory}/repos/media-kit"
-      "${homeDirectory}/repos/home-manager-flakes"
+      "${currentUser.system.homeDirectory}/repos/storm-ops"
+      "${currentUser.system.homeDirectory}/repos/stryke"
+      "${currentUser.system.homeDirectory}/repos/powerlines"
+      "${currentUser.system.homeDirectory}/repos/earthquake"
+      "${currentUser.system.homeDirectory}/repos/acidic"
+      "${currentUser.system.homeDirectory}/repos/shell-shock"
+      "${currentUser.system.homeDirectory}/repos/storm-dev"
+      "${currentUser.system.homeDirectory}/repos/media-kit"
+      "${currentUser.system.homeDirectory}/repos/home-manager-flakes"
     ];
   };
 
   signing = {
-    key = signingKey;
+    key = currentUser.signingKey;
     signByDefault = true;
     format = "openpgp";
   };
@@ -46,8 +44,8 @@
 
   settings = {
     user = {
-      name = gitUser.name;
-      email = gitUser.email;
+      name = currentUser.name;
+      email = currentUser.email;
     };
     lfs = {
       enable = "true";
@@ -62,12 +60,12 @@
     merge.tool = "vscode";
     help.autocorrect = "true";
     branch.autosetuprebase = "always";
-    github.user = gitUser.name;
+    github.user = currentUser.name;
     commit.gpgsign = "true";
     tag.gpgSign = "true";
     pull.rebase = "true";
     push.default = "tracking";
     init.defaultBranch = "main";
-    alias = (import ./aliases.nix { inherit homeDirectory; }).git;
+    alias = (import ./aliases.nix { inherit currentUser; }).git;
   };
 }
