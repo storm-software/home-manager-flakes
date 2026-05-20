@@ -58,23 +58,18 @@ let
     comma
     coreutils
     findutils
-    htmltest
     libiconv
     open-policy-agent
     openssl
-    pikchr
     pkg-config
     skopeo
     stow
-    subversion
     tailscale
     tree
-    treefmt
     wget
     zstd
     pinentry-gnome3
     keychain
-    # keybase
     gnupg
     direnv
   ];
