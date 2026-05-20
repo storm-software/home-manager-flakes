@@ -7,8 +7,6 @@
 let
   # The packages to load into the PATH
   packages = import ./packages.nix { inherit pkgs pkgsUnstable currentUser; };
-in
-{
   lib = {
     teams = {
       storm = {
@@ -23,7 +21,8 @@ in
       };
     };
   };
-
+in
+{
   meta = {
     description = "Home Manager configuration for Storm Software";
     maintainers = with lib.maintainers; [ sullivanpj ];
