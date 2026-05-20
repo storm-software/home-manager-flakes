@@ -40,10 +40,10 @@
 
   gpg-agent = {
     enable = true;
-    defaultCacheTtl = 7200;
-    defaultCacheTtlSsh = 7200;
-    maxCacheTtl = 14400;
-    maxCacheTtlSsh = 14400;
+    defaultCacheTtl = 12600;
+    defaultCacheTtlSsh = 12600;
+    maxCacheTtl = 18000;
+    maxCacheTtlSsh = 18000;
     grabKeyboardAndMouse = true;
     pinentry = {
       package = pkgsUnstable.pinentry-gnome3;

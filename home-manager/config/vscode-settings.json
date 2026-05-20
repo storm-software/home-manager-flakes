@@ -2,27 +2,28 @@
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "search.exclude": {
-    "**/.git/**": true,
+    "**/.git": true,
+    "**/.rolldown": true,
     "**/bower_components": true,
     "**/*.code-search": true,
     "**/.tamagui": true,
-    "**/.next/**": true,
-    "**/.next-dev/**": true,
-    "**/dist/**": true,
-    "**/dist-dev/**": true,
-    "**/out-tsc/**": true,
-    "**/tmp/**": true,
-    "**/.docusaurus/**": true,
+    "**/.next": true,
+    "**/.next-dev": true,
+    "**/dist": true,
+    "**/dist-dev": true,
+    "**/out-tsc": true,
+    "**/tmp": true,
+    "**/.docusaurus": true,
     "**/CHANGELOG.json": true,
     "docs/spec.html": true,
-    "**/node_modules/**": true,
+    "**/node_modules": true,
     "**/.tsbuildinfo": true
   },
   "rust-analyzer.procMacro.ignored": {
     "napi-derive": ["napi"]
   },
   "nix.enableLanguageServer": true,
-  "nix.serverPath": "nixd",
+  "nix.serverPath": "/nix/store/cdzdgirz7m8finvpn08b4nlikcpyxnl8-nixd-2.9.0/bin/nixd",
   "nix.serverSettings": {
     "nixd": {
       "formatting": {

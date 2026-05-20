@@ -49,6 +49,10 @@
       name = gitUser.name;
       email = gitUser.email;
     };
+    lfs = {
+      enable = "true";
+      allowincompletepush = "true";
+    };
     core = {
       editor = "code-insiders --wait";
       autocrlf = "input";
@@ -57,10 +61,10 @@
     };
     merge.tool = "vscode";
     help.autocorrect = "true";
-    lfs.enable = "true";
     branch.autosetuprebase = "always";
     github.user = gitUser.name;
     commit.gpgsign = "true";
+    tag.gpgSign = "true";
     pull.rebase = "true";
     push.default = "tracking";
     init.defaultBranch = "main";
