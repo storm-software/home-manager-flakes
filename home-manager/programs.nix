@@ -119,7 +119,7 @@
 
   cursor = {
     enable = true;
-    package = pkgs.unstable.cursor;
+    package = pkgs.unstable.code-cursor;
     mutableExtensionsDir = true;
   };
 
