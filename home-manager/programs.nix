@@ -109,18 +109,6 @@
 
   man.enable = true;
 
-  vscode = {
-    enable = true;
-    package = pkgs.unstable.vscode;
-    mutableExtensionsDir = true;
-  };
-
-  cursor = {
-    enable = true;
-    package = pkgs.unstable.code-cursor;
-    mutableExtensionsDir = true;
-  };
-
   zsh = import ./zsh.nix {
     inherit user;
     inherit (pkgs) substituteAll;

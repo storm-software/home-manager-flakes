@@ -55,7 +55,9 @@ rec {
 
     elixir =
       let
-        darwinDeps = darwinOnly ((with pkgs.stable; [ terminal-notifier ]) ++ (with pkgs.stable; [ apple-sdk ]));
+        darwinDeps = darwinOnly (
+          (with pkgs.stable; [ terminal-notifier ]) ++ (with pkgs.stable; [ apple-sdk ])
+        );
         linuxDeps = linuxOnly (
           with pkgs.stable;
           [

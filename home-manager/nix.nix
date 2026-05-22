@@ -10,6 +10,10 @@
   };
 
   settings = {
+    allowed-users = [
+      "root"
+      "${user.system.username}"
+    ];
     trusted-users = [
       "root"
       "${user.system.username}"

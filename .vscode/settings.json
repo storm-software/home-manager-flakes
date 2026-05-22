@@ -1,0 +1,92 @@
+{
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "search.exclude": {
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/.tamagui": true,
+    "**/.next/**": true,
+    "**/.next-dev/**": true,
+    "**/dist/**": true,
+    "**/dist-dev/**": true,
+    "**/.docusaurus/**": true,
+    "**/CHANGELOG.json": true,
+    "docs/spec.html": true,
+    "**/node_modules/**": true,
+    "**/.tsbuildinfo": true,
+    "packages/compiler/templates/__snapshots__/**": true,
+    "packages/website/versioned_docs/**": true,
+    "packages/http-client-csharp/**/Generated/**": true,
+    "packages/samples/scratch/**": false // Those files are in gitignore but we still want to search for them
+  },
+  "files.exclude": {
+    "**/common/temp/**": true,
+    "**/obj/**": true,
+    "**/bin/**": true,
+    "**/.git": true,
+    "**/.DS_Store": true
+  },
+  "json.schemas": [
+    {
+      "url": "https://cdn.jsdelivr.net/npm/tsup/schema.json",
+      "fileMatch": ["tsup.config.json"]
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/nx/schemas/nx-schema.json",
+      "fileMatch": ["nx.json"]
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/@storm-software/config/schemas/storm-workspace.schema.json",
+      "fileMatch": ["storm-workspace.json"]
+    }
+  ],
+  "yaml.schemas": {
+    "url": "https://json.schemastore.org/github-action.json",
+    "fileMatch": [".github/actions/setup/action.yml"]
+  },
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#1d232a",
+    "statusBarItem.hoverBackground": "#313C47",
+    "statusBar.foreground": "#1fb2a6"
+  },
+  "peacock.color": "#1fb2a6",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.associations": {
+    "*.json": "jsonc"
+  },
+  "[json]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[jsonc]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[markdown]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnPaste": true
+  },
+  "[mdx]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.wordWrap": "on"
+  },
+  "[toml]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  "[yaml]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[nix]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "brettm12345.nixfmt-vscode"
+  },
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "chat.mcp.gallery.enabled": true
+}

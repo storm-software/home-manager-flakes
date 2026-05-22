@@ -24,17 +24,15 @@ let
     git-sync
     git-lfs
     difftastic
-    diff-so-fancy
     codeowners
   ];
 
   misc = with pkgs; [
-    stable.comma
     stable.coreutils
     stable.findutils
     stable.libiconv
-    stable.open-policy-agent
     stable.openssl
+    stable.cmake
     stable.pkg-config
     stable.skopeo
     stable.stow
@@ -49,6 +47,7 @@ let
   ];
 
   nixTools = with pkgs; [
+    stable.comma
     stable.nix-direnv
     stable.nixfmt
     stable.vulnix
