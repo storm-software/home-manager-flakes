@@ -1,20 +1,19 @@
-{ vimPlugins }:
+{ pkgs }:
 
 {
   enable = true;
-  # Sets alias vim=nvim
+  package = pkgs.stable.neovim-unwrapped;
   vimAlias = true;
 
   extraConfig = (builtins.readFile ./config/.vimrc);
 
   # Neovim plugins
-  plugins = with vimPlugins; [
+  plugins = with pkgs.stable.vimPlugins; [
     ctrlp
     editorconfig-vim
     gruvbox
     nerdtree
     tabular
-    vim-elixir
     vim-nix
     vim-markdown
   ];

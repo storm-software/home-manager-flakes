@@ -1,10 +1,8 @@
 { user, pkgs }:
 
 {
-  # Fancy replacement for cat
   bat.enable = true;
 
-  # Navigate directory trees
   broot = {
     enable = true;
     enableZshIntegration = true;
@@ -72,6 +70,8 @@
     };
   };
 
+  neovim = import ./neovim.nix { inherit pkgs; };
+
   tmux = import ./tmux.nix { inherit pkgs; };
 
   fzf = import ./fzf.nix;
@@ -102,8 +102,6 @@
     ];
   };
 
-  ghostty = import ./ghostty.nix;
-
   atuin = import ./atuin.nix;
 
   carapace = {
@@ -112,9 +110,6 @@
   };
 
   man.enable = true;
-
-  # Disabling vscode for now since it causes a lot of issues with the extension manager
-  #   vscode = import ./vscode.nix { inherit username pkgs pkgsUnstable; };
 
   vscode = {
     enable = true;
