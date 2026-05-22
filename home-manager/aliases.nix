@@ -32,8 +32,7 @@
     # General
     "," = "comma";
     cat = "bat";
-    code = "code-insiders";
-    conf = "code-insiders ~/.config/nixpkgs";
+    conf = "code ~/.config/nixpkgs";
     dc = "docker compose";
     diff = "diff --color=auto";
     grep = "grep --color=auto";
@@ -42,13 +41,18 @@
     zj = "zellij";
 
     # Direnv helpers
-    da = "direnv allow";
-    dr = "direnv reload";
+    dir-a = "direnv allow";
+    dir-r = "direnv reload";
+
+    # Devenv helpers
+    da = "devenv allow";
+    du = "devenv update";
 
     ## Nix stuff. Inspired by: https://alexfedoseev.com/blog/post/nix-time.
 
     # Reload the Home Manager configuration (after git push)
-    reload-hm = "home-manager switch -b backup --flake github:storm-software/home-manager-flakes && source ${user.system.homeDirectory}/.zshrc";
+    hmr = "home-manager switch -b backup --flake github:storm-software/home-manager-flakes && source ${user.system.homeDirectory}/.zshrc";
+    hmf = "nix build \"github:storm-software/home-manager-flakes#homeConfigurations.development.activationPackage\"";
 
     # Run Nix garbage collection
     xgc = "nix-env --delete-generations old && nix-store --gc";
