@@ -1,4 +1,7 @@
-{ fakeHash, writeScriptBin }:
+{
+  fakeHash,
+  writeScriptBin,
+}:
 
 let
   checkForArg = num: msg: ''

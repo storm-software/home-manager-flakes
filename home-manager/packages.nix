@@ -2,8 +2,8 @@
 
 let
   bin = import ./bin.nix {
-    inherit (pkgs) writeScriptBin;
-    inherit (pkgs.lib) fakeHash;
+    inherit (pkgs.stable) writeScriptBin;
+    inherit (pkgs.stable.lib) fakeHash;
   };
 
   fonts = with pkgs.stable.nerd-fonts; [
