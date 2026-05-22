@@ -7,6 +7,6 @@
   baseIndex = 1;
   keyMode = "vi";
   shortcut = "b";
-  shell = "${pkgs.zsh}/bin/zsh";
+  shell = "${pkgs.stable.zsh}/bin/zsh";
   extraConfig = (builtins.readFile ./config/tmux.conf);
 }

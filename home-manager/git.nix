@@ -1,30 +1,27 @@
-{
-  pkgs,
-  currentUser
-}:
+{ pkgs, user }:
 
 {
   enable = true;
-  package = pkgs.gitFull;
+  package = pkgs.stable.gitFull;
   lfs.enable = true;
 
   maintenance = {
     enable = true;
     repositories = [
-      "${currentUser.system.homeDirectory}/repos/storm-ops"
-      "${currentUser.system.homeDirectory}/repos/stryke"
-      "${currentUser.system.homeDirectory}/repos/powerlines"
-      "${currentUser.system.homeDirectory}/repos/earthquake"
-      "${currentUser.system.homeDirectory}/repos/acidic"
-      "${currentUser.system.homeDirectory}/repos/shell-shock"
-      "${currentUser.system.homeDirectory}/repos/storm-dev"
-      "${currentUser.system.homeDirectory}/repos/media-kit"
-      "${currentUser.system.homeDirectory}/repos/home-manager-flakes"
+      "${user.system.homeDirectory}/repos/storm-ops"
+      "${user.system.homeDirectory}/repos/stryke"
+      "${user.system.homeDirectory}/repos/powerlines"
+      "${user.system.homeDirectory}/repos/earthquake"
+      "${user.system.homeDirectory}/repos/acidic"
+      "${user.system.homeDirectory}/repos/shell-shock"
+      "${user.system.homeDirectory}/repos/storm-dev"
+      "${user.system.homeDirectory}/repos/media-kit"
+      "${user.system.homeDirectory}/repos/home-manager-flakes"
     ];
   };
 
   signing = {
-    key = currentUser.signingKey;
+    key = user.signingKey;
     signByDefault = true;
     format = "openpgp";
   };
@@ -44,8 +41,8 @@
 
   settings = {
     user = {
-      name = currentUser.name;
-      email = currentUser.email;
+      name = user.name;
+      email = user.email;
     };
     lfs = {
       enable = "true";
@@ -60,12 +57,12 @@
     merge.tool = "vscode";
     help.autocorrect = "true";
     branch.autosetuprebase = "always";
-    github.user = currentUser.name;
+    github.user = user.name;
     commit.gpgsign = "true";
     tag.gpgSign = "true";
     pull.rebase = "true";
     push.default = "tracking";
     init.defaultBranch = "main";
-    alias = (import ./aliases.nix { inherit currentUser; }).git;
+    alias = (import ./aliases.nix { inherit user; }).git;
   };
 }

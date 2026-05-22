@@ -1,12 +1,8 @@
-{
-  pkgs,
-  pkgsUnstable,
-  currentUser,
-}:
+{ pkgs, user }:
 
 let
   # The packages to load into the PATH
-  packages = import ./packages.nix { inherit pkgs pkgsUnstable; };
+  packages = import ./packages.nix { inherit pkgs; };
   lib = {
     teams = {
       storm = {
@@ -43,18 +39,18 @@ in
     inherit packages;
 
     stateVersion = "25.11";
-    username = currentUser.system.username;
-    homeDirectory = currentUser.system.homeDirectory;
+    username = user.system.username;
+    homeDirectory = user.system.homeDirectory;
 
     shell.enableZshIntegration = true;
-    shellAliases = (import ./aliases.nix { inherit currentUser; }).shell;
+    shellAliases = (import ./aliases.nix { inherit user; }).shell;
   };
 
   xdg.autostart.enable = true;
 
-  nix = import ./nix.nix { inherit pkgs; };
+  nix = import ./nix.nix { inherit pkgs user; };
   nixpkgs = import ./nixpkgs.nix;
 
-  programs = import ./programs.nix { inherit pkgs pkgsUnstable currentUser; };
-  services = import ./services.nix { inherit pkgs pkgsUnstable currentUser; };
+  programs = import ./programs.nix { inherit pkgs user; };
+  services = import ./services.nix { inherit pkgs user; };
 }

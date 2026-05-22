@@ -1,8 +1,4 @@
-{
-  currentUser,
-  pkgs,
-  pkgsUnstable,
-}:
+{ user, pkgs }:
 
 {
   # git-sync = {
@@ -45,7 +41,7 @@
     maxCacheTtlSsh = 18000;
     grabKeyboardAndMouse = true;
     pinentry = {
-      package = pkgsUnstable.pinentry-gnome3;
+      package = pkgs.unstable.pinentry-gnome3;
       program = "pinentry-gnome3";
     };
     enableSshSupport = true;
@@ -77,7 +73,7 @@
 
   protonmail-bridge = {
     enable = true;
-    extraPackages = with pkgsUnstable; [
+    extraPackages = with pkgs.unstable; [
       keepassxc
     ];
     logLevel = "info";
@@ -86,15 +82,15 @@
   syncthing = {
     enable = false;
     guiAddress = "127.0.0.1:8384";
-    cert = "${currentUser.system.homeDirectory}/.cert/syncthing/cert.pem";
-    key = "${currentUser.system.homeDirectory}/.cert/syncthing/key.pem";
+    cert = "${user.system.homeDirectory}/.cert/syncthing/cert.pem";
+    key = "${user.system.homeDirectory}/.cert/syncthing/key.pem";
     settings = {
-      defaultFolderPath = "${currentUser.system.homeDirectory}/sync";
+      defaultFolderPath = "${user.system.homeDirectory}/sync";
       defaultFolderRescanIntervalS = 3600;
       defaultFolderType = "readwrite";
       gui = {
         theme = "black";
-        user = "${currentUser.system.username}";
+        user = "${user.system.username}";
         metricsWithoutAuth = false;
       };
       options = {

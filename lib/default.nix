@@ -1,8 +1,8 @@
 { eachDefaultSystem, pkgs }:
 
 let
-  inherit (pkgs.lib) optionals;
-  inherit (pkgs.stdenv) isDarwin isLinux;
+  inherit (pkgs.stable.lib) optionals;
+  inherit (pkgs.stable.stdenv) isDarwin isLinux;
 in
 rec {
   darwinOnly = ls: optionals isDarwin ls;
@@ -21,7 +21,7 @@ rec {
     eachDefaultSystem (
       system:
       let
-        inherit (pkgs) mkShell;
+        inherit (pkgs.stable) mkShell;
       in
       {
         devShells = {
@@ -36,7 +36,7 @@ rec {
     );
 
   toolchains = {
-    builds = with pkgs; [
+    builds = with pkgs.stable; [
       cue
       dhall
       buildkit
@@ -46,7 +46,7 @@ rec {
       capnproto
     ];
 
-    kubernetes = with pkgs; [
+    kubernetes = with pkgs.stable; [
       kubectx
       kubectl
       minikube
@@ -55,62 +55,62 @@ rec {
 
     elixir =
       let
-        darwinDeps = darwinOnly ((with pkgs; [ terminal-notifier ]) ++ (with pkgs; [ apple-sdk ]));
+        darwinDeps = darwinOnly ((with pkgs.stable; [ terminal-notifier ]) ++ (with pkgs.stable; [ apple-sdk ]));
         linuxDeps = linuxOnly (
-          with pkgs;
+          with pkgs.stable;
           [
             inotify-tools
             libnotify
           ]
         );
       in
-      with pkgs;
+      with pkgs.stable;
       [ elixir ] ++ darwinDeps ++ linuxDeps;
 
-    go = with pkgs; [
+    go = with pkgs.stable; [
       go
       go2nix
       gotools
     ];
 
     node =
-      with pkgs;
+      with pkgs.stable;
       [ nodejs_latest ]
-      ++ (with pkgs.nodePackages; [
+      ++ (with pkgs.stable.nodePackages; [
         pnpm
         typescript
         typescript-language-server
       ]);
 
     python =
-      with pkgs;
+      with pkgs.stable;
       [ python313 ]
-      ++ (with pkgs.python313Packages; [
+      ++ (with pkgs.stable.python313Packages; [
         httpie
         pip
         virtualenv
       ]);
 
     ruby =
-      with pkgs;
+      with pkgs.stable;
       [
         rbenv
         rubyBuild
       ]
-      ++ (with pkgs.rubyPackages; [
+      ++ (with pkgs.stable.rubyPackages; [
         bundler
         rubocop
         solargraph
       ]);
 
-    java = with pkgs; [
+    java = with pkgs.stable; [
       gradle
       maven
       openjdk17
       openjdk21
     ];
 
-    wasm = with pkgs; [
+    wasm = with pkgs.stable; [
       binaryen
       wabt
       wapm
@@ -124,7 +124,7 @@ rec {
       webassemblyjs-repl
     ];
 
-    rust = with pkgs; [
+    rust = with pkgs.stable; [
       devRust
       cargo
       cargo-audit

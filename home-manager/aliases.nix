@@ -1,4 +1,4 @@
-{ currentUser }:
+{ user }:
 
 {
   git = {
@@ -48,7 +48,7 @@
     ## Nix stuff. Inspired by: https://alexfedoseev.com/blog/post/nix-time.
 
     # Reload the Home Manager configuration (after git push)
-    reload-hm = "home-manager switch -b backup --flake github:storm-software/home-manager-flakes && source ${currentUser.system.homeDirectory}/.zshrc";
+    reload-hm = "home-manager switch -b backup --flake github:storm-software/home-manager-flakes && source ${user.system.homeDirectory}/.zshrc";
 
     # Run Nix garbage collection
     xgc = "nix-env --delete-generations old && nix-store --gc";

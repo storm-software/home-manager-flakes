@@ -1,17 +1,14 @@
-{
-  pkgsUnstable,
-  currentUser,
-}:
+{ pkgs, user }:
 
 {
   enable = true;
   autostart = true;
-  package = pkgsUnstable.keepassxc;
+  package = pkgs.unstable.keepassxc;
   settings = {
     General = {
       ConfigVersion = 2;
       BackupBeforeSave = true;
-      DefaultDatabaseFileName = "${currentUser.system.homeDirectory}/sync/vault/vault.kdbx";
+      DefaultDatabaseFileName = "${user.system.homeDirectory}/sync/vault/vault.kdbx";
       OpenPreviousDatabasesOnStartup = true;
       RememberLastDatabases = true;
       RememberLastKeyFiles = true;

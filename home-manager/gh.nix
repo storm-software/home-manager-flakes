@@ -1,4 +1,4 @@
-{ currentUser }:
+{ user }:
 
 {
   gitCredentialHelper = {
@@ -13,7 +13,7 @@
   hosts = {
     "github.com" = {
       gitProtocol = "https";
-      user = currentUser.name;
+      user = user.name;
     };
   };
 }

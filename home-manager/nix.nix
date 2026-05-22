@@ -1,7 +1,7 @@
-{ pkgs }:
+{ pkgs, user }:
 
 {
-  package = pkgs.nix;
+  package = pkgs.stable.nix;
 
   gc = {
     automatic = true;
@@ -12,7 +12,7 @@
   settings = {
     trusted-users = [
       "root"
-      "development"
+      "${user.system.username}"
     ];
     substituters = [ "https://cache.nixos.org" ];
     experimental-features = [

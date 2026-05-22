@@ -1,7 +1,4 @@
-{
-  pkgs,
-  pkgsUnstable,
-}:
+{ pkgs }:
 
 let
   bin = import ./bin.nix {
@@ -9,7 +6,7 @@ let
     inherit (pkgs.lib) fakeHash;
   };
 
-  fonts = with pkgs.nerd-fonts; [
+  fonts = with pkgs.stable.nerd-fonts; [
     hack
     fira-code
     fira-mono
@@ -20,7 +17,7 @@ let
     martian-mono
   ];
 
-  gitTools = with pkgs; [
+  gitTools = with pkgs.stable; [
     gitFull
     git-annex
     git-crypt
@@ -32,32 +29,32 @@ let
   ];
 
   misc = with pkgs; [
-    comma
-    coreutils
-    findutils
-    libiconv
-    open-policy-agent
-    openssl
-    pkg-config
-    skopeo
-    stow
-    tailscale
-    tree
-    wget
-    zstd
-    pinentry-gnome3
-    keychain
-    gnupg
-    direnv
+    stable.comma
+    stable.coreutils
+    stable.findutils
+    stable.libiconv
+    stable.open-policy-agent
+    stable.openssl
+    stable.pkg-config
+    stable.skopeo
+    stable.stow
+    stable.tailscale
+    stable.tree
+    stable.wget
+    stable.zstd
+    unstable.pinentry-gnome3
+    stable.keychain
+    stable.gnupg
+    stable.direnv
   ];
 
-  nixTools = [
-    pkgs.nix-direnv
-    pkgs.nixfmt
-    pkgs.vulnix
-    pkgs.statix
-    pkgsUnstable.cachix
-    pkgsUnstable.devenv
+  nixTools = with pkgs; [
+    stable.nix-direnv
+    stable.nixfmt
+    stable.vulnix
+    stable.statix
+    unstable.cachix
+    unstable.devenv
   ];
 in
 bin ++ fonts ++ gitTools ++ nixTools ++ misc

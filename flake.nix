@@ -23,26 +23,26 @@
     }:
     let
       # User specific settings
-      currentUser = {
+      user = {
         name = "sullivanpj";
         displayName = "Pat Sullivan";
         email = "pat@patsullivan.org";
         signingKey = "67216ED35A5544A9";
         system = {
-            username = "development";
-            homeDirectory = self.lib.getHomeDirectory "development";
+          username = "development";
+          homeDirectory = self.lib.getHomeDirectory "development";
         };
       };
 
       system = "x86_64-linux";
 
-      pkgsUnstable = import nixpkgs-unstable {
+      pkgs-unstable = import nixpkgs-unstable {
         inherit system;
         config = {
           allowUnfree = true;
           allowUnsupportedSystem = true;
           xdg = {
-            configHome = currentUser.system.homeDirectory;
+            configHome = user.system.homeDirectory;
           };
         };
         overlays = [
@@ -50,13 +50,13 @@
         ];
       };
 
-      pkgs = import nixpkgs {
+      pkgs-stable = import nixpkgs {
         inherit system;
         config = {
           allowUnfree = true;
           allowUnsupportedSystem = true;
           xdg = {
-            configHome = currentUser.system.homeDirectory;
+            configHome = user.system.homeDirectory;
           };
         };
         overlays = [
@@ -83,18 +83,17 @@
             pkgs = import nixpkgs { inherit system; };
           }
         );
+
+      pkgs = {
+        stable = pkgs-stable;
+        unstable = pkgs-unstable;
+      };
     in
     {
-      homeConfigurations.${currentUser.system.username} = homeManagerConfiguration {
-        inherit pkgs;
+      homeConfigurations.${user.system.username} = homeManagerConfiguration {
+        pkgs = pkgs.stable;
         modules = [
-          (import ./home-manager {
-            inherit
-              pkgs
-              pkgsUnstable
-              currentUser
-              ;
-          })
+          (import ./home-manager { inherit pkgs user; })
         ];
       };
 
@@ -105,7 +104,6 @@
       overlays = import ./overlays;
 
       inherit pkgs;
-      inherit pkgsUnstable;
 
       devShells = forEachSupportedSystem (
         { pkgs, system }:

@@ -1,8 +1,4 @@
-{
-  currentUser,
-  pkgs,
-  pkgsUnstable,
-}:
+{ user, pkgs }:
 
 {
   # Fancy replacement for cat
@@ -20,7 +16,7 @@
     nix-direnv.enable = true;
   };
 
-  gh = import ./gh.nix { inherit currentUser; };
+  gh = import ./gh.nix { inherit user; };
 
   ssh = {
     enable = true;
@@ -31,24 +27,17 @@
       serverAliveInterval = 0;
       serverAliveCountMax = 3;
       hashKnownHosts = false;
-      userKnownHostsFile = "${currentUser.system.homeDirectory}/.ssh/known_hosts";
+      userKnownHostsFile = "${user.system.homeDirectory}/.ssh/known_hosts";
     };
   };
 
-  keepassxc = import ./keepassxc.nix { inherit currentUser pkgsUnstable; };
+  keepassxc = import ./keepassxc.nix { inherit user pkgs; };
 
-  #   git-credential-keepassxc = {
-  #     enable = true;
-  #     package = pkgs.git-credential-keepassxc;
-  #     groups = [ "Vault - Root" ];
-  #     # hosts = [ "https://github.com" ];
-  #   };
-
-  git = import ./git.nix { inherit currentUser pkgs; };
+  git = import ./git.nix { inherit user pkgs; };
 
   gpg = {
     enable = true;
-    homedir = "${currentUser.system.homeDirectory}/.gnupg";
+    homedir = "${user.system.homeDirectory}/.gnupg";
     mutableKeys = true;
     mutableTrust = true;
   };
@@ -127,8 +116,20 @@
   # Disabling vscode for now since it causes a lot of issues with the extension manager
   #   vscode = import ./vscode.nix { inherit username pkgs pkgsUnstable; };
 
+  vscode = {
+    enable = true;
+    package = pkgs.unstable.vscode;
+    mutableExtensionsDir = true;
+  };
+
+  cursor = {
+    enable = true;
+    package = pkgs.unstable.cursor;
+    mutableExtensionsDir = true;
+  };
+
   zsh = import ./zsh.nix {
-    inherit currentUser;
+    inherit user;
     inherit (pkgs) substituteAll;
   };
 
