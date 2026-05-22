@@ -9,7 +9,7 @@
 
   # Neovim plugins
   plugins = with pkgs.stable.vimPlugins; [
-    ctrlp
+    ctrlp-vim
     editorconfig-vim
     gruvbox
     nerdtree

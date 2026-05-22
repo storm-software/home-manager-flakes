@@ -70,8 +70,6 @@
     };
   };
 
-  neovim = import ./neovim.nix { inherit pkgs; };
-
   tmux = import ./tmux.nix { inherit pkgs; };
 
   fzf = import ./fzf.nix;
