@@ -38,7 +38,7 @@ in
   home = {
     inherit packages;
 
-    stateVersion = "26.11";
+    stateVersion = "26.05";
     username = user.system.username;
     homeDirectory = user.system.homeDirectory;
 
