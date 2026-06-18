@@ -6,7 +6,7 @@
     "storm-software" = {
       theme.name = "Storm Software";
       colors = {
-        Base = "#151718";
+        Base = "#1e2023";
         Title = "#3be4be";
       };
     };

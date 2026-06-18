@@ -8,10 +8,10 @@
   ];
   colors = {
     fg = "#adbac7";
-    bg = "#22272e";
+    bg = "#1e2023";
     hl = "#3be4be";
     "fg+" = "#cdd9e5";
-    "bg+" = "#2d333b";
+    "bg+" = "#1e2023";
     "hl+" = "#56d4dd";
     info = "#1fb2a6";
     label = "#1fb2a6";

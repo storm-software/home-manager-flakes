@@ -14,12 +14,12 @@
       RememberLastKeyFiles = true;
       NumberOfRememberedLastDatabases = 5;
       BackupFilePathPattern = "{DB_FILENAME}.backup.kdbx";
-    #   LastDatabases = [
-    #     {
-    #       FilePath = "${user.system.homeDirectory}/sync/vault/vault.kdbx";
-    #       KeyFilePath = "${user.system.homeDirectory}/vault/vault.keyx";
-    #     }
-    #   ];
+      #   LastDatabases = [
+      #     {
+      #       FilePath = "${user.system.homeDirectory}/sync/vault/vault.kdbx";
+      #       KeyFilePath = "${user.system.homeDirectory}/vault/vault.keyx";
+      #     }
+      #   ];
     };
     Browser = {
       Enabled = true;

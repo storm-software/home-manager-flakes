@@ -10,6 +10,7 @@
     repositories = [
       "${user.system.homeDirectory}/repos/storm-ops"
       "${user.system.homeDirectory}/repos/stryke"
+      "${user.system.homeDirectory}/repos/power-plant"
       "${user.system.homeDirectory}/repos/powerlines"
       "${user.system.homeDirectory}/repos/earthquake"
       "${user.system.homeDirectory}/repos/acidic"

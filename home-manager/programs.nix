@@ -61,15 +61,6 @@
     enableZshIntegration = true;
   };
 
-  pandoc = {
-    enable = true;
-    defaults = {
-      metadata = {
-        author = "Storm Software";
-      };
-    };
-  };
-
   tmux = import ./tmux.nix { inherit pkgs; };
 
   fzf = import ./fzf.nix;
