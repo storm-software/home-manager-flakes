@@ -61,6 +61,7 @@
     github.user = user.name;
     commit.gpgsign = "true";
     tag.gpgSign = "true";
+    rebase.autoStash = "true";
     pull.rebase = "true";
     push.default = "tracking";
     init.defaultBranch = "main";
