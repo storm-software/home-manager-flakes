@@ -8,16 +8,14 @@
   ];
   colors = {
     fg = "#adbac7";
-    # bg = "#1e2023";
     hl = "#3be4be";
-    "fg+" = "#cdd9e5";
-    # "bg+" = "#1e2023";
-    "hl+" = "#56d4dd";
-    info = "#38bdf8";
+    "fg+" = "#ffffff";
+    "hl+" = "#3be4be";
+    info = "#3be4be";
     label = "#3be4be";
-    prompt = "#39c5cf";
+    prompt = "#3be4be";
     pointer = "#3be4be";
-    marker = "#39c5cf";
+    marker = "#3be4be";
     spinner = "#3be4be";
     header = "#3be4be";
     footer = "#3be4be";
