@@ -7,7 +7,7 @@
 
   autosuggestion = {
     enable = true;
-    highlight = "fg=#a3f2e0,bold";
+    highlight = "fg=#acffec,bold";
     strategy = [
       "history"
       "completion"

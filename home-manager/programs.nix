@@ -14,6 +14,11 @@
     nix-direnv.enable = true;
   };
 
+  devenv = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   gh = import ./gh.nix { inherit user; };
 
   ssh = {

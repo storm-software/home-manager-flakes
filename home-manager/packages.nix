@@ -46,14 +46,12 @@ let
     stable.direnv
   ];
 
-  nixTools = with pkgs; [
-    stable.comma
-    stable.nix-direnv
-    stable.nixfmt
-    stable.vulnix
-    stable.statix
-    unstable.cachix
-    unstable.devenv
+  nixTools = with pkgs.stable; [
+    comma
+    nix-direnv
+    nixfmt
+    vulnix
+    statix
   ];
 in
 bin ++ fonts ++ gitTools ++ nixTools ++ misc

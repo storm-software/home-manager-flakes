@@ -8,20 +8,20 @@
   ];
   colors = {
     fg = "#adbac7";
-    bg = "#1e2023";
+    # bg = "#1e2023";
     hl = "#3be4be";
     "fg+" = "#cdd9e5";
-    "bg+" = "#1e2023";
+    # "bg+" = "#1e2023";
     "hl+" = "#56d4dd";
-    info = "#1fb2a6";
-    label = "#1fb2a6";
+    info = "#38bdf8";
+    label = "#3be4be";
     prompt = "#39c5cf";
-    pointer = "#1fb2a6";
+    pointer = "#3be4be";
     marker = "#39c5cf";
-    spinner = "#1fb2a6";
-    header = "#1fb2a6";
-    footer = "#1fb2a6";
-    ghost = "#a3f2e0";
+    spinner = "#3be4be";
+    header = "#3be4be";
+    footer = "#3be4be";
+    ghost = "#acffec";
   };
   tmux.enableShellIntegration = true;
 }
