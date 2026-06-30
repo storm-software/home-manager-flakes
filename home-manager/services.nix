@@ -80,76 +80,66 @@
   };
 
   syncthing = {
-    enable = false;
+    enable = true;
     guiAddress = "127.0.0.1:8384";
     cert = "${user.system.homeDirectory}/.cert/syncthing/cert.pem";
     key = "${user.system.homeDirectory}/.cert/syncthing/key.pem";
+
+    tray = {
+      enable = true;
+    };
+
+    guiCredentials = {
+      username = user.system.username;
+      passwordFile = "${user.system.homeDirectory}/.cert/syncthing/gui-password";
+    };
+
+    # Keep false until devices and folders are fully declarative in Nix.
+    overrideDevices = true;
+    overrideFolders = true;
+
     settings = {
-      defaultFolderPath = "${user.system.homeDirectory}/sync";
-      defaultFolderRescanIntervalS = 3600;
-      defaultFolderType = "readwrite";
+      options = {
+        urAccepted = -1;
+        crashReportingEnabled = false;
+        announceLANAddresses = false;
+
+        # Hardening for LAN-only or static-address setups:
+        globalAnnounceEnabled = false;
+        localAnnounceEnabled = false;
+        relaysEnabled = false;
+        natEnabled = false;
+        # listenAddresses = [ "tcp://127.0.0.1:22000" "quic://127.0.0.1:22000" ];
+      };
+
       gui = {
         theme = "black";
-        user = "${user.system.username}";
         metricsWithoutAuth = false;
       };
-      options = {
-        listenAddresses = [ "default" ];
-        globalAnnounceEnabled = true;
-        localAnnounceEnabled = true;
-        relaysEnabled = true;
-        natEnabled = true;
-        urAccepted = -1;
-        globalAnnounceServers = [ "default" ];
-        localAnnouncePort = 21027;
-        localAnnounceMCAddr = "[ff12::8384]:21027";
-        maxSendKbps = 0;
-        maxRecvKbps = 0;
-        reconnectionIntervalS = 60;
-        relayReconnectIntervalM = 10;
-        startBrowser = true;
-        natLeaseMinutes = 60;
-        natRenewalMinutes = 30;
-        natTimeoutSeconds = 10;
-        urSeen = 3;
-        urUniqueID = "";
-        urURL = "https://data.syncthing.net/newdata";
-        urPostInsecurely = false;
-        urInitialDelayS = 1800;
-        autoUpgradeIntervalH = 12;
-        upgradeToPreReleases = false;
-        keepTemporariesH = 24;
-        cacheIgnoredFiles = false;
-        progressUpdateIntervalS = 5;
-        limitBandwidthInLan = false;
-        minHomeDiskFree = {
-          unit = "%";
-          value = 1;
+
+      devices = {
+        megacore = {
+          id = "R5ZKLRI-HPGP63B-N4RYWRK-QCXYEOV-LFZ56SN-XEDA7CN-MC2ZRVO-PI2PCQ3";
+          autoAcceptFolders = false;
         };
-        releasesURL = "https://upgrades.syncthing.net/meta.json";
-        overwriteRemoteDeviceNamesOnConnect = false;
-        tempIndexMinBlocks = 10;
-        trafficClass = 0;
-        setLowPriority = true;
-        maxFolderConcurrency = 0;
-        crashReportingURL = "https://crash.syncthing.net/newcrash";
-        crashReportingEnabled = true;
-        stunKeepaliveStartS = 180;
-        stunKeepaliveMinS = 20;
-        stunServers = [ "default" ];
-        maxConcurrentIncomingRequestKiB = 0;
-        announceLANAddresses = true;
-        sendFullIndexOnUpgrade = false;
-        auditEnabled = false;
-        auditFile = "";
-        connectionLimitEnough = 0;
-        connectionLimitMax = 0;
-        connectionPriorityTcpLan = 10;
-        connectionPriorityQuicLan = 20;
-        connectionPriorityTcpWan = 30;
-        connectionPriorityQuicWan = 40;
-        connectionPriorityRelay = 50;
-        connectionPriorityUpgradeThreshold = 0;
+        megabyte = {
+          id = "LTDBCVU-3YB7772-EQZ2GTR-THUKO5V-HNQIHGI-BQCJ6IA-6IPHT53-YV5Y2A6";
+          autoAcceptFolders = false;
+        };
+      };
+
+      folders = {
+        sync = {
+          id = "sync";
+          label = "Sync";
+          path = "${user.system.homeDirectory}/sync";
+          type = "sendreceive";
+          devices = [ "megabyte" ];
+          versioning = {
+            type = "staggered";
+            params.maxAge = "31536000";
+          };
+        };
       };
     };
   };
