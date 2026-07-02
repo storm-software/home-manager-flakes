@@ -93,6 +93,23 @@
       homeConfigurations.${user.system.username} = homeManagerConfiguration {
         pkgs = pkgs.stable;
         modules = [
+          ({ lib, ... }: {
+            home.activation.ensureNixAccessTokensFile = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+              $DRY_RUN_CMD mkdir -p "${user.system.homeDirectory}/.cert/nix"
+              $DRY_RUN_CMD chmod 700 "${user.system.homeDirectory}/.cert/nix"
+              if [ ! -f "${user.system.homeDirectory}/.cert/nix/access-tokens.conf" ]; then
+                if [ -f "${user.system.homeDirectory}/.config/nix/nix.conf.backup" ] && grep -q '^access-tokens' "${user.system.homeDirectory}/.config/nix/nix.conf.backup"; then
+                  $DRY_RUN_CMD grep '^access-tokens' "${user.system.homeDirectory}/.config/nix/nix.conf.backup" > "${user.system.homeDirectory}/.cert/nix/access-tokens.conf"
+                else
+                  $DRY_RUN_CMD printf '%s\n' \
+                    '# GitHub access token for authenticated flake fetches' \
+                    '# access-tokens = github.com=<your-token>' \
+                    > "${user.system.homeDirectory}/.cert/nix/access-tokens.conf"
+                fi
+                $DRY_RUN_CMD chmod 600 "${user.system.homeDirectory}/.cert/nix/access-tokens.conf"
+              fi
+            '';
+          })
           (import ./home-manager { inherit pkgs user; })
         ];
       };

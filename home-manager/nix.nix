@@ -3,6 +3,9 @@
 {
   package = pkgs.stable.nix;
 
+  # access-tokens.conf is included from outside the store; skip build-time validation.
+  checkConfig = false;
+
   gc = {
     automatic = true;
     persistent = true;
@@ -33,4 +36,9 @@
     download-buffer-size = 4611686018427387904;
     auto-optimise-store = true;
   };
+
+  # Keep tokens out of the Nix store; see ~/.cert/nix/access-tokens.conf
+  extraOptions = ''
+    include ${user.system.homeDirectory}/.cert/nix/access-tokens.conf
+  '';
 }
