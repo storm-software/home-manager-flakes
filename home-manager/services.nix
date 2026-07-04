@@ -141,4 +141,24 @@
     enable = true;
     theme = "dark";
   };
+
+  udiskie = {
+    enable = true;
+    automount = true;
+    settings = {
+      icon_names = {
+        media = [
+          "media-optical"
+        ];
+      };
+      program_options = {
+        tray = true;
+        udisks_version = 2;
+      };
+    };
+    tray = "auto";
+  };
+
+  keybase.enable = false;
+  kbfs.enable = false;
 }

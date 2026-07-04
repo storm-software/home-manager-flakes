@@ -226,9 +226,11 @@ in
       settings = [
         {
           layer = "top";
-          position = "top";
-          height = 30;
+          position = "bottom";
+          height = 40;
           spacing = 4;
+          margin-top = 2;
+          margin-bottom = 2;
           modules-left = [
             "sway/workspaces"
             "sway/mode"
@@ -236,11 +238,11 @@ in
           modules-center = [ "sway/window" ];
           modules-right = [
             "pulseaudio"
+            "battery"
             "network"
             "cpu"
             "memory"
             "tray"
-            "clock"
           ];
           "sway/workspaces" = {
             disable-scroll = true;
@@ -254,13 +256,14 @@ in
           };
           pulseaudio = {
             format = "{icon} {volume}%";
-            format-muted = "🔇 muted";
+            format-muted = "🔇 Muted";
+            format-volume = "🔊 {volume}%";
             on-click = "${stable.pavucontrol}/bin/pavucontrol";
           };
           network = {
-            format-wifi = "🌐 {signalStrength}%";
-            format-ethernet = "🔗 connected";
-            format-disconnected = "🔴 offline";
+            format-wifi = "📡 {signalStrength}%";
+            format-ethernet = "🌐 Connected";
+            format-disconnected = "🔴 Offline";
           };
           cpu = {
             format = "💻 {usage}%";
@@ -268,6 +271,12 @@ in
           };
           memory = {
             format = "💾 {}%";
+          };
+          battery = {
+            format = "{capacity}% {icon}";
+            format-charging = "⚡ {capacity}%";
+            format-discharging = "🔋 {capacity}%";
+            format-full = "🔌 {capacity}%";
           };
           clock = {
             format = "{:%a %b %d  %H:%M}";

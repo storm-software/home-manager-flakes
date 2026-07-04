@@ -56,6 +56,7 @@ let
 
   waylandTools = with pkgs.stable; [
     egl-gbm
+    avahi
     grim
     slurp
     swaylock
