@@ -213,116 +213,173 @@ in
     };
   };
 
-  programs.waybar = {
-    enable = true;
-    systemd = {
+  programs = {
+    waybar = {
       enable = true;
-      targets = [ "sway-session.target" ];
+      systemd = {
+        enable = true;
+        targets = [ "sway-session.target" ];
+      };
+      settings = [
+        {
+          layer = "top";
+          position = "top";
+          height = 30;
+          spacing = 4;
+          modules-left = [
+            "sway/workspaces"
+            "sway/mode"
+          ];
+          modules-center = [ "sway/window" ];
+          modules-right = [
+            "pulseaudio"
+            "network"
+            "cpu"
+            "memory"
+            "tray"
+            "clock"
+          ];
+          "sway/workspaces" = {
+            disable-scroll = true;
+            all-outputs = true;
+          };
+          "sway/mode" = {
+            format = "<span style=\"italic\">{}</span>";
+          };
+          "sway/window" = {
+            max-length = 80;
+          };
+          pulseaudio = {
+            format = "{icon} {volume}%";
+            format-muted = "🔇 muted";
+            on-click = "${stable.pavucontrol}/bin/pavucontrol";
+          };
+          network = {
+            format-wifi = "🌐 {signalStrength}%";
+            format-ethernet = "🔗 connected";
+            format-disconnected = "🔴 offline";
+          };
+          cpu = {
+            format = "💻 {usage}%";
+            interval = 2;
+          };
+          memory = {
+            format = "💾 {}%";
+          };
+          clock = {
+            format = "{:%a %b %d  %H:%M}";
+            tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+          };
+          tray = {
+            spacing = 10;
+          };
+        }
+      ];
+      style = ''
+        * {
+          font-family: "Ubuntu Sans", "JetBrainsMono Nerd Font", sans-serif;
+          font-size: 13px;
+          min-height: 0;
+        }
+
+        window#waybar {
+          background-color: ${colors.background};
+          color: ${colors.foreground};
+          border-bottom: 2px solid ${colors.accentDim};
+        }
+
+        #workspaces button {
+          padding: 0 6px;
+          color: ${colors.unfocused};
+        }
+
+        #workspaces button.active {
+          color: ${colors.accent};
+          border-bottom: 2px solid ${colors.accent};
+        }
+
+        #workspaces button.urgent {
+          color: ${colors.urgent};
+        }
+
+        #pulseaudio,
+        #network,
+        #cpu,
+        #memory,
+        #clock,
+        #tray {
+          padding: 0 8px;
+        }
+      '';
     };
-    settings = [
-      {
-        layer = "top";
-        position = "top";
-        height = 30;
-        spacing = 4;
-        modules-left = [
-          "sway/workspaces"
-          "sway/mode"
-        ];
-        modules-center = [ "sway/window" ];
-        modules-right = [
-          "pulseaudio"
-          "network"
-          "cpu"
-          "memory"
-          "tray"
-          "clock"
-        ];
-        "sway/workspaces" = {
-          disable-scroll = true;
-          all-outputs = true;
-        };
-        "sway/mode" = {
-          format = "<span style=\"italic\">{}</span>";
-        };
-        "sway/window" = {
-          max-length = 80;
-        };
-        pulseaudio = {
-          format = "{icon} {volume}%";
-          format-muted = "󰝟 muted";
-          on-click = "${stable.pavucontrol}/bin/pavucontrol";
-        };
-        network = {
-          format-wifi = "󰤨 {signalStrength}%";
-          format-ethernet = "󰈀 connected";
-          format-disconnected = "󰤭 offline";
-        };
-        cpu = {
-          format = "󰻠 {usage}%";
-          interval = 2;
-        };
-        memory = {
-          format = "󰍛 {}%";
-        };
-        clock = {
-          format = "{:%a %b %d  %H:%M}";
-          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-        };
-        tray = {
-          spacing = 10;
-        };
-      }
-    ];
-    style = ''
-      * {
-        font-family: "Ubuntu Sans", "JetBrainsMono Nerd Font", sans-serif;
-        font-size: 13px;
-        min-height: 0;
-      }
-
-      window#waybar {
-        background-color: ${colors.background};
-        color: ${colors.foreground};
-        border-bottom: 2px solid ${colors.accentDim};
-      }
-
-      #workspaces button {
-        padding: 0 6px;
-        color: ${colors.unfocused};
-      }
-
-      #workspaces button.active {
-        color: ${colors.accent};
-        border-bottom: 2px solid ${colors.accent};
-      }
-
-      #workspaces button.urgent {
-        color: ${colors.urgent};
-      }
-
-      #pulseaudio,
-      #network,
-      #cpu,
-      #memory,
-      #clock,
-      #tray {
-        padding: 0 8px;
-      }
-    '';
   };
 
   services = {
     clipman.enable = true;
-    kanshi.enable = true;
-    kanshi.profiles = {
-      "default" = {
-        output = {
-          "*" = {
-            bg = "${colors.background} solid_color";
-          };
-        };
-      };
+
+    # kanshi = {
+    #   enable = true;
+    #   profiles = {
+    #     "default" = {
+    #       output = {
+    #         "*" = {
+    #           bg = "${colors.background} solid_color";
+    #         };
+    #       };
+    #     };
+    #   };
+    # };
+
+    swaync = {
+      enable = true;
+      style = ''
+        :root {
+          /* Storm Software palette (matches ghostty.nix / waybar) */
+          --cc-bg: ${colors.background}eb;
+          --noti-border-color: ${colors.border};
+          --noti-bg: 30, 32, 35;
+          --noti-bg-alpha: 0.95;
+          --noti-bg-darker: rgb(24, 26, 29);
+          --noti-bg-hover: ${colors.border};
+          --noti-bg-focus: ${colors.accentDim}26;
+          --noti-close-bg: ${colors.border};
+          --noti-close-bg-hover: ${colors.accentDim};
+
+          --text-color: ${colors.foreground};
+          --text-color-disabled: ${colors.unfocused};
+          --bg-selected: ${colors.accent};
+
+          --border-radius: 12px;
+          --notification-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3),
+            0 1px 3px 1px rgba(0, 0, 0, 0.7), 0 2px 6px 2px rgba(0, 0, 0, 0.3);
+          --font-size-body: 13px;
+          --font-size-summary: 14px;
+        }
+
+        * {
+          font-family: "Ubuntu Sans", "JetBrainsMono Nerd Font", sans-serif;
+        }
+
+        .notification-row {
+          outline: none;
+        }
+
+        .notification-row:focus,
+        .notification-row:hover {
+          background: var(--noti-bg-focus);
+        }
+
+        .notification {
+          border-radius: var(--border-radius);
+          margin: 6px 12px;
+          box-shadow: var(--notification-shadow);
+          padding: 0;
+        }
+
+        .control-center {
+          border: 2px solid ${colors.accentDim};
+        }
+      '';
     };
 
     swayidle = {
