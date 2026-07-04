@@ -4,7 +4,7 @@
   enable = true;
   package = pkgs.stable.voxtype-vulkan;
   loadModels = [
-    "base.en"
+    "tiny.en"
   ];
   settings = {
     #     "model.base.en" = {
