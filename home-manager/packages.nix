@@ -64,7 +64,6 @@ let
     pavucontrol
     bibata-cursors
     displaylink
-    linuxPackages.evdi
   ];
 in
 bin ++ fonts ++ gitTools ++ nixTools ++ misc ++ waylandTools

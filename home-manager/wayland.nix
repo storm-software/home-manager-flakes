@@ -1,7 +1,29 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   stable = pkgs.stable;
+
+  # displaylink-server is a system service (runs as root); see
+  # https://wiki.nixos.org/wiki/Displaylink
+  displaylinkService = stable.writeText "displaylink-server.service" ''
+    [Unit]
+    Description=DisplayLink Manager Service
+    Requires=systemd-udevd.service
+    After=systemd-udevd.service
+
+    [Service]
+    Type=simple
+    ExecStart=${stable.displaylink}/bin/DisplayLinkManager
+    User=root
+    Group=root
+    Restart=on-failure
+    RestartSec=5
+
+    [Install]
+    WantedBy=multi-user.target
+  '';
+
+  evdiModule = stable.writeText "evdi" "evdi\n";
 
   # Storm Software palette (aligned with ghostty.nix / fzf.nix)
   colors = {
@@ -33,6 +55,10 @@ in
         xdgAutostart = true;
       };
 
+      # DisplayLink USB monitors need --unsupported-gpu and WLR_EVDI_RENDER_DEVICE;
+      # adjust the render device if needed (ls -l /dev/dri/by-path).
+      extraOptions = [ "--unsupported-gpu" ];
+
       extraSessionCommands = ''
         export SDL_VIDEODRIVER=wayland
         export QT_QPA_PLATFORM=wayland
@@ -42,6 +68,7 @@ in
         export NIXOS_OZONE_WL=1
         export XDG_CURRENT_DESKTOP=sway
         export XDG_SESSION_TYPE=wayland
+        export WLR_EVDI_RENDER_DEVICE=/dev/dri/card1
       '';
 
       config = {
@@ -406,4 +433,19 @@ in
       };
     };
   };
+
+  # displaylink-server must be a system unit (not systemd.user); Home Manager
+  # installs it via activation on non-NixOS hosts. Requires passwordless sudo
+  # for install, udev reload, and systemctl enable --now.
+  home.activation.displaylink = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD sudo install -Dm644 \
+      ${stable.displaylink}/lib/udev/rules.d/99-displaylink.rules \
+      /etc/udev/rules.d/99-displaylink.rules
+    $DRY_RUN_CMD sudo install -Dm644 ${displaylinkService} \
+      /etc/systemd/system/displaylink-server.service
+    $DRY_RUN_CMD sudo install -Dm644 ${evdiModule} /etc/modules-load.d/evdi.conf
+    $DRY_RUN_CMD sudo udevadm control --reload
+    $DRY_RUN_CMD sudo systemctl daemon-reload
+    $DRY_RUN_CMD sudo systemctl enable --now displaylink-server.service
+  '';
 }

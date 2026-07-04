@@ -111,7 +111,12 @@
             '';
           })
           (import ./home-manager { inherit pkgs user; })
-          (import ./home-manager/wayland.nix { inherit pkgs; })
+          (
+            { lib, ... }:
+            import ./home-manager/wayland.nix {
+              inherit lib pkgs;
+            }
+          )
         ];
       };
 
