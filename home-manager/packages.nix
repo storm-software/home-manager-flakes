@@ -53,5 +53,9 @@ let
     vulnix
     statix
   ];
+
+  kodiTools = with pkgs.stable; [
+    egl-gbm
+  ];
 in
-bin ++ fonts ++ gitTools ++ nixTools ++ misc
+bin ++ fonts ++ gitTools ++ nixTools ++ misc ++ kodiTools

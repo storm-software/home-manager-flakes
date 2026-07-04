@@ -28,7 +28,6 @@
       "node"
       "kate"
       "tmux"
-      "systemd"
       "repo"
       "fzf"
       "dotenv"

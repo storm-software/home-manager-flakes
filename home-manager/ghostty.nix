@@ -37,7 +37,6 @@
       title-report = true;
     };
 
-    systemd.enable = true;
     enableZshIntegration = true;
     enable = true;
   };
