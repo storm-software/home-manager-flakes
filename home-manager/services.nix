@@ -136,4 +136,9 @@
   };
 
   voxtype = import ./voxtype.nix { inherit pkgs; };
+
+  tailscale-systray = {
+    enable = true;
+    theme = "dark";
+  };
 }

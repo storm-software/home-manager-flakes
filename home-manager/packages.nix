@@ -55,7 +55,6 @@ let
   ];
 
   waylandTools = with pkgs.stable; [
-    sudo
     egl-gbm
     grim
     slurp
@@ -70,4 +69,4 @@ let
   ];
 
 in
-bin ++ fonts ++ gitTools ++ nixTools ++ misc ++ waylandTools
+bin ++ fonts ++ gitTools ++ nixTools ++ waylandTools ++ misc

@@ -412,7 +412,11 @@ in
 
   # displaylink-server is a system unit; setup runs automatically on switch.
   # See home-manager/scripts/displaylink-setup.sh and the Displaylink wiki.
+  # The activation PATH is minimal, so host system dirs are prepended to resolve
+  # sudo/systemctl/udevadm/install; nix binaries are appended via the inherited PATH.
   home.activation.displaylink = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    $DRY_RUN_CMD env NIXPKGS=${stable.path} ${displaylinkSetup}
+    $DRY_RUN_CMD env NIXPKGS=${stable.path} \
+      PATH="/run/wrappers/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH" \
+      ${displaylinkSetup}
   '';
 }
