@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "bash-linux": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/bash-linux/SKILL.md",
+      "computedHash": "e078b9da423a49126b6684dc210ae77e4d851b521de390a21b7c8b9f6c926851"
+    },
     "nix-best-practices": {
       "source": "0xbigboss/claude-code",
       "sourceType": "github",
