@@ -133,17 +133,6 @@
 
   pipewire = {
     enable = true;
-    clientConfigs = {
-      stream.properties = {
-        node.latency = 1024/48000;
-        node.autoconnect = true;
-      };
-
-      alsa.properties = {
-        alsa.deny = false;
-        alsa.volume-method = "cubic"; # linear, cubic
-      };
-    };
   };
 
   voxtype = import ./voxtype.nix { inherit pkgs; };
