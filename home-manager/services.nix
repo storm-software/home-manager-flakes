@@ -101,20 +101,7 @@
     settings = {
       options = {
         urAccepted = -1;
-        crashReportingEnabled = false;
-        announceLANAddresses = false;
-
-        # Hardening for LAN-only or static-address setups:
-        globalAnnounceEnabled = false;
-        localAnnounceEnabled = false;
         relaysEnabled = false;
-        natEnabled = false;
-        # listenAddresses = [ "tcp://127.0.0.1:22000" "quic://127.0.0.1:22000" ];
-      };
-
-      gui = {
-        theme = "black";
-        metricsWithoutAuth = false;
       };
 
       devices = {
