@@ -2,7 +2,7 @@
 
 {
   enable = true;
-  package = pkgs.stable.kodi-wayland;
+  package = pkgs.stable.kodi-gbm;
   datadir = "${user.system.homeDirectory}/.kodi";
 
   # package = pkgs.kodi.withPackages (exts: [ exts.pvr-iptvsimple ]);

@@ -55,16 +55,17 @@ let
   ];
 
   waylandTools = with pkgs.stable; [
-    egl-wayland
+    sudo
+    egl-gbm
     grim
     slurp
     swaylock
     wl-clipboard
     brightnessctl
     pavucontrol
-    bibata-cursors
     wtype
     dotool
+
     # displaylink is installed by home.activation (scripts/displaylink-setup.sh)
   ];
 

@@ -148,28 +148,6 @@ in
     };
   };
 
-  #   home.pointerCursor = {
-  #     enable = true;
-  #     package = stable.bibata-cursors;
-  #     name = "Bibata-Modern-Classic";
-  #     size = 24;
-  #     sway.size = 28;
-  #     gtk.size = 28;
-  #   };
-
-  #   gtk = {
-  #     cursorTheme = {
-  #       package = stable.bibata-cursors;
-  #       name = "Bibata-Modern-Classic";
-  #       size = 28;
-  #     };
-  #     gtk4.cursorTheme = {
-  #       package = stable.bibata-cursors;
-  #       name = "Bibata-Modern-Classic";
-  #       size = 28;
-  #     };
-  #   };
-
   home.sessionVariables = {
     NIXOS_OZONE_WL = "1";
     MOZ_ENABLE_WAYLAND = "1";

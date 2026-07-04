@@ -97,8 +97,8 @@ install_system_components() {
   local displaylink_pkg
   displaylink_pkg="$(build_displaylink)"
 
-#   require_command sudo
-#   sudo -v
+  require_command sudo
+  sudo -v
 
   log "Installing udev rules"
   sudo install -Dm644 \
