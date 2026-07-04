@@ -150,8 +150,8 @@ in
 
   home.pointerCursor = {
     enable = true;
-    gtk.enable = true;
-
+    package = stable.bibata-cursors;
+    name = "Bibata-Modern-Classic";
     size = 24;
     sway.size = 28;
     gtk.size = 28;
