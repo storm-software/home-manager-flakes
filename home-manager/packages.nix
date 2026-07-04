@@ -63,7 +63,10 @@ let
     brightnessctl
     pavucontrol
     bibata-cursors
+    wtype
+    dotool
     # displaylink is installed by home.activation (scripts/displaylink-setup.sh)
   ];
+
 in
 bin ++ fonts ++ gitTools ++ nixTools ++ misc ++ waylandTools

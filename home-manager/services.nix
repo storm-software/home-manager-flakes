@@ -130,4 +130,89 @@
       };
     };
   };
+
+  pipewire = {
+    enable = true;
+    clientConfigs = {
+      stream.properties = {
+        node.latency = 1024/48000;
+        node.autoconnect = true;
+
+        #resample.disable = false
+        #resample.quality = 4
+        #monitor.channel-volumes = false
+        #channelmix.disable = false
+        #channelmix.min-volume = 0.0
+        #channelmix.max-volume = 10.0
+        #channelmix.normalize = false
+        #channelmix.mix-lfe = true
+        #channelmix.upmix = true
+        #channelmix.upmix-method = psd  # none, simple
+        #channelmix.lfe-cutoff = 150.0
+        #channelmix.fc-cutoff  = 12000.0
+        #channelmix.rear-delay = 12.0
+        #channelmix.stereo-widen = 0.0
+        #channelmix.hilbert-taps = 0
+        #dither.noise = 0
+        #dither.method = none # rectangular, triangular, triangular-hf, wannamaker3, shaped5
+        #debug.wav-path = ""
+      };
+
+    #   loopback.properties = {
+    #     node.latency = 1024/48000;
+    #     node.autoconnect = true;
+    #   };
+
+    #   pulse.properties = {
+    #     node.latency = 1024/48000;
+    #     node.autoconnect = true;
+    #   };
+
+      alsa.properties = {
+        alsa.deny = false;
+        alsa.format = 0;
+        alsa.rate = 0;
+        alsa.channels = 0;
+        alsa.period-bytes = 0;
+        alsa.buffer-bytes = 0;
+        alsa.volume-method = cubic; # linear, cubic
+        alsa.rules = [
+          {
+            matches = [ { application.process.binary = "resolve" } ];
+            actions = {
+              update-props = {
+                alsa.buffer-bytes = 131072;
+              };
+            };
+          }
+        ];
+      };
+    };
+
+    configPackages = [
+      (pkgs.stable.writeTextDir "share/pipewire/pipewire.conf.d/10-loopback.conf" ''
+        context.modules = [
+          {
+            name = libpipewire-module-loopback
+            args = {
+              node.description = "Scarlett Focusrite Line 1"
+              capture.props = {
+                audio.position = [ FL ]
+                stream.dont-remix = true
+                node.target = "alsa_input.usb-Focusrite_Scarlett_Solo_USB_Y7ZD17C24495BC-00.analog-stereo"
+                node.passive = true
+              }
+              playback.props = {
+                node.name = "SF_mono_in_1"
+                media.class = "Audio/Source"
+                audio.position = [ MONO ]
+              }
+            }
+          }
+        ]
+      '')
+    ];
+  };
+
+  voxtype = import ./voxtype.nix { inherit pkgs; };
 }
