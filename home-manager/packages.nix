@@ -54,8 +54,17 @@ let
     statix
   ];
 
-  kodiTools = with pkgs.stable; [
-    egl-gbm
+  waylandTools = with pkgs.stable; [
+    egl-wayland
+    grim
+    slurp
+    swaylock
+    wl-clipboard
+    brightnessctl
+    pavucontrol
+    bibata-cursors
+    displaylink
+    linuxPackages.evdi
   ];
 in
-bin ++ fonts ++ gitTools ++ nixTools ++ misc ++ kodiTools
+bin ++ fonts ++ gitTools ++ nixTools ++ misc ++ waylandTools
