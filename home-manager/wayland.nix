@@ -223,19 +223,21 @@ in
         enable = true;
         targets = [ "sway-session.target" ];
       };
-      settings = [
-        {
+      settings = {
+        mainBar = {
+
           layer = "top";
           position = "bottom";
           height = 40;
           spacing = 4;
-          margin-top = 2;
-          margin-bottom = 2;
           modules-left = [
             "sway/workspaces"
             "sway/mode"
           ];
-          modules-center = [ "sway/window" ];
+          modules-center = [
+            "wlr/taskbar"
+            "sway/window"
+          ];
           modules-right = [
             "pulseaudio"
             "battery"
@@ -243,6 +245,7 @@ in
             "cpu"
             "memory"
             "tray"
+            "clock"
           ];
           "sway/workspaces" = {
             disable-scroll = true;
@@ -254,10 +257,23 @@ in
           "sway/window" = {
             max-length = 80;
           };
+          "wlr/taskbar" = {
+            "format" = "{icon}";
+            "icon-size" = 32;
+            "tootltip-format" = "{title}";
+            "on-click" = "activate";
+            "app_ids-mapping" = {
+              "firefox" = "firefox";
+            };
+          };
           pulseaudio = {
             format = "{icon} {volume}%";
-            format-muted = "🔇 Muted";
-            format-volume = "🔊 {volume}%";
+            format-icons = [
+              "🔇"
+              "🔈"
+              "🔉"
+              "🔊"
+            ];
             on-click = "${stable.pavucontrol}/bin/pavucontrol";
           };
           network = {
@@ -274,19 +290,23 @@ in
           };
           battery = {
             format = "{capacity}% {icon}";
-            format-charging = "⚡ {capacity}%";
-            format-discharging = "🔋 {capacity}%";
-            format-full = "🔌 {capacity}%";
+            format-icons = [
+              "❗"
+              "🔌"
+              "🔋"
+            ];
           };
           clock = {
-            format = "{:%a %b %d  %H:%M}";
+            "format" = "{:%H:%M}";
+            "format-alt" = "{:%F %T}";
+            "interval" = 1;
             tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
           };
           tray = {
             spacing = 10;
           };
-        }
-      ];
+        };
+      };
       style = ''
         * {
           font-family: "Ubuntu Sans", "JetBrainsMono Nerd Font", sans-serif;
@@ -297,7 +317,7 @@ in
         window#waybar {
           background-color: ${colors.background};
           color: ${colors.foreground};
-          border-bottom: 2px solid ${colors.accentDim};
+          border-top: 2px solid ${colors.accentDim};
         }
 
         #workspaces button {
