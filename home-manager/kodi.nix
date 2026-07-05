@@ -2,7 +2,12 @@
 
 {
   enable = true;
-  package = pkgs.stable.kodi-wayland;
+  # On this standalone Home Manager setup on a foreign distro (Manjaro), the
+  # Nix-built `kodi-wayland` crashes at startup with
+  # "failed to get EGL display (EGL_SUCCESS)" because Nix's mesa/EGL cannot
+  # locate the host GPU driver ICD for the Wayland platform (no nixGL wrapper).
+  # The X11 build starts reliably and runs via XWayland under Sway.
+  package = pkgs.stable.kodi;
   datadir = "${user.system.homeDirectory}/.kodi";
 
   # package = pkgs.kodi.withPackages (exts: [ exts.pvr-iptvsimple ]);
