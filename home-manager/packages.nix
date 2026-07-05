@@ -44,7 +44,6 @@ let
   ];
 
   waylandTools = with pkgs.stable; [
-    egl-gbm
     avahi
     grim
     slurp
@@ -57,6 +56,8 @@ let
   ];
 
   misc = with pkgs; [
+    stable.egl-x11
+    stable.xkeyboard-config
     stable.openssl
     unstable.tailscale
     stable.wget
