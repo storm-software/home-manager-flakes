@@ -57,6 +57,12 @@ let
 
   misc = with pkgs; [
     stable.egl-x11
+    stable.glibc
+    stable.mesa
+    stable.libdrm
+    stable.libx11
+    stable.libGL
+    stable.libGLX
     stable.xkeyboard-config
     stable.openssl
     unstable.tailscale
