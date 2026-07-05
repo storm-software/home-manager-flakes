@@ -216,135 +216,135 @@ in
     };
   };
 
-  programs = {
-    waybar = {
-      enable = true;
-      systemd = {
-        enable = true;
-        targets = [ "sway-session.target" ];
-      };
-      settings = {
-        mainBar = {
+  #   programs = {
+  #     waybar = {
+  #       enable = true;
+  #       systemd = {
+  #         enable = true;
+  #         targets = [ "sway-session.target" ];
+  #       };
+  #       settings = {
+  #         mainBar = {
 
-          layer = "top";
-          position = "bottom";
-          height = 40;
-          spacing = 4;
-          modules-left = [
-            "sway/workspaces"
-            "sway/mode"
-          ];
-          modules-center = [
-            "wlr/taskbar"
-            "sway/window"
-          ];
-          modules-right = [
-            "pulseaudio"
-            "battery"
-            "network"
-            "cpu"
-            "memory"
-            "tray"
-            "clock"
-          ];
-          "sway/workspaces" = {
-            disable-scroll = true;
-            all-outputs = true;
-          };
-          "sway/mode" = {
-            format = "<span style=\"italic\">{}</span>";
-          };
-          "sway/window" = {
-            max-length = 80;
-          };
-          "wlr/taskbar" = {
-            "format" = "{icon}";
-            "icon-size" = 32;
-            "tootltip-format" = "{title}";
-            "on-click" = "activate";
-            "app_ids-mapping" = {
-              "firefox" = "firefox";
-            };
-          };
-          pulseaudio = {
-            format = "{icon} {volume}%";
-            format-icons = [
-              "🔇"
-              "🔈"
-              "🔉"
-              "🔊"
-            ];
-            on-click = "${stable.pavucontrol}/bin/pavucontrol";
-          };
-          network = {
-            format-wifi = "📡 {signalStrength}%";
-            format-ethernet = "🌐 Connected";
-            format-disconnected = "🔴 Offline";
-          };
-          cpu = {
-            format = "💻 {usage}%";
-            interval = 2;
-          };
-          memory = {
-            format = "💾 {}%";
-          };
-          battery = {
-            format = "{capacity}% {icon}";
-            format-icons = [
-              "❗"
-              "🔌"
-              "🔋"
-            ];
-          };
-          clock = {
-            "format" = "{:%H:%M}";
-            "format-alt" = "{:%F %T}";
-            "interval" = 1;
-            tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-          };
-          tray = {
-            spacing = 10;
-          };
-        };
-      };
-      style = ''
-        * {
-          font-family: "Ubuntu Sans", "JetBrainsMono Nerd Font", sans-serif;
-          font-size: 13px;
-          min-height: 0;
-        }
+  #           layer = "top";
+  #           position = "bottom";
+  #           height = 40;
+  #           spacing = 4;
+  #           modules-left = [
+  #             "sway/workspaces"
+  #             "sway/mode"
+  #           ];
+  #           modules-center = [
+  #             "wlr/taskbar"
+  #             "sway/window"
+  #           ];
+  #           modules-right = [
+  #             "pulseaudio"
+  #             "battery"
+  #             "network"
+  #             "cpu"
+  #             "memory"
+  #             "tray"
+  #             "clock"
+  #           ];
+  #           "sway/workspaces" = {
+  #             disable-scroll = true;
+  #             all-outputs = true;
+  #           };
+  #           "sway/mode" = {
+  #             format = "<span style=\"italic\">{}</span>";
+  #           };
+  #           "sway/window" = {
+  #             max-length = 80;
+  #           };
+  #           "wlr/taskbar" = {
+  #             "format" = "{icon}";
+  #             "icon-size" = 32;
+  #             "tootltip-format" = "{title}";
+  #             "on-click" = "activate";
+  #             "app_ids-mapping" = {
+  #               "firefox" = "firefox";
+  #             };
+  #           };
+  #           pulseaudio = {
+  #             format = "{icon} {volume}%";
+  #             format-icons = [
+  #               "🔇"
+  #               "🔈"
+  #               "🔉"
+  #               "🔊"
+  #             ];
+  #             on-click = "${stable.pavucontrol}/bin/pavucontrol";
+  #           };
+  #           network = {
+  #             format-wifi = "📡 {signalStrength}%";
+  #             format-ethernet = "🌐 Connected";
+  #             format-disconnected = "🔴 Offline";
+  #           };
+  #           cpu = {
+  #             format = "💻 {usage}%";
+  #             interval = 2;
+  #           };
+  #           memory = {
+  #             format = "💾 {}%";
+  #           };
+  #           battery = {
+  #             format = "{capacity}% {icon}";
+  #             format-icons = [
+  #               "❗"
+  #               "🔌"
+  #               "🔋"
+  #             ];
+  #           };
+  #           clock = {
+  #             "format" = "{:%H:%M}";
+  #             "format-alt" = "{:%F %T}";
+  #             "interval" = 1;
+  #             tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+  #           };
+  #           tray = {
+  #             spacing = 10;
+  #           };
+  #         };
+  #       };
+  #       style = ''
+  #         * {
+  #           font-family: "Ubuntu Sans", "JetBrainsMono Nerd Font", sans-serif;
+  #           font-size: 13px;
+  #           min-height: 0;
+  #         }
 
-        window#waybar {
-          background-color: ${colors.background};
-          color: ${colors.foreground};
-          border-top: 2px solid ${colors.accentDim};
-        }
+  #         window#waybar {
+  #           background-color: ${colors.background};
+  #           color: ${colors.foreground};
+  #           border-top: 2px solid ${colors.accentDim};
+  #         }
 
-        #workspaces button {
-          padding: 0 6px;
-          color: ${colors.unfocused};
-        }
+  #         #workspaces button {
+  #           padding: 0 6px;
+  #           color: ${colors.unfocused};
+  #         }
 
-        #workspaces button.active {
-          color: ${colors.accent};
-          border-bottom: 2px solid ${colors.accent};
-        }
+  #         #workspaces button.active {
+  #           color: ${colors.accent};
+  #           border-bottom: 2px solid ${colors.accent};
+  #         }
 
-        #workspaces button.urgent {
-          color: ${colors.urgent};
-        }
+  #         #workspaces button.urgent {
+  #           color: ${colors.urgent};
+  #         }
 
-        #pulseaudio,
-        #network,
-        #cpu,
-        #memory,
-        #clock,
-        #tray {
-          padding: 0 8px;
-        }
-      '';
-    };
-  };
+  #         #pulseaudio,
+  #         #network,
+  #         #cpu,
+  #         #memory,
+  #         #clock,
+  #         #tray {
+  #           padding: 0 8px;
+  #         }
+  #       '';
+  #     };
+  #   };
 
   services = {
     clipman.enable = true;
