@@ -1,13 +1,28 @@
 { pkgs, user }:
 
+let
+  stable = pkgs.stable;
+
+  # On this standalone Home Manager setup on a foreign distro (Manjaro), the
+  # Nix-built Kodi fails to initialize OpenGL/EGL ("failed to get egl display",
+  # "GLX Error: vInfo is NULL!") because Nix's mesa cannot locate the host GPU
+  # driver ICD. nixGLIntel wraps the launcher so it exports the correct GL
+  # driver paths before exec'ing Kodi; child processes (kodi-x11) inherit them.
+  kodiPackage = stable.kodi;
+  kodiWrapped = stable.symlinkJoin {
+    name = "kodi-nixgl-${kodiPackage.version}";
+    paths = [ kodiPackage ];
+    nativeBuildInputs = [ stable.makeWrapper ];
+    postBuild = ''
+      rm -f "$out/bin/kodi"
+      makeWrapper "${stable.nixgl.nixGLIntel}/bin/nixGLIntel" "$out/bin/kodi" \
+        --add-flags "${kodiPackage}/bin/kodi"
+    '';
+  };
+in
 {
   enable = true;
-  # On this standalone Home Manager setup on a foreign distro (Manjaro), the
-  # Nix-built `kodi-wayland` crashes at startup with
-  # "failed to get EGL display (EGL_SUCCESS)" because Nix's mesa/EGL cannot
-  # locate the host GPU driver ICD for the Wayland platform (no nixGL wrapper).
-  # The X11 build starts reliably and runs via XWayland under Sway.
-  package = pkgs.stable.kodi;
+  package = kodiWrapped;
   datadir = "${user.system.homeDirectory}/.kodi";
 
   # package = pkgs.kodi.withPackages (exts: [ exts.pvr-iptvsimple ]);

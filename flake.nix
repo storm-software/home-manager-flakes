@@ -10,6 +10,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    # nixGL provides OpenGL/EGL/Vulkan wrappers so Nix-built GUI apps can use
+    # the host GPU driver on foreign (non-NixOS) distros. Required for Kodi.
+    nixgl.url = "github:nix-community/nixGL";
   };
 
   outputs =
@@ -20,6 +23,7 @@
       nixpkgs,
       nixpkgs-unstable,
       rust-overlay,
+      nixgl,
     }:
     let
       # User specific settings
@@ -61,6 +65,7 @@
         };
         overlays = [
           (import rust-overlay)
+          nixgl.overlay
         ];
       };
 
