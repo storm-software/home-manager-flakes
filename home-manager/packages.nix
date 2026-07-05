@@ -53,24 +53,25 @@ let
     pavucontrol
     wtype
     dotool
+    egl-wayland
+    wayland-protocols
+    wayland-utils
   ];
 
-  misc = with pkgs; [
-    stable.egl-x11
-    stable.glibc
-    stable.mesa
-    stable.libdrm
-    stable.libx11
-    stable.libGL
-    stable.libGLX
-    stable.xkeyboard-config
-    stable.openssl
-    unstable.tailscale
-    stable.wget
-    stable.zstd
-    stable.keychain
-    stable.gnupg
-    stable.pinentry-gnome3
+  misc = with pkgs.stable; [
+    glibc
+    mesa
+    libdrm
+    libGL
+    libGLX
+    xkeyboard-config
+    openssl
+    tailscale
+    wget
+    zstd
+    keychain
+    gnupg
+    pinentry-gnome3
   ];
 
 in
