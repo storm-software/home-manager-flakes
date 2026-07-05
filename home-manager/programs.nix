@@ -115,5 +115,5 @@
     enableZshIntegration = true;
   };
 
-  kodi = import ./kodi.nix { inherit user pkgs; };
+  #   kodi = import ./kodi.nix { inherit user pkgs; };
 }
