@@ -19,7 +19,6 @@ let
 
   gitTools = with pkgs.stable; [
     gitFull
-    git-annex
     git-crypt
     git-sync
     git-lfs
@@ -27,26 +26,16 @@ let
     codeowners
   ];
 
-  misc = with pkgs; [
-    stable.coreutils
-    stable.findutils
-    stable.libiconv
-    stable.openssl
-    stable.cmake
-    stable.pkg-config
-    stable.skopeo
-    stable.stow
-    stable.tailscale
-    stable.tree
-    stable.wget
-    stable.zstd
-    unstable.pinentry-gnome3
-    stable.keychain
-    stable.gnupg
-    stable.direnv
-  ];
-
-  nixTools = with pkgs.stable; [
+  buildTools = with pkgs.stable; [
+    coreutils
+    findutils
+    libiconv
+    cmake
+    pkg-config
+    skopeo
+    stow
+    tree
+    direnv
     comma
     nix-direnv
     nixfmt
@@ -65,9 +54,17 @@ let
     pavucontrol
     wtype
     dotool
+  ];
 
-    # displaylink is installed by home.activation (scripts/displaylink-setup.sh)
+  misc = with pkgs; [
+    stable.openssl
+    unstable.tailscale
+    stable.wget
+    stable.zstd
+    stable.keychain
+    stable.gnupg
+    stable.pinentry-gnome3
   ];
 
 in
-bin ++ fonts ++ gitTools ++ nixTools ++ waylandTools ++ misc
+bin ++ fonts ++ gitTools ++ buildTools ++ waylandTools ++ misc
