@@ -52,12 +52,12 @@ in
         {
           name = "movies";
           path = "${user.system.homeDirectory}/media/movies";
-          allowsharing = "false";
+          allowsharing = "true";
         }
         {
           name = "tv";
           path = "${user.system.homeDirectory}/media/tv";
-          allowsharing = "false";
+          allowsharing = "true";
         }
       ];
     };
