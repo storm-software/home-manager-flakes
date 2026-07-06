@@ -43,6 +43,7 @@ in
     audiolibrary = {
       albumsortingmethod = "1";
     };
+    fullscreen = "false";
   };
 
   sources = {
@@ -73,9 +74,9 @@ in
     };
   };
 
-  # addonSettings = {
-  #   "service.xbmc.versioncheck" = {
-  #     versioncheck_enable = "false";
+  #   addonSettings = {
+  #     "service.xbmc.versioncheck" = {
+  #       versioncheck_enable = "false";
+  #     };
   #   };
-  # };
 }
