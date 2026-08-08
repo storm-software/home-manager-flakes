@@ -53,4 +53,6 @@ in
 
   programs = import ./programs.nix { inherit pkgs user; };
   services = import ./services.nix { inherit pkgs user; };
+
+  systemd.user.services = import ./tailscale.nix { inherit pkgs user; };
 }
