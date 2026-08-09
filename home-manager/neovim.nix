@@ -1,7 +1,7 @@
 { pkgs }:
 
 {
-  enable = true;
+  enable = false;
   package = pkgs.stable.neovim-unwrapped;
   vimAlias = true;
 

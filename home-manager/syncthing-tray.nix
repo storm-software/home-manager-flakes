@@ -38,5 +38,6 @@ in
 {
   home.packages = [ syncthingTrayWrapper ];
 
-  systemd.user.services.syncthingtray-minimal.serviceConfig.ExecStart = lib.mkForce "${syncthingTrayWrapper}/bin/syncthingtray-managed";
+  systemd.user.services.syncthingtray-minimal.serviceConfig.ExecStart =
+    lib.mkForce "${syncthingTrayWrapper}/bin/syncthingtray-managed";
 }
