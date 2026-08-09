@@ -21,6 +21,8 @@
 
   gh = import ./gh.nix { inherit user; };
 
+  github-copilot-cli = import ./github-copilot-cli.nix { inherit pkgs; };
+
   ssh = {
     enable = true;
     enableDefaultConfig = false;
