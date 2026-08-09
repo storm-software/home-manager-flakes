@@ -45,12 +45,6 @@
       };
     };
 
-    allowedUrls = [
-      "*.github.com"
-      "*.githubusercontent.com"
-      "api.githubcopilot.com"
-    ];
-
     ide = {
       autoConnect = true;
       openDiffOnEdit = true;
@@ -58,13 +52,6 @@
 
     mergeStrategy = "rebase";
   };
-
-  context = ''
-    Prefer actionable findings and focused diffs over general commentary.
-    Follow existing project conventions; do not introduce drive-by refactors.
-    For Nix/Home Manager changes, keep overlays and package scope correct
-    (especially with useGlobalPkgs) and avoid editing generated hardware configs.
-  '';
 
   # Context7 matches the VS Code MCP setup. Set CONTEXT7_API_KEY in the
   # environment for higher rate limits ($ denotes an env-var reference).

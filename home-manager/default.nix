@@ -19,7 +19,10 @@ let
   };
 in
 {
-  imports = [ ./syncthing-tray.nix ];
+  imports = [
+    ./activate-wrapper.nix
+    ./syncthing-tray.nix
+  ];
 
   meta = {
     maintainers = with lib.maintainers; [ sullivanpj ];
