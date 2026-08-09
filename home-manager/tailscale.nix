@@ -1,11 +1,9 @@
 { pkgs, user }:
 
 {
-  # Userspace tailscaled for standalone home-manager (Manjaro/Arch, no
-  # NixOS services.tailscale). Provides the daemon that
-  # services.tailscale-systray requires at /var/run/tailscale/tailscaled.sock
-  # when no privileged system daemon is available. Remove this block if you
-  # use the host package: `sudo pacman -S tailscale && sudo systemctl enable --now tailscaled`.
+  # Userspace tailscaled for standalone home-manager (Manjaro/Arch, no NixOS services.tailscale). Provides the daemon that
+  # services.tailscale-systray requires at /var/run/tailscale/tailscaled.sock when no privileged system daemon is available.
+  # Remove this block if you use the host package: `sudo pacman -S tailscale && sudo systemctl enable --now tailscaled`.
   tailscaled = {
     Unit = {
       Description = "Tailscale daemon (userspace)";
