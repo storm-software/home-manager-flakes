@@ -1,18 +1,28 @@
 { pkgs, user }:
 
 {
-  # Userspace tailscaled for standalone home-manager (Manjaro/Arch, no NixOS services.tailscale). Provides the daemon that
-  # services.tailscale-systray requires at /var/run/tailscale/tailscaled.sock when no privileged system daemon is available.
-  # Remove this block if you use the host package: `sudo pacman -S tailscale && sudo systemctl enable --now tailscaled`.
+  # Kernel-TUN tailscaled for standalone home-manager (Manjaro/Arch, no
+  # NixOS services.tailscale). Apps like Orca dial Tailscale 100.x addresses
+  # directly, which userspace-networking cannot route. AmbientCapabilities
+  # lets the user unit create /dev/net/tun (user systemd already holds
+  # CAP_NET_ADMIN). Alternative: host package
+  # `sudo pacman -S tailscale && sudo systemctl enable --now tailscaled`
+  # and delete this block.
+  #
+  # Coexists with ProtonVPN (tun0) via separate interfaces; if routing
+  # fights, prefer `tailscale set --accept-routes=false` over falling
+  # back to userspace-networking.
   tailscaled = {
     Unit = {
-      Description = "Tailscale daemon (userspace)";
+      Description = "Tailscale daemon (kernel TUN)";
       After = [ "network-online.target" ];
       Wants = [ "network-online.target" ];
       PartOf = [ "graphical-session.target" ];
     };
     Service = {
-      ExecStart = "${pkgs.stable.tailscale}/bin/tailscaled --tun=userspace-networking --state=${user.system.homeDirectory}/.local/share/tailscale/tailscaled.state --socket=${user.system.homeDirectory}/.cache/tailscale/tailscaled.sock --port 41641";
+      ExecStart = "${pkgs.stable.tailscale}/bin/tailscaled --tun=tailscale0 --state=${user.system.homeDirectory}/.local/share/tailscale/tailscaled.state --socket=${user.system.homeDirectory}/.cache/tailscale/tailscaled.sock --port 41641";
+      AmbientCapabilities = "CAP_NET_ADMIN CAP_NET_RAW";
+      CapabilityBoundingSet = "CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE";
       Restart = "on-failure";
       RestartSec = 5;
     };
