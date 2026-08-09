@@ -18,7 +18,7 @@
     };
     hotkey = {
       key = "SPACE";
-      modifiers = "LEFTCTRL";
+      modifiers = [ "LEFTCTRL" ];
     };
   };
   wayland.display = "wayland-1";

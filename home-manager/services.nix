@@ -82,6 +82,10 @@
   syncthing = {
     enable = true;
     guiAddress = "127.0.0.1:8384";
+    # Syncthing 1.27+ defaults to XDG_STATE_HOME; tray still reads ~/.config by default.
+    extraOptions = [
+      "--config=${user.system.homeDirectory}/.local/state/syncthing"
+    ];
     cert = "${user.system.homeDirectory}/.cert/syncthing/cert.pem";
     key = "${user.system.homeDirectory}/.cert/syncthing/key.pem";
 

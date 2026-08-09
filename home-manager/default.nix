@@ -19,6 +19,8 @@ let
   };
 in
 {
+  imports = [ ./syncthing-tray.nix ];
+
   meta = {
     maintainers = with lib.maintainers; [ sullivanpj ];
     teams = with lib.teams; [ storm ];
