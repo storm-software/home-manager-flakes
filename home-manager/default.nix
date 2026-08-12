@@ -22,6 +22,7 @@ in
   imports = [
     ./activate-wrapper.nix
     ./syncthing-tray.nix
+    (import ./github-copilot-cli.nix { inherit pkgs; })
   ];
 
   meta = {
