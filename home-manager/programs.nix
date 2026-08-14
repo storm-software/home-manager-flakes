@@ -66,7 +66,7 @@
     enableZshIntegration = true;
   };
 
-  tmux = import ./tmux.nix { inherit pkgs; };
+  # tmux = import ./tmux.nix { inherit pkgs; };
 
   fzf = import ./fzf.nix;
 
@@ -116,4 +116,8 @@
   };
 
   kodi = import ./kodi.nix { inherit user pkgs; };
+
+  thunderbird = import ./thunderbird.nix { inherit pkgs user; };
+
+  khal = import ./khal.nix { inherit pkgs; };
 }

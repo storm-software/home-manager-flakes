@@ -79,6 +79,8 @@
     logLevel = "info";
   };
 
+  vdirsyncer = import ./vdirsyncer.nix { inherit pkgs user; };
+
   syncthing = {
     enable = true;
     guiAddress = "127.0.0.1:8384";
@@ -135,11 +137,11 @@
     };
   };
 
-  pipewire = {
-    enable = true;
-  };
+  # pipewire = {
+  #  enable = true;
+  # };
 
-  voxtype = import ./voxtype.nix { inherit pkgs; };
+  # voxtype = import ./voxtype.nix { inherit pkgs; };
 
   tailscale-systray = {
     enable = true;
