@@ -15,10 +15,7 @@
 
       # Secure: password never in Nix store. Bridge password is the
       # per-bridge mailbox password generated in Proton Bridge settings.
-      # Prefer `pass` if available, fall back to a 0600 file.
-      # Create ~/.cert/protonmail/bridge-password with: chmod 600; echo -n "<bridge-password>" > file
-      passwordCommand = "sh -c 'if command -v ${pkgs.stable.pass}/bin/pass >/dev/null 2>&1 && ${pkgs.stable.pass}/bin/pass show proton/bridge/${user.email} >/dev/null 2>&1; then ${pkgs.stable.pass}/bin/pass show proton/bridge/${user.email}; else cat ${user.system.homeDirectory}/.cert/protonmail/bridge-password; fi'";
-
+      passwordCommand = "sh -c 'if ${pkgs.stable.pass}/bin/pass show proton/bridge/${user.email} >/dev/null 2>&1; then ${pkgs.stable.pass}/bin/pass show proton/bridge/${user.email}; else cat ${user.system.homeDirectory}/.cert/protonmail/bridge-password; fi'";
       # Proton Bridge exposes unauthenticated TLS on loopback only.
       # TLS is intentionally disabled here — traffic never leaves localhost
       # and is encrypted end-to-end by Proton's PGP layer. The bridge
