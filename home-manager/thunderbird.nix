@@ -1,7 +1,9 @@
 { pkgs, user }:
 {
   enable = true;
-  package = pkgs.stable.thunderbird;
+  # Mozilla's official binary. Compiling thunderbird-unwrapped locally
+  # LTO-links libxul.so and routinely OOM-kills ld.lld (exit 137).
+  package = pkgs.stable.thunderbird-bin;
 
   # Use external gpg-agent (services.gpg-agent in services.nix) so
   # Thunderbird/OpenPGP reuses the existing keyring at ~/.gnupg
