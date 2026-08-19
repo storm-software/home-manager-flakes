@@ -7,6 +7,7 @@ fi
 
 eval "$(atuin init zsh)"
 eval "$(devenv hook zsh)"
+eval "$(pass-cli completions zsh)"
 
 # Run the env.sh script (if it exists). That script is meant to contain secrets, tokens, and
 # other things you don't want to put in your Nix config. This is quite "impure" but a

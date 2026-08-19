@@ -22,7 +22,9 @@ in
   imports = [
     ./activate-wrapper.nix
     ./syncthing-tray.nix
+    ./clamav.nix
     (import ./github-copilot-cli.nix { inherit pkgs; })
+    (import ./proton-pass-cli.nix { inherit pkgs; })
   ];
 
   meta = {
