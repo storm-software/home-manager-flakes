@@ -2,7 +2,7 @@
 
 let
   inherit (pkgs.stable.lib) optionals;
-  inherit (pkgs.stable.stdenv) isDarwin isLinux;
+  inherit (pkgs.stable.stdenv.hostPlatform) isDarwin isLinux;
 in
 rec {
   darwinOnly = ls: optionals isDarwin ls;

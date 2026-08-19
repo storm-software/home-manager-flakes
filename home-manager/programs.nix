@@ -24,13 +24,13 @@
   ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks."*" = {
-      forwardAgent = true;
-      addKeysToAgent = "yes";
-      serverAliveInterval = 0;
-      serverAliveCountMax = 3;
-      hashKnownHosts = false;
-      userKnownHostsFile = "${user.system.homeDirectory}/.ssh/known_hosts";
+    settings."*" = {
+      ForwardAgent = true;
+      AddKeysToAgent = "yes";
+      ServerAliveInterval = 0;
+      ServerAliveCountMax = 3;
+      HashKnownHosts = false;
+      UserKnownHostsFile = "${user.system.homeDirectory}/.ssh/known_hosts";
     };
   };
 

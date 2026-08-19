@@ -65,7 +65,11 @@
         };
         overlays = [
           (import rust-overlay)
-          nixgl.overlay
+          # nixGL still reads pkgs.system; pass hostPlatform.system to avoid the alias warning.
+          (
+            final: prev:
+            nixgl.overlay (final // { inherit (final.stdenv.hostPlatform) system; }) prev
+          )
         ];
       };
 

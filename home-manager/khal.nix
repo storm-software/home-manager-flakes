@@ -5,12 +5,12 @@
 
   locale = {
     # Align with Proton Calendar UI — adapt to your locale
-    longDateFormat = "%Y-%m-%d";
-    dateFormat = "%Y-%m-%d";
-    longDatetimeFormat = "%Y-%m-%d %H:%M";
-    datetimeFormat = "%Y-%m-%d %H:%M";
-    timeFormat = "%H:%M";
-    weekNumbers = "off";
+    longdateformat = "%Y-%m-%d";
+    dateformat = "%Y-%m-%d";
+    longdatetimeformat = "%Y-%m-%d %H:%M";
+    datetimeformat = "%Y-%m-%d %H:%M";
+    timeformat = "%H:%M";
+    weeknumbers = "off";
     firstweekday = 0; # Monday (1 = Sunday in some locales, keep 0 for ISO)
   };
 
