@@ -60,6 +60,6 @@ in
       After = lib.mkAfter [ "syncthing.service" ];
       Wants = [ "syncthing.service" ];
     };
-    serviceConfig.ExecStart = lib.mkForce "${syncthingTrayWrapper}/bin/syncthingtray-managed";
+    Service.ExecStart = lib.mkForce "${syncthingTrayWrapper}/bin/syncthingtray-managed";
   };
 }

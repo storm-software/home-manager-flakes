@@ -71,22 +71,15 @@
   #     };
   #   };
 
-  protonmail-bridge = {
-    enable = true;
-    extraPackages = with pkgs.unstable; [
-      keepassxc
-    ];
-    logLevel = "info";
-  };
-
   vdirsyncer = import ./vdirsyncer.nix { inherit pkgs user; };
 
   syncthing = {
     enable = true;
     guiAddress = "127.0.0.1:8384";
-    # Syncthing 1.27+ defaults to XDG_STATE_HOME; tray still reads ~/.config by default.
+    # Syncthing 1.27+ requires --config and --data together, or --home for both.
+    # Keep config.xml and index-v2 under XDG_STATE_HOME.
     extraOptions = [
-      "--config=${user.system.homeDirectory}/.local/state/syncthing"
+      "--home=${user.system.homeDirectory}/.local/state/syncthing"
     ];
     cert = "${user.system.homeDirectory}/.cert/syncthing/cert.pem";
     key = "${user.system.homeDirectory}/.cert/syncthing/key.pem";

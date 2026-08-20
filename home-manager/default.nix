@@ -25,6 +25,7 @@ in
     ./clamav.nix
     (import ./github-copilot-cli.nix { inherit pkgs; })
     (import ./proton-pass-cli.nix { inherit pkgs; })
+    ./protonmail-bridge.nix
   ];
 
   meta = {
