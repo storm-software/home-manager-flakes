@@ -23,6 +23,7 @@ in
     ./activate-wrapper.nix
     ./syncthing-tray.nix
     ./clamav.nix
+    ./agents.nix
     (import ./github-copilot-cli.nix { inherit pkgs; })
     (import ./proton-pass-cli.nix { inherit pkgs; })
     ./codex.nix

@@ -29,6 +29,22 @@
   };
 
   shell = {
+    # Route provider traffic for every agent natively supported by Caveman
+    # through its local compression proxy. Shell aliases avoid recursive PATH
+    # lookup when Caveman launches the underlying agent executable.
+    claude = "caveman claude";
+    codex = "caveman codex";
+    gemini = "caveman gemini";
+    aider = "caveman aider";
+    opencode = "caveman opencode";
+    hermes = "caveman hermes";
+    openclaw = "caveman openclaw";
+    pi = "caveman pi";
+
+    # Copilot CLI has no named Caveman profile; the generic runner places
+    # unsupported executables on the same local proxy layer.
+    copilot = "caveman run -- copilot";
+
     # General
     "," = "comma";
     cat = "bat";
