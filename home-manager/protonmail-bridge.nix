@@ -42,38 +42,64 @@ in
   };
 
   # Thunderbird does not read accounts.email.passwordCommand. It talks to
-  # Bridge's IMAP, and Bridge has no mailbox until this login is done once.
+  # Bridge IMAP. Bridge has no mailbox until Proton login is done once.
   home.packages = [
     (pkgs.writeShellApplication {
       name = "protonmail-bridge-login";
       runtimeInputs = [
         config.services.protonmail-bridge.package
+        pkgs.coreutils
+        pkgs.gnugrep
       ];
       text = ''
         export PASSWORD_STORE_DIR="${config.home.homeDirectory}/.password-store"
         export PASSWORD_STORE_GPG_OPTS="--trust-model=always"
 
+        if [[ ! -t 0 ]]; then
+          echo "protonmail-bridge-login must run in a terminal (it asks for your Proton password and 2FA)." >&2
+          exit 1
+        fi
+
         echo "Stopping the Bridge daemon (only one instance can run)..."
         systemctl --user stop protonmail-bridge.service
 
         echo
-        echo "Log in with your Proton account (email, password, 2FA)."
-        echo "Do not use the password Thunderbird is prompting for."
+        echo "This is Proton Bridge login, not Thunderbird."
+        echo "Use your Proton account password and 2FA, then run:"
         echo
         echo "  login"
-        echo "  info      # copy the mailbox password"
+        echo "  info      # copy the mailbox password for Thunderbird"
         echo "  quit"
-        echo
-        echo "Then in Thunderbird: paste that mailbox password once and"
-        echo "check Use Password Manager to remember this password."
         echo
 
         protonmail-bridge --cli
 
+        echo
+        echo "Checking that Bridge has an account..."
+        list_out="$(printf 'list\nquit\n' | protonmail-bridge --cli 2>/dev/null || true)"
+        if printf '%s\n' "$list_out" | grep -qi 'no active accounts'; then
+          echo "No Proton account is logged into Bridge yet." >&2
+          echo "Run protonmail-bridge-login again and complete the login command." >&2
+          systemctl --user start protonmail-bridge.service
+          exit 1
+        fi
+
         systemctl --user start protonmail-bridge.service
+        echo "Bridge is running. In Thunderbird, Get Messages and paste the mailbox password from 'info'."
       '';
     })
   ];
+
+  xdg.desktopEntries.protonmail-bridge-login = {
+    name = "Proton Mail Bridge Login";
+    comment = "Log your Proton account into Bridge (required before Thunderbird IMAP works)";
+    exec = "protonmail-bridge-login";
+    terminal = true;
+    categories = [
+      "Network"
+      "Email"
+    ];
+  };
 
   systemd.user.services.gnome-keyring = {
     Unit.PartOf = [ "sway-session.target" ];
