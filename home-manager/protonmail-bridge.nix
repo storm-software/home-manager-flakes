@@ -5,9 +5,10 @@
   ...
 }:
 
-# KeePassXC owns org.freedesktop.secrets here, but only exposes
-# collection/session. Proton Bridge's secret-service helper requires
-# collection/login (gnome-keyring). Use pass + gpg-agent instead.
+# KeePassXC FdoSecrets only exposes collection/session. Bridge's
+# secret-service helper needs gnome-keyring's collection/login.
+# Vault persistence uses pass; the systemd unit must encrypt without
+# interactive GPG trust prompts.
 let
   waitForGpg = pkgs.writeShellScript "wait-for-gpg-agent" ''
     set -euo pipefail
@@ -22,22 +23,40 @@ let
   '';
 in
 {
+  services.gnome-keyring = {
+    enable = true;
+    components = [
+      "pkcs11"
+      "secrets"
+    ];
+  };
+
   services.protonmail-bridge = {
     enable = true;
     extraPackages = with pkgs; [
       pass
       gnupg
+      gnome-keyring
     ];
     logLevel = "info";
+  };
+
+  systemd.user.services.gnome-keyring = {
+    Unit.PartOf = [ "sway-session.target" ];
+    Install.WantedBy = [ "sway-session.target" ];
   };
 
   systemd.user.services.protonmail-bridge = {
     Unit.After = [
       "graphical-session.target"
       "gpg-agent.socket"
+      "gnome-keyring.service"
     ];
     Service = {
-      Environment = [ "PASSWORD_STORE_DIR=${config.home.homeDirectory}/.password-store" ];
+      Environment = [
+        "PASSWORD_STORE_DIR=${config.home.homeDirectory}/.password-store"
+        "PASSWORD_STORE_GPG_OPTS=--trust-model=always"
+      ];
       ExecStartPre = "${waitForGpg}";
       RestartSec = "5";
     };
