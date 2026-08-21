@@ -13,8 +13,9 @@
       # ProtonMail via local Bridge — not a well-known flavor
       flavor = "plain";
 
-      # Secure: password never in Nix store. Bridge password is the
-      # per-bridge mailbox password generated in Proton Bridge settings.
+      # Used by mbsync/msmtp only. Thunderbird never reads passwordCommand;
+      # it stores the Bridge mailbox password in its own password manager
+      # after a successful login (run protonmail-bridge-login first).
       passwordCommand = "sh -c 'if ${pkgs.stable.pass}/bin/pass show proton/bridge/${user.email} >/dev/null 2>&1; then ${pkgs.stable.pass}/bin/pass show proton/bridge/${user.email}; else cat ${user.system.homeDirectory}/.cert/protonmail/bridge-password; fi'";
       # Proton Bridge exposes unauthenticated TLS on loopback only.
       # TLS is intentionally disabled here — traffic never leaves localhost
@@ -33,9 +34,13 @@
         tls.useStartTls = false;
       };
 
-      # Let Thunderbird autoconfiguration be generated from this account
       thunderbird = {
         enable = true;
+        # Don't IMAP-login on startup until Bridge has a mailbox. A failed
+        # auto-login is what shows the password dialog on every Thunderbird open.
+        settings = id: {
+          "mail.server.server_${id}.login_at_startup" = false;
+        };
       };
 
       # Sign by default with the user's existing PGP key; encryption

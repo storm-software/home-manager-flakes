@@ -33,6 +33,7 @@
       # IMAP/SMTP tuning for Bridge (local, no IDLE push delay)
       "mail.server.default.check_all_folders_for_new" = true;
       "mail.imap.use_status_for_biff" = false;
+      "signon.rememberSignons" = true;
 
       # Calendar (Lightning) — Thunderbird ships calendar built-in.
       # Proton Calendar has no CalDAV; subscribe via ICS URL

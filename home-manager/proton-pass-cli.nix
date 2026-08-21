@@ -1,12 +1,13 @@
 { pkgs }:
 
-# Proton Pass CLI (`pass-cli`) is a user tool, so it lives in Home Manager
-# rather than a system profile. The nixpkgs wrapper already sets
-# PROTON_PASS_NO_UPDATE_CHECK. SSH agent support is left off: gpg-agent already
-# owns SSH_AUTH_SOCK (`services.gpg-agent.enableSshSupport`), and enabling
-# `services.proton-pass-agent` would replace it.
+# Proton Pass CLI (`pass-cli`) is a user tool. The nixpkgs wrapper already
+# sets PROTON_PASS_NO_UPDATE_CHECK. The SSH agent owns SSH_AUTH_SOCK
+# (gpg-agent SSH is disabled in services.nix).
 {
-  home.packages = [ pkgs.unstable.proton-pass-cli ];
+  services.proton-pass-agent = {
+    enable = true;
+    package = pkgs.unstable.proton-pass-cli;
+  };
 
   home.sessionVariables = {
     # Persist the vault encryption key across reboots via Secret Service

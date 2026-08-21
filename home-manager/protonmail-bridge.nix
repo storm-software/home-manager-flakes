@@ -41,6 +41,40 @@ in
     logLevel = "info";
   };
 
+  # Thunderbird does not read accounts.email.passwordCommand. It talks to
+  # Bridge's IMAP, and Bridge has no mailbox until this login is done once.
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "protonmail-bridge-login";
+      runtimeInputs = [
+        config.services.protonmail-bridge.package
+      ];
+      text = ''
+        export PASSWORD_STORE_DIR="${config.home.homeDirectory}/.password-store"
+        export PASSWORD_STORE_GPG_OPTS="--trust-model=always"
+
+        echo "Stopping the Bridge daemon (only one instance can run)..."
+        systemctl --user stop protonmail-bridge.service
+
+        echo
+        echo "Log in with your Proton account (email, password, 2FA)."
+        echo "Do not use the password Thunderbird is prompting for."
+        echo
+        echo "  login"
+        echo "  info      # copy the mailbox password"
+        echo "  quit"
+        echo
+        echo "Then in Thunderbird: paste that mailbox password once and"
+        echo "check Use Password Manager to remember this password."
+        echo
+
+        protonmail-bridge --cli
+
+        systemctl --user start protonmail-bridge.service
+      '';
+    })
+  ];
+
   systemd.user.services.gnome-keyring = {
     Unit.PartOf = [ "sway-session.target" ];
     Install.WantedBy = [ "sway-session.target" ];

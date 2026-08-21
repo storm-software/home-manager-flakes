@@ -44,7 +44,8 @@
       package = pkgs.unstable.pinentry-gnome3;
       program = "pinentry-gnome3";
     };
-    enableSshSupport = true;
+    # SSH_AUTH_SOCK is provided by services.proton-pass-agent.
+    enableSshSupport = false;
     enableScDaemon = true;
     enableZshIntegration = true;
   };
