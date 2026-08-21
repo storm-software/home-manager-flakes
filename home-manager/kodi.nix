@@ -48,25 +48,25 @@ in
 
   sources = {
     video = {
-      default = "movies";
+      default = "Movies";
       source = [
         {
-          name = "movies";
+          name = "Movies";
           path = "${user.system.homeDirectory}/media/movies";
           allowsharing = "true";
         }
         {
-          name = "tv";
+          name = "TV Shows";
           path = "${user.system.homeDirectory}/media/tv";
           allowsharing = "true";
         }
       ];
     };
     music = {
-      default = "music";
+      default = "Music";
       source = [
         {
-          name = "music";
+          name = "Music";
           path = "${user.system.homeDirectory}/media/music";
           allowsharing = "false";
         }
