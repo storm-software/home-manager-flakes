@@ -33,8 +33,6 @@ in
   package = kodiWrapped;
   datadir = "${user.system.homeDirectory}/.kodi";
 
-  # package = pkgs.kodi.withPackages (exts: [ exts.pvr-iptvsimple ]);
-
   settings = {
     videolibrary = {
       showemptytvshows = "true";
@@ -73,10 +71,4 @@ in
       ];
     };
   };
-
-  #   addonSettings = {
-  #     "service.xbmc.versioncheck" = {
-  #       versioncheck_enable = "false";
-  #     };
-  #   };
 }
