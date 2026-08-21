@@ -5,6 +5,10 @@ set -o pipefail
 inner="$(cd "$(dirname "$0")" && pwd)/activate-inner"
 remaining=()
 
+# Back up colliding files by default (equivalent to `-b backup`) unless the
+# caller already requested a specific backup extension/command or -B.
+export HOME_MANAGER_BACKUP_EXT="${HOME_MANAGER_BACKUP_EXT:-backup}"
+
 while (( $# > 0 )); do
   opt="$1"
   shift
