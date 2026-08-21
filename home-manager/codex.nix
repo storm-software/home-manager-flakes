@@ -24,7 +24,7 @@
   };
 
   programs.codex = {
-    enable = true;
+    enable = false;
     enableMcpIntegration = true;
   };
 }
