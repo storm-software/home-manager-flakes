@@ -46,7 +46,7 @@
     # Proton Bridge needs collection/login (gnome-keyring). KeePassXC only
     # exposes collection/session, so it must not own Secret Service.
     FdoSecrets = {
-      Enabled = false;
+      Enabled = true;
     };
   };
 }

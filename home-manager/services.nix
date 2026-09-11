@@ -72,7 +72,7 @@
   #     };
   #   };
 
-  vdirsyncer = import ./vdirsyncer.nix { inherit pkgs user; };
+  #   vdirsyncer = import ./vdirsyncer.nix { inherit pkgs user; };
 
   syncthing = {
     enable = true;

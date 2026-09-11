@@ -27,7 +27,6 @@ in
     (import ./github-copilot-cli.nix { inherit pkgs; })
     (import ./proton-pass-cli.nix { inherit pkgs; })
     ./codex.nix
-    ./protonmail-bridge.nix
   ];
 
   meta = {
@@ -65,7 +64,7 @@ in
   programs = import ./programs.nix { inherit pkgs user; };
   services = import ./services.nix { inherit pkgs user; };
 
-  accounts = import ./accounts.nix { inherit pkgs user; };
+  #   accounts = import ./accounts.nix { inherit pkgs user; };
 
   # TODO: Add tailscale back in when we have a way to connect to the VPN
   #   systemd.user.services = import ./tailscale.nix { inherit pkgs user; };
