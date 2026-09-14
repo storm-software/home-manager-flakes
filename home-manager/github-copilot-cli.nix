@@ -5,7 +5,7 @@
 # treats as auto-managed runtime state: it migrates those keys into
 # settings.json and replaces the HM symlink. The next activation then tries to
 # back up config.json onto an existing config.json.backup and aborts.
-{ config, ... }:
+{ config, lib, ... }:
 
 let
   jsonFormat = pkgs.unstable.formats.json { };
@@ -63,7 +63,20 @@ in
 {
   programs.github-copilot-cli = {
     enable = true;
-    package = pkgs.unstable.github-copilot-cli;
+    package = pkgs.unstable.symlinkJoin {
+      name = "github-copilot-cli-weave";
+      paths = [ pkgs.unstable.github-copilot-cli ];
+      nativeBuildInputs = [ pkgs.unstable.makeWrapper ];
+      postBuild = ''
+        wrapProgram "$out/bin/copilot" --run ${lib.escapeShellArg ''
+          if [ ! -r "${config.xdg.stateHome}/weave-router/client.env" ]; then
+            echo "Weave Router is not configured; start weave-router.service first." >&2
+            exit 1
+          fi
+          . "${config.xdg.stateHome}/weave-router/client.env"
+        ''}
+      '';
+    };
 
     # Context7 matches the VS Code MCP setup. Set CONTEXT7_API_KEY in the
     # environment for higher rate limits ($ denotes an env-var reference).

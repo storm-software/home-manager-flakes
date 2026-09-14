@@ -6,8 +6,8 @@
 }:
 
 let
-  rtkVersion = "0.45.0";
-  rtkSources = {
+  rtkCleanupVersion = "0.45.0";
+  rtkCleanupSources = {
     "aarch64-darwin" = {
       target = "aarch64-apple-darwin";
       hash = "sha256-BkFRz8LVCyTYELBqCvLkG5yUXoNTTkxDjD0+rmB/w/Q=";
@@ -25,32 +25,20 @@ let
       hash = "sha256-xMA2+/GB/FXvMpeGyMF+DUJ5crBTuCWUTZaKaq/vG6Q=";
     };
   };
-  rtkSource = rtkSources.${pkgs.stdenv.hostPlatform.system};
-  rtk = pkgs.stdenvNoCC.mkDerivation {
-    pname = "rtk";
-    version = rtkVersion;
-
+  rtkCleanupSource = rtkCleanupSources.${pkgs.stdenv.hostPlatform.system};
+  rtkCleanup = pkgs.stdenvNoCC.mkDerivation {
+    pname = "rtk-cleanup";
+    version = rtkCleanupVersion;
     src = pkgs.fetchurl {
-      url = "https://github.com/rtk-ai/rtk/releases/download/v${rtkVersion}/rtk-${rtkSource.target}.tar.gz";
-      inherit (rtkSource) hash;
+      url = "https://github.com/rtk-ai/rtk/releases/download/v${rtkCleanupVersion}/rtk-${rtkCleanupSource.target}.tar.gz";
+      inherit (rtkCleanupSource) hash;
     };
-
     sourceRoot = ".";
     installPhase = ''
-      runHook preInstall
       install -Dm755 rtk "$out/bin/rtk"
-      runHook postInstall
     '';
-
-    meta = {
-      description = "CLI output proxy that reduces token usage by AI coding agents";
-      homepage = "https://www.rtk-ai.app";
-      license = lib.licenses.mit;
-      mainProgram = "rtk";
-      platforms = builtins.attrNames rtkSources;
-    };
   };
-
+  rtkCleanupMarker = "${config.xdg.stateHome}/rtk/home-manager-removed-${rtkCleanupVersion}";
   cavemanVersion = "1.2.3";
   caveman = pkgs.stdenvNoCC.mkDerivation {
     pname = "caveman-cli";
@@ -83,36 +71,117 @@ let
       platforms = lib.platforms.all;
     };
   };
-
-  rtkInitMarker = "${config.xdg.stateHome}/rtk/home-manager-init-${rtkVersion}";
+  headroomImage = "ghcr.io/headroomlabs-ai/headroom@sha256:4e559273659ebc5ce8711a60278e288550fa596377af18a7058e10036d63ef0b";
+  headroomHome = "${config.home.homeDirectory}/.headroom";
+  headroomPython = pkgs.python3.withPackages (ps: [ ps.tomlkit ]);
+  configureHeadroomClients = pkgs.writeShellApplication {
+    name = "configure-headroom-clients";
+    runtimeInputs = [ headroomPython ];
+    text = ''
+      exec ${headroomPython}/bin/python ${./scripts/configure-headroom-clients.py} \
+        ${lib.escapeShellArg config.home.homeDirectory}
+    '';
+  };
+  headroom = pkgs.writeShellApplication {
+    name = "headroom";
+    runtimeInputs = [
+      pkgs.bash
+      pkgs.coreutils
+      pkgs.docker
+    ];
+    text = ''
+      : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
+      mkdir -p ${lib.escapeShellArg headroomHome}
+      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
+      exec docker run --rm \
+        --network host \
+        --user "$(id -u):$(id -g)" \
+        --workdir /workspace \
+        --env HOME=/tmp/headroom-home \
+        --env HEADROOM_WORKSPACE_DIR=/tmp/headroom-home/.headroom \
+        --env HEADROOM_CONFIG_DIR=/tmp/headroom-home/.headroom/config \
+        --volume "$PWD:/workspace" \
+        --volume ${lib.escapeShellArg "${headroomHome}:/tmp/headroom-home/.headroom"} \
+        ${headroomImage} headroom "$@"
+    '';
+  };
+  headroomProxy = pkgs.writeShellApplication {
+    name = "headroom-proxy";
+    runtimeInputs = [
+      pkgs.bash
+      pkgs.coreutils
+      pkgs.docker
+    ];
+    text = ''
+      : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
+      mkdir -p ${lib.escapeShellArg headroomHome}
+      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
+      exec docker run --rm --name headroom-proxy \
+        --network host \
+        --user "$(id -u):$(id -g)" \
+        --env HOME=/tmp/headroom-home \
+        --env HEADROOM_WORKSPACE_DIR=/tmp/headroom-home/.headroom \
+        --env HEADROOM_CONFIG_DIR=/tmp/headroom-home/.headroom/config \
+        --env HEADROOM_BEACON=off \
+        --env DO_NOT_TRACK=1 \
+        --volume ${lib.escapeShellArg "${headroomHome}:/tmp/headroom-home/.headroom"} \
+        ${headroomImage} headroom proxy \
+          --host 127.0.0.1 \
+          --port 8787 \
+          --mode cache \
+          --openai-api-url http://127.0.0.1:8080 \
+          --anthropic-api-url http://127.0.0.1:8080 \
+          --no-telemetry
+    '';
+  };
 in
 {
+  imports = [ ./weave-router.nix ];
+
   home.packages = [
     caveman
-    rtk
+    headroom
   ];
 
-  # RTK's integrations are not all expressible as Home Manager options. Run
-  # each global initializer once per pinned RTK version so upgrades can refresh
-  # hook formats without rewriting agent-owned files on every activation.
-  home.activation.configureRtk = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    if [ ! -e "${rtkInitMarker}" ]; then
+  home.sessionVariables.HEADROOM_CODEX_UPSTREAM_BASE_URL = "http://127.0.0.1:8080";
+
+  # RTK writes global hooks and prompt files outside the Home Manager profile.
+  # Remove the integrations this module formerly installed, once, before RTK
+  # disappears from PATH with the new generation.
+  home.activation.removeRtkIntegrations = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if [ ! -e "${rtkCleanupMarker}" ]; then
       export HOME="${config.home.homeDirectory}"
-      export RTK_TELEMETRY_DISABLED=1
 
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --auto-patch
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --copilot
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --gemini
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --opencode
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --codex
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --agent cursor
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --agent pi
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --agent droid
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --global --agent vibe
-      $DRY_RUN_CMD ${rtk}/bin/rtk init --agent hermes
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall --copilot
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall --gemini
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall --opencode
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall --codex
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall --agent cursor
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall --agent pi
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall --agent droid
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --global --uninstall --agent vibe
+      $DRY_RUN_CMD ${rtkCleanup}/bin/rtk init --uninstall --agent hermes
 
-      $DRY_RUN_CMD mkdir -p "$(dirname "${rtkInitMarker}")"
-      $DRY_RUN_CMD touch "${rtkInitMarker}"
+      $DRY_RUN_CMD mkdir -p "$(dirname "${rtkCleanupMarker}")"
+      $DRY_RUN_CMD touch "${rtkCleanupMarker}"
     fi
   '';
+
+  # Headroom runs ahead of the self-hosted Weave Router. It starts only after
+  # Weave has installed its client settings, then updates Headroom-owned fields.
+  systemd.user.services.headroom = {
+    Unit = {
+      Description = "Headroom context-optimization proxy";
+      Requires = [ "weave-router.service" ];
+      After = [ "weave-router.service" ];
+    };
+    Service = {
+      ExecStartPre = "${configureHeadroomClients}/bin/configure-headroom-clients";
+      ExecStart = "${headroomProxy}/bin/headroom-proxy";
+      Restart = "on-failure";
+      RestartSec = 5;
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
 }
