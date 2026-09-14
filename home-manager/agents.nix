@@ -182,6 +182,7 @@ in
       Restart = "on-failure";
       RestartSec = 5;
     };
-    Install.WantedBy = [ "default.target" ];
+    # `activate --weave-router` starts this after the router has configured
+    # its client settings. Do not pull it in at login without that opt-in.
   };
 }

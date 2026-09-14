@@ -5,6 +5,7 @@ set -o pipefail
 inner="$(cd "$(dirname "$0")" && pwd)/activate-inner"
 remaining=()
 setup_displaylink=false
+setup_weave_router=false
 
 # Back up colliding files by default (equivalent to `-b backup`) unless the
 # caller already requested a specific backup extension/command or -B.
@@ -37,9 +38,12 @@ while (( $# > 0 )); do
     --displaylink)
       setup_displaylink=true
       ;;
+    --weave-router)
+      setup_weave_router=true
+      ;;
     -h|--help)
       cat <<'USAGE'
-Usage: activate [backup options] [--displaylink] [--driver-version N]
+Usage: activate [backup options] [--displaylink] [--weave-router] [--driver-version N]
 
 Backup options (same as home-manager switch):
   -b EXT           Move colliding files to <path>.EXT before linking
@@ -48,6 +52,7 @@ Backup options (same as home-manager switch):
 
 Other options:
   --displaylink      After successful activation, run displaylink-setup
+  --weave-router     After successful activation, start Weave Router setup
   --driver-version N
                    Activation driver version (0 or 1)
   -h, --help       Show this help message
@@ -69,5 +74,9 @@ if [[ "$setup_displaylink" == true ]]; then
     exit 1
   fi
 
-  exec "$setup"
+  "$setup"
+fi
+
+if [[ "$setup_weave_router" == true ]]; then
+  systemctl --user start weave-router.service headroom.service
 fi

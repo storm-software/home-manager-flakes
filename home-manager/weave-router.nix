@@ -112,7 +112,9 @@ in
       TimeoutStopSec = 120;
       UMask = "0077";
     };
-    Install.WantedBy = [ "default.target" ];
+    # Activation starts this explicitly through `activate --weave-router`.
+    # Leaving it out of default.target keeps the initial image build and
+    # client configuration opt-in.
   };
 
   xdg.configFile."weave-router/README.md".source = ./weave-router.md;

@@ -14,10 +14,12 @@ For a checkout containing new, untracked module files, use the `path:` flake
 reference so Nix includes them:
 
 ```sh
-home-manager switch --flake path:.#development
+nix build path:.#homeConfigurations.development.activationPackage
+./result/activate --weave-router
 ```
 
-The `weave-router` user service starts on login. The initial container build
+The `--weave-router` flag starts the router and its dependent Headroom proxy
+after activation. Without it, neither service starts automatically. The initial container build
 downloads Go/npm dependencies, native libraries and model weights; it can take
 several minutes and requires network access and several GB of disk space.
 The router source is pinned; upstream container base tags and dependency
