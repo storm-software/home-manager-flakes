@@ -74,6 +74,7 @@ if [[ "$setup_displaylink" == true ]]; then
     exit 1
   fi
 
+  echo "Starting DisplayLink setup..."
   "$setup"
 fi
 
