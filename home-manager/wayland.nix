@@ -3,9 +3,18 @@
 let
   stable = pkgs.stable;
 
-  displaylinkSetup = stable.writeShellScript "displaylink-setup" (
+  displaylinkSetupScript = stable.writeShellScript "displaylink-setup-script" (
     builtins.readFile ./scripts/displaylink-setup.sh
   );
+
+  displaylinkSetup = stable.writeShellApplication {
+    name = "displaylink-setup";
+    text = ''
+    exec env NIXPKGS=${stable.path} \
+      PATH="/run/wrappers/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH" \
+      ${displaylinkSetupScript}
+    '';
+  };
 
   # Storm Software palette (aligned with ghostty.nix / fzf.nix)
   colors = {
@@ -38,7 +47,7 @@ in
       };
 
       # DisplayLink USB monitors need --unsupported-gpu and WLR_EVDI_RENDER_DEVICE;
-      # displaylink-setup.sh writes ~/.config/sway/displaylink-env on switch.
+      # displaylink-setup writes ~/.config/sway/displaylink-env when run manually.
       extraOptions = [ "--unsupported-gpu" ];
 
       extraSessionCommands = ''
@@ -439,13 +448,9 @@ in
     };
   };
 
-  # displaylink-server is a system unit; setup runs automatically on switch.
-  # See home-manager/scripts/displaylink-setup.sh and the Displaylink wiki.
-  # The activation PATH is minimal, so host system dirs are prepended to resolve
-  # sudo/systemctl/udevadm/install; nix binaries are appended via the inherited PATH.
-  home.activation.displaylink = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    $DRY_RUN_CMD env NIXPKGS=${stable.path} \
-      PATH="/run/wrappers/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH" \
-      ${displaylinkSetup}
-  '';
+  # This installer downloads a proprietary driver and changes /etc and a system
+  # service, so it must run from an interactive terminal where sudo can prompt.
+  # Keeping it out of Home Manager activation prevents generation switches from
+  # waiting on privileged or network operations.
+  home.packages = [ displaylinkSetup ];
 }

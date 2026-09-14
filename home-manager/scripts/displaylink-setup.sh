@@ -5,6 +5,7 @@ set -euo pipefail
 
 readonly DISPLAYLINK_NAME="displaylink-620.zip"
 readonly DISPLAYLINK_URL="https://www.synaptics.com/sites/default/files/exe_files/2025-09/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.2-EXE.zip"
+readonly DOWNLOAD_TIMEOUT_SECONDS=120
 readonly EVDI_CONF="/etc/modules-load.d/evdi.conf"
 readonly SERVICE_PATH="/etc/systemd/system/displaylink-server.service"
 readonly UDEV_RULES="/etc/udev/rules.d/99-displaylink.rules"
@@ -52,14 +53,18 @@ build_displaylink() {
 ensure_displaylink_blob() {
   require_command nix-build
   require_command nix-prefetch-url
+  require_command timeout
 
   if build_displaylink >/dev/null; then
     log "DisplayLink driver already available in the Nix store"
     return 0
   fi
 
-  log "Fetching DisplayLink driver into the Nix store..."
-  nix-prefetch-url --name "$DISPLAYLINK_NAME" "$DISPLAYLINK_URL" >/dev/null
+  log "Downloading the DisplayLink driver into the Nix store (up to ${DOWNLOAD_TIMEOUT_SECONDS}s)..."
+  if ! timeout --kill-after=10s "$DOWNLOAD_TIMEOUT_SECONDS" \
+    nix-prefetch-url --name "$DISPLAYLINK_NAME" "$DISPLAYLINK_URL" >/dev/null; then
+    die "DisplayLink driver download failed or timed out after ${DOWNLOAD_TIMEOUT_SECONDS}s"
+  fi
 
   build_displaylink >/dev/null || die "displaylink package build failed after prefetch"
   log "DisplayLink driver added to the Nix store"
