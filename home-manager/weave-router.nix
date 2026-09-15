@@ -18,8 +18,8 @@ let
     patches = [ ./patches/weave-router-codex-env-headers.patch ];
     # Codex keeps its ChatGPT OAuth bearer in Authorization while the router
     # key is in X-Weave-Router-Key. The pinned server discovers that pair while
-    # filtering models, but can drop OpenAI from the final Responses eligibility
-    # set. Keep the valid OAuth path present through that handoff.
+    # filtering models. Admit validated OAuth in the eligibility function,
+    # before exclusions and gateway policy, and retain native dispatch auth.
     postPatch = ''
       target=internal/server/middleware/auth.go
       substituteInPlace "$target" --replace-fail \
@@ -30,8 +30,8 @@ let
         $'\t"weave-os/router/internal/proxy"\n\t"weave-os/router/internal/requestcontext"\n'
       target=internal/proxy/service.go
       substituteInPlace "$target" --replace-fail \
-        $'\tif billing.SubscriptionOnlyFromContext(ctx) {\n\t\tenabledProviders = restrictToSubscriptionProviders(ctx, r.Header, enabledProviders)\n\t}\n\n\t// Codex (ChatGPT) subscription passthrough:' \
-        $'\tif billing.SubscriptionOnlyFromContext(ctx) {\n\t\tenabledProviders = restrictToSubscriptionProviders(ctx, r.Header, enabledProviders)\n\t}\n\n\t// The router-keyed Codex path carries ChatGPT OAuth in Authorization. Keep\n\t// its native OpenAI lane eligible after every policy/subscription filter.\n\tif raw, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer "); ok {\n\t\tif requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")) != nil {\n\t\t\tenabledProviders[providers.ProviderOpenAI] = struct{}{}\n\t\t}\n\t}\n\n\t// Codex (ChatGPT) subscription passthrough:'
+        $'\tif c := ExtractClientCredentials(providers.ProviderOpenAI, headers); c != nil && c.OAuth {\n\t\tout[providers.ProviderOpenAI] = struct{}{}\n\t}' \
+        $'\tif raw, ok := strings.CutPrefix(headers.Get("Authorization"), "Bearer "); ok {\n\t\tif requestcontext.CodexSubscriptionCreds(raw, headers.Get("ChatGPT-Account-ID")) != nil {\n\t\t\tout[providers.ProviderOpenAI] = struct{}{}\n\t\t}\n\t}'
       substituteInPlace "$target" --replace-fail \
         $'\tif s.codexSubscriptionExhausted(ctx, r.Header) {\n\t\tctx = withSuppressedCodexSubscription(ctx)\n\t}\n\tctx = resolveAndInjectCredentials(ctx, decision.Provider, decision.Model, r.Header)\n\topts.FastMode = fastModeForAttempt(ctx, decision.Model, decision.Provider)\n' \
         $'\tif s.codexSubscriptionExhausted(ctx, r.Header) {\n\t\tctx = withSuppressedCodexSubscription(ctx)\n\t}\n\tctx = resolveAndInjectCredentials(ctx, decision.Provider, decision.Model, r.Header)\n\t// Codex preserves its ChatGPT OAuth bearer while using a router key. The\n\t// installation policy may have removed the transient subscription context,\n\t// so restore only a validated bearer for the native Codex model family.\n\t// This makes the OpenAI adapter choose chatgpt.com/backend-api/codex rather\n\t// than the API-key-only api.openai.com endpoint.\n\tif decision.Provider == providers.ProviderOpenAI && !servedOnCodexSubscription(ctx) {\n\t\tif raw, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer "); ok {\n\t\t\tif sub := requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")); sub != nil && requestcontext.CodexSubscriptionCoversModel(decision.Model) {\n\t\t\t\tctx = context.WithValue(ctx, CredentialsContextKey{}, sub)\n\t\t\t}\n\t\t}\n\t}\n\topts.FastMode = fastModeForAttempt(ctx, decision.Model, decision.Provider)\n'
@@ -44,14 +44,17 @@ let
         echo "Codex OAuth path must not force the incoming model" >&2
         exit 1
       fi
-      grep -Fq 'if requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")) != nil {' internal/proxy/service.go
-      grep -Fq 'enabledProviders[providers.ProviderOpenAI] = struct{}{}' internal/proxy/service.go
+      grep -Fq 'if requestcontext.CodexSubscriptionCreds(raw, headers.Get("ChatGPT-Account-ID")) != nil {' internal/proxy/service.go
       grep -Fq 'if sub := requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")); sub != nil && requestcontext.CodexSubscriptionCoversModel(decision.Model) {' internal/proxy/service.go
       grep -Fq 'ctx = context.WithValue(ctx, CredentialsContextKey{}, sub)' internal/proxy/service.go
       ${pkgs.python3}/bin/python ${./scripts/test-weave-codex-readers.py} .
+      ${pkgs.python3}/bin/python ${./scripts/test-weave-codex-routing.py} . ${pkgs.go}/bin/go ${./scripts/weave-codex-routing-fixture.go}
     '';
   };
-  imageTag = "${revision}-codex-oauth-routing";
+  # The input-addressed source hash includes every patch and postPatch change.
+  # Docker's image-exists shortcut must never reuse a differently patched tree.
+  sourceFingerprint = builtins.substring 0 32 (builtins.baseNameOf "${source}");
+  imageTag = "${revision}-${sourceFingerprint}";
   state = "${config.xdg.stateHome}/weave-router";
   python = pkgs.python3.withPackages (ps: [
     ps.pyyaml

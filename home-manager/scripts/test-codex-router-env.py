@@ -31,14 +31,26 @@ class CodexRouterEnvTests(unittest.TestCase):
         )
         self.mock_codex.chmod(0o755)
         self.systemctl_record = self.root / "systemctl.json"
+        self.systemctl_state = self.root / "systemctl-state.json"
         systemctl = self.bin / "systemctl"
         systemctl.write_text(
             "#!/usr/bin/env python3\n"
             "import json, os, pathlib, sys\n"
-            "pathlib.Path(os.environ['SYSTEMCTL_RECORD']).write_text(json.dumps({"
+            "record = pathlib.Path(os.environ['SYSTEMCTL_RECORD'])\n"
+            "calls = json.loads(record.read_text()) if record.exists() else []\n"
+            "calls.append({"
             "'args': sys.argv[1:], "
             "'router_key': os.environ.get('WEAVE_ROUTER_KEY'), "
-            "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID')}))\n"
+            "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID')})\n"
+            "record.write_text(json.dumps(calls))\n"
+            "state = pathlib.Path(os.environ['SYSTEMCTL_STATE'])\n"
+            "values = json.loads(state.read_text()) if state.exists() else {}\n"
+            "assert sys.argv[1] == '--user'\n"
+            "for name in sys.argv[3:]:\n"
+            "    if sys.argv[2] == 'unset-environment': values.pop(name, None)\n"
+            "    elif sys.argv[2] == 'import-environment': values[name] = os.environ[name]\n"
+            "    else: raise AssertionError(sys.argv)\n"
+            "state.write_text(json.dumps(values))\n"
         )
         systemctl.chmod(0o755)
 
@@ -54,6 +66,7 @@ class CodexRouterEnvTests(unittest.TestCase):
             "CODEX_HOME": str(self.codex_home),
             "PATH": str(self.bin) + ":" + os.environ["PATH"],
             "SYSTEMCTL_RECORD": str(self.systemctl_record),
+            "SYSTEMCTL_STATE": str(self.systemctl_state),
         }
         env.pop("WEAVE_ROUTER_KEY", None)
         env.pop("CODEX_CHATGPT_ACCOUNT_ID", None)
@@ -130,7 +143,7 @@ class CodexRouterEnvTests(unittest.TestCase):
         result = self.run_helper("import")
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        recorded = json.loads(self.systemctl_record.read_text())
+        recorded, = json.loads(self.systemctl_record.read_text())
         self.assertEqual(
             recorded["args"],
             [
@@ -144,6 +157,72 @@ class CodexRouterEnvTests(unittest.TestCase):
         self.assertEqual(recorded["account_id"], "acct_test")
         self.assertNotIn("rk_test", " ".join(recorded["args"]))
         self.assertNotIn("acct_test", " ".join(recorded["args"]))
+
+    def test_repeated_import_clears_missing_or_unusable_sources(self):
+        cases = {
+            "absent": None,
+            "empty": "",
+            "malformed": "{invalid",
+            "missing-account": '{"tokens": {}}',
+            "empty-account": '{"tokens": {"account_id": ""}}',
+            "non-string-account": '{"tokens": {"account_id": 123}}',
+        }
+        for case, auth in cases.items():
+            with self.subTest(case=case):
+                self.write_credentials()
+                self.systemctl_state.write_text(json.dumps({"UNRELATED": "keep"}))
+                initial = self.run_helper("import")
+                self.assertEqual(initial.returncode, 0, initial.stderr)
+                self.assertEqual(json.loads(self.systemctl_state.read_text()), {
+                    "UNRELATED": "keep", "WEAVE_ROUTER_KEY": "rk_test",
+                    "CODEX_CHATGPT_ACCOUNT_ID": "acct_test",
+                })
+                key_file = self.state / "weave-router/router-key"
+                auth_file = self.codex_home / "auth.json"
+                if auth is None:
+                    key_file.unlink()
+                    auth_file.unlink()
+                else:
+                    key_file.write_text("")
+                    auth_file.write_text(auth)
+                for _ in range(2):
+                    result = self.run_helper("import")
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(json.loads(self.systemctl_state.read_text()), {"UNRELATED": "keep"})
+                recorded = json.loads(self.systemctl_record.read_text())
+                self.assertEqual(recorded[-1]["args"], [
+                    "--user", "unset-environment", "WEAVE_ROUTER_KEY", "CODEX_CHATGPT_ACCOUNT_ID",
+                ])
+                self.assert_safe_systemctl_argv(recorded)
+
+    def test_import_unsets_absent_name_before_importing_present_name(self):
+        for missing in ("WEAVE_ROUTER_KEY", "CODEX_CHATGPT_ACCOUNT_ID"):
+            with self.subTest(missing=missing):
+                self.write_credentials()
+                initial = self.run_helper("import")
+                self.assertEqual(initial.returncode, 0, initial.stderr)
+                if missing == "WEAVE_ROUTER_KEY":
+                    (self.state / "weave-router/router-key").unlink()
+                    present, value = "CODEX_CHATGPT_ACCOUNT_ID", "acct_test"
+                else:
+                    (self.codex_home / "auth.json").write_text("{invalid")
+                    present, value = "WEAVE_ROUTER_KEY", "rk_test"
+                result = self.run_helper("import")
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(self.systemctl_state.read_text()), {present: value})
+                recorded = json.loads(self.systemctl_record.read_text())
+                self.assertEqual([call["args"] for call in recorded[-2:]], [
+                    ["--user", "unset-environment", missing],
+                    ["--user", "import-environment", present],
+                ])
+                self.assert_safe_systemctl_argv(recorded)
+
+    def assert_safe_systemctl_argv(self, calls):
+        for call in calls:
+            self.assertIn(call["args"][1], ("import-environment", "unset-environment"))
+            self.assertTrue(set(call["args"][2:]) <= {"WEAVE_ROUTER_KEY", "CODEX_CHATGPT_ACCOUNT_ID"})
+            self.assertNotIn("rk_test", " ".join(call["args"]))
+            self.assertNotIn("acct_test", " ".join(call["args"]))
 
     def test_malformed_auth_warns_and_still_executes(self):
         (self.codex_home / "auth.json").write_text("{invalid")

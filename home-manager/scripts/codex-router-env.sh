@@ -36,8 +36,19 @@ case "${1:-}" in
     ;;
   import)
     names=()
-    [[ -n "${WEAVE_ROUTER_KEY:-}" ]] && names+=(WEAVE_ROUTER_KEY)
-    [[ -n "${CODEX_CHATGPT_ACCOUNT_ID:-}" ]] && names+=(CODEX_CHATGPT_ACCOUNT_ID)
+    absent_names=()
+    for name in WEAVE_ROUTER_KEY CODEX_CHATGPT_ACCOUNT_ID; do
+      if [[ -n "${!name:-}" ]]; then
+        names+=("$name")
+      else
+        absent_names+=("$name")
+      fi
+    done
+    # Clear stale credentials from earlier imports before delivering current
+    # values. Both operations take names only; values stay in the environment.
+    if (( ${#absent_names[@]} > 0 )); then
+      systemctl --user unset-environment "${absent_names[@]}"
+    fi
     if (( ${#names[@]} > 0 )); then
       exec systemctl --user import-environment "${names[@]}"
     fi
