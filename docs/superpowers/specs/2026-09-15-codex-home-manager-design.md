@@ -58,7 +58,7 @@ remain temporary and the next activation restores the declared baseline.
 
 The declared baseline will reflect the current installation where practical:
 
-- default model `gpt-5.6-sol` as the Codex wire/request model;
+- default model `gpt-5.6-terra` as the Codex wire/request model;
 - high reasoning effort, pragmatic personality, and default service tier;
 - ChatGPT-only login;
 - Weave as the selected model provider;
