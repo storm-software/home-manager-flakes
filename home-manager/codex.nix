@@ -141,6 +141,7 @@ let
   installCodexConfig = pkgs.writeShellApplication {
     name = "install-codex-config";
     runtimeInputs = [
+      pkgs.bash
       pkgs.coreutils
       pkgs.python3
     ];
@@ -152,6 +153,7 @@ let
   codexRouterEnv = pkgs.writeShellApplication {
     name = "codex-router-env";
     runtimeInputs = [
+      pkgs.bash
       pkgs.coreutils
       pkgs.jq
       pkgs.systemd
