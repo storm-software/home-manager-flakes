@@ -6,8 +6,12 @@ codex_home="${CODEX_HOME:-$HOME/.codex}"
 key_file="$state_home/weave-router/router-key"
 auth_file="$codex_home/auth.json"
 
+unset WEAVE_ROUTER_KEY CODEX_CHATGPT_ACCOUNT_ID
+
 if [[ -s "$key_file" ]]; then
-  IFS= read -r WEAVE_ROUTER_KEY < "$key_file"
+  if ! IFS= read -r WEAVE_ROUTER_KEY < "$key_file"; then
+    : # read returns EOF for a key file without a trailing newline.
+  fi
   if [[ -n "$WEAVE_ROUTER_KEY" ]]; then
     export WEAVE_ROUTER_KEY
   fi

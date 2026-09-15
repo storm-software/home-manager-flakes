@@ -45,7 +45,9 @@ class CodexRouterEnvTests(unittest.TestCase):
     def tearDown(self):
         self.temporary.cleanup()
 
-    def run_helper(self, *arguments: str) -> subprocess.CompletedProcess[str]:
+    def run_helper(
+        self, *arguments: str, inherited: dict[str, str] | None = None
+    ) -> subprocess.CompletedProcess[str]:
         env = os.environ | {
             "HOME": str(self.home),
             "XDG_STATE_HOME": str(self.state),
@@ -55,6 +57,8 @@ class CodexRouterEnvTests(unittest.TestCase):
         }
         env.pop("WEAVE_ROUTER_KEY", None)
         env.pop("CODEX_CHATGPT_ACCOUNT_ID", None)
+        if inherited:
+            env.update(inherited)
         return subprocess.run(
             ["bash", str(SCRIPT), *arguments],
             env=env,
@@ -92,6 +96,32 @@ class CodexRouterEnvTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         recorded = json.loads(result.stdout)
         self.assertEqual(recorded["args"], ["login"])
+        self.assertIsNone(recorded["account_id"])
+
+    def test_exec_loads_router_key_without_trailing_newline(self):
+        (self.state / "weave-router/router-key").write_text("rk_test")
+
+        result = self.run_helper("exec", str(self.mock_codex), "login")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        recorded = json.loads(result.stdout)
+        self.assertEqual(recorded["args"], ["login"])
+        self.assertEqual(recorded["router_key"], "rk_test")
+
+    def test_exec_clears_inherited_values_when_sources_are_absent(self):
+        result = self.run_helper(
+            "exec",
+            str(self.mock_codex),
+            "login",
+            inherited={
+                "WEAVE_ROUTER_KEY": "stale-router-key",
+                "CODEX_CHATGPT_ACCOUNT_ID": "stale-account-id",
+            },
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        recorded = json.loads(result.stdout)
+        self.assertIsNone(recorded["router_key"])
         self.assertIsNone(recorded["account_id"])
 
     def test_import_passes_names_not_values_on_argv(self):
