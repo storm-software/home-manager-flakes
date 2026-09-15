@@ -81,6 +81,15 @@ esac
                 "hooks": {"PreToolUse": ["rtk"]},
                 "customModels": [{"id": "custom:other", "model": "other"}],
             }))
+            (home / ".codex").mkdir()
+            (home / ".codex/config.toml").write_text(
+                '[model_providers.weave]\n'
+                'http_headers = { "X-Weave-Router-Key" = "rk_test", '
+                '"X-App" = "codex"}\n'
+            )
+            (home / ".codex/auth.json").write_text(json.dumps({
+                "tokens": {"account_id": "account_test"},
+            }))
             clients.configure(home, state, "rk_test_first")
             clients.configure(home, state, "rk_test_second")
             gemini = json.loads((home / ".gemini/settings.json").read_text())
@@ -98,6 +107,10 @@ esac
             droid = json.loads((home / ".factory/settings.json").read_text())
             self.assertEqual(len(droid["customModels"]), 2)
             self.assertEqual(droid["hooks"], {"PreToolUse": ["rtk"]})
+            codex = tomlkit.loads((home / ".codex/config.toml").read_text())
+            headers = codex["model_providers"]["weave"]["http_headers"]
+            self.assertEqual(headers["X-App"], "codex")
+            self.assertEqual(headers["ChatGPT-Account-ID"], "account_test")
             hermes = yaml.safe_load((home / ".hermes/config.yaml").read_text())
             self.assertEqual(hermes["model"]["provider"], "custom:weave")
             for path in [home / ".gemini/.env", home / ".factory/settings.json",

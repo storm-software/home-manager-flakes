@@ -98,12 +98,20 @@ def configure(home, state, key):
         auth = json.loads(auth_path.read_text()) if auth_path.exists() else {}
         account_id = auth.get("tokens", {}).get("account_id")
         for provider in ("weave", "headroom"):
-            headers = providers.get(provider, {}).get("http_headers", {})
-            for name in list(headers):
-                if name.casefold() == "x-weave-force-model":
-                    del headers[name]
+            provider_config = providers.get(provider, {})
+            headers = provider_config.get("http_headers", {})
+            if not hasattr(headers, "items"):
+                continue
+            # Rebuild the installer's inline table instead of extending it in
+            # place. tomlkit can retain the closing-brace trivia and render a
+            # newly appended account id without the required comma.
+            updated_headers = tomlkit.inline_table()
+            for name, value in headers.items():
+                if name.casefold() != "x-weave-force-model":
+                    updated_headers[name] = str(value)
             if account_id:
-                headers["ChatGPT-Account-ID"] = account_id
+                updated_headers["ChatGPT-Account-ID"] = str(account_id)
+            provider_config["http_headers"] = updated_headers
 
     update(home / ".codex/config.toml", tomlkit.loads, tomlkit.dumps, codex)
 
