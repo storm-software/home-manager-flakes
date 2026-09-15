@@ -45,3 +45,72 @@
 +  # 0600: the file may contain private user configuration, even though this
 +  # managed block no longer contains the router key.
    chmod 600 "$config_file"
+--- a/install/install.sh
++++ b/install/install.sh
+@@ -2066,0 +2067,3 @@
++      header_table = ""
++      if ($0 ~ /\.[[:space:]]*env_http_headers[[:space:]]*\]/) header_table = "env"
++      else if ($0 ~ /\.[[:space:]]*http_headers[[:space:]]*\]/) header_table = "static"
+@@ -2070,5 +2073,15 @@
+-      hdr = substr($0, RSTART, RLENGTH)
+-      sub(/^.*=[[:space:]]*"/, "", hdr)
+-      sub(/"$/, "", hdr)
+-      print hdr
+-      exit
++      v = substr($0, RSTART, RLENGTH)
++      sub(/^.*=[[:space:]]*"/, "", v)
++      sub(/"$/, "", v)
++      kind = header_table
++      if ($0 ~ /^[[:space:]]*"?env_http_headers"?[[:space:]]*=/) kind = "env"
++      else if ($0 ~ /^[[:space:]]*"?http_headers"?[[:space:]]*=/) kind = "static"
++      if (kind == "env") {
++        has_env_key = 1
++        # ENVIRON performs a data lookup, never shell evaluation.
++        env_key = (v ~ /^[A-Za-z_][A-Za-z0-9_]*$/) ? ENVIRON[v] : ""
++      } else if (kind == "static" && key == "") key = v
++    }
++    END {
++      if (has_env_key) key = env_key
++      if (key != "") print key
+@@ -3992,0 +4006,3 @@
++      header_table = ""
++      if ($0 ~ /\.[[:space:]]*env_http_headers[[:space:]]*\]/) header_table = "env"
++      else if ($0 ~ /\.[[:space:]]*http_headers[[:space:]]*\]/) header_table = "static"
+@@ -4004 +4020,12 @@
+-      if (key == "") key = v
++      kind = header_table
++      if ($0 ~ /^[[:space:]]*"?env_http_headers"?[[:space:]]*=/) kind = "env"
++      else if ($0 ~ /^[[:space:]]*"?http_headers"?[[:space:]]*=/) kind = "static"
++      if (kind == "env") {
++        has_env_key = 1
++        # ENVIRON performs a data lookup, never shell evaluation.
++        env_key = (v ~ /^[A-Za-z_][A-Za-z0-9_]*$/) ? ENVIRON[v] : ""
++      } else if (kind == "static" && key == "") key = v
++    }
++    END {
++      if (has_env_key) key = env_key
++      if (url != "" && key != "") printf "%s\n%s\n", url, key
+@@ -4006 +4032,0 @@
+-    END { if (url != "" && key != "") printf "%s\n%s\n", url, key }
+--- a/install/codex-status.sh
++++ b/install/codex-status.sh
+@@ -205,0 +206,3 @@
++      header_table = ""
++      if ($0 ~ /\.[[:space:]]*env_http_headers[[:space:]]*\]/) header_table = "env"
++      else if ($0 ~ /\.[[:space:]]*http_headers[[:space:]]*\]/) header_table = "static"
+@@ -217 +220,12 @@
+-      if (key == "") key = v
++      kind = header_table
++      if ($0 ~ /^[[:space:]]*"?env_http_headers"?[[:space:]]*=/) kind = "env"
++      else if ($0 ~ /^[[:space:]]*"?http_headers"?[[:space:]]*=/) kind = "static"
++      if (kind == "env") {
++        has_env_key = 1
++        # ENVIRON performs a data lookup, never shell evaluation.
++        env_key = (v ~ /^[A-Za-z_][A-Za-z0-9_]*$/) ? ENVIRON[v] : ""
++      } else if (kind == "static" && key == "") key = v
++    }
++    END {
++      if (has_env_key) key = env_key
++      if (url != "" && key != "") printf "%s\n%s\n", url, key
+@@ -219 +232,0 @@
+-    END { if (url != "" && key != "") printf "%s\n%s\n", url, key }

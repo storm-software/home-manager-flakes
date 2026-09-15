@@ -48,6 +48,7 @@ let
       grep -Fq 'enabledProviders[providers.ProviderOpenAI] = struct{}{}' internal/proxy/service.go
       grep -Fq 'if sub := requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")); sub != nil && requestcontext.CodexSubscriptionCoversModel(decision.Model) {' internal/proxy/service.go
       grep -Fq 'ctx = context.WithValue(ctx, CredentialsContextKey{}, sub)' internal/proxy/service.go
+      ${pkgs.python3}/bin/python ${./scripts/test-weave-codex-readers.py} .
     '';
   };
   imageTag = "${revision}-codex-oauth-routing";
