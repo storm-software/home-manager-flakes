@@ -142,7 +142,9 @@ Also assert a repeated call remains parseable by `tomllib`, preserves the declar
 Run:
 
 ```bash
-nix shell nixpkgs#python3 nixpkgs#python3Packages.tomlkit nixpkgs#python3Packages.pyyaml --command \
+nix shell --impure --expr \
+  'let flake = builtins.getFlake (toString ./.); pkgs = flake.pkgs.stable; in pkgs.python3.withPackages (ps: [ ps.tomlkit ps.pyyaml ])' \
+  --command \
   python -m unittest \
   home-manager/scripts/test-weave-clients.py \
   home-manager/scripts/test-configure-headroom-clients.py -v
@@ -1340,7 +1342,9 @@ git commit --no-gpg-sign -m "feat: import Codex router credentials on activation
 Run:
 
 ```bash
-nix shell nixpkgs#python3 nixpkgs#python3Packages.tomlkit nixpkgs#python3Packages.pyyaml --command \
+nix shell --impure --expr \
+  'let flake = builtins.getFlake (toString ./.); pkgs = flake.pkgs.stable; in pkgs.python3.withPackages (ps: [ ps.tomlkit ps.pyyaml ])' \
+  --command \
   python -m unittest \
   home-manager/scripts/test-weave-clients.py \
   home-manager/scripts/test-configure-headroom-clients.py \
