@@ -173,35 +173,45 @@ let
   };
 in
 {
-  assertions = [
-    {
-      assertion = lib.all (server: lib.all builtins.isString (lib.attrValues server.env)) (
-        lib.attrValues config.programs.mcp.servers
-      );
-      message = "Codex MCP translation currently requires string env references";
-    }
-    {
-      assertion = codexSettings.model == "gpt-5.6-terra";
-      message = "Codex must use gpt-5.6-terra as its request model";
-    }
-    {
-      assertion = !(codexSettings.model_providers.weave.http_headers ? X-Weave-Force-Model);
-      message = "Codex must not force a Weave model";
-    }
-    {
-      assertion = !(codexSettings.model_providers.weave ? env_key);
-      message = "Codex must use ChatGPT OAuth, not OPENAI_API_KEY";
-    }
-  ];
+  options.storm.codex.routerEnvPackage = lib.mkOption {
+    type = lib.types.package;
+    readOnly = true;
+    internal = true;
+  };
 
-  home.packages = [
-    codex
-    codexRouterEnv
-    installCodexConfig
-  ];
+  config = {
+    assertions = [
+      {
+        assertion = lib.all (server: lib.all builtins.isString (lib.attrValues server.env)) (
+          lib.attrValues config.programs.mcp.servers
+        );
+        message = "Codex MCP translation currently requires string env references";
+      }
+      {
+        assertion = codexSettings.model == "gpt-5.6-terra";
+        message = "Codex must use gpt-5.6-terra as its request model";
+      }
+      {
+        assertion = !(codexSettings.model_providers.weave.http_headers ? X-Weave-Force-Model);
+        message = "Codex must not force a Weave model";
+      }
+      {
+        assertion = !(codexSettings.model_providers.weave ? env_key);
+        message = "Codex must use ChatGPT OAuth, not OPENAI_API_KEY";
+      }
+    ];
 
-  home.activation.installCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    $DRY_RUN_CMD ${installCodexConfig}/bin/install-codex-config \
-      ${codexConfig} ${lib.escapeShellArg config.home.homeDirectory}
-  '';
+    home.packages = [
+      codex
+      codexRouterEnv
+      installCodexConfig
+    ];
+
+    home.activation.installCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD ${installCodexConfig}/bin/install-codex-config \
+        ${codexConfig} ${lib.escapeShellArg config.home.homeDirectory}
+    '';
+
+    storm.codex.routerEnvPackage = codexRouterEnv;
+  };
 }
