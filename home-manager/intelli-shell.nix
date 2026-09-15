@@ -24,9 +24,12 @@ let
       "--features"
       "extra-features,vendored"
     ];
-    cargoHash = pkgs.lib.fakeHash;
+    cargoHash = "sha256-g/sJJiwUl+N4ryFXhrbSIaOl0zzXKbehGyxTNamtua8=";
 
-    nativeBuildInputs = [ pkgs.pkg-config ];
+    nativeBuildInputs = [
+      pkgs.pkg-config
+      pkgs.perl
+    ];
     buildInputs = [ pkgs.openssl ];
 
     meta = {

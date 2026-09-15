@@ -46,7 +46,7 @@
     };
     # SSH_AUTH_SOCK is provided by services.proton-pass-agent.
     enableSshSupport = false;
-    enableScDaemon = true;
+    enableScDaemon = false;
     enableZshIntegration = true;
   };
 
