@@ -10,6 +10,38 @@ import tomlkit
 import yaml
 
 
+FORBIDDEN_STATIC_HEADERS = {
+    "authorization",
+    "chatgpt-account-id",
+    "x-weave-force-model",
+    "x-weave-router-key",
+}
+
+
+def normalize_codex_provider(provider: dict, base_url: str) -> None:
+    provider["base_url"] = base_url
+    provider["wire_api"] = "responses"
+    provider["requires_openai_auth"] = True
+    provider["supports_websockets"] = False
+    provider.pop("env_key", None)
+    provider.pop("experimental_bearer_token", None)
+
+    static_headers = tomlkit.inline_table()
+    for name, value in provider.get("http_headers", {}).items():
+        if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
+            static_headers[name] = str(value)
+    static_headers["X-App"] = "codex"
+    provider["http_headers"] = static_headers
+
+    env_headers = tomlkit.inline_table()
+    for name, value in provider.get("env_http_headers", {}).items():
+        if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
+            env_headers[name] = str(value)
+    env_headers["X-Weave-Router-Key"] = "WEAVE_ROUTER_KEY"
+    env_headers["ChatGPT-Account-ID"] = "CODEX_CHATGPT_ACCOUNT_ID"
+    provider["env_http_headers"] = env_headers
+
+
 def atomic_write(path, content):
     fd, temporary = tempfile.mkstemp(dir=path.parent)
     try:
@@ -20,13 +52,13 @@ def atomic_write(path, content):
         Path(temporary).unlink(missing_ok=True)
 
 
-def update(path, load, dump, change):
+def update(path, load, dump, change, *, backup=True):
     # Preserve a first-install backup. Atomic replacement leaves Nix-owned
     # symlink targets intact; Home Manager must not also own these settings.
     path.parent.mkdir(parents=True, exist_ok=True)
     value = load(path.read_text()) if path.exists() else {}
     change(value)
-    if path.exists() and not path.with_suffix(path.suffix + ".pre-weave").exists():
+    if backup and path.exists() and not path.with_suffix(path.suffix + ".pre-weave").exists():
         shutil.copyfile(path, path.with_suffix(path.suffix + ".pre-weave"))
         path.with_suffix(path.suffix + ".pre-weave").chmod(0o600)
     atomic_write(path, dump(value))
@@ -89,26 +121,19 @@ def configure(home, state, key):
     update(home / ".vibe/config.toml", tomlkit.loads, tomlkit.dumps, vibe)
 
     def codex(value):
-        # The upstream installer can add a force-model header for Codex. Keep
-        # routing enabled, but leave selection to Weave rather than pinning a
-        # model across all future sessions. The upstream installer preserves
-        # Codex OAuth; the router also keeps an encrypted enrolled refresh token.
-        providers = value.get("model_providers", {})
-        for provider in ("weave", "headroom"):
-            provider_config = providers.get(provider, {})
-            headers = provider_config.get("http_headers", {})
-            if not hasattr(headers, "items"):
-                continue
-            # Rebuild the installer's inline table instead of extending it in
-            # place. tomlkit can retain the closing-brace trivia and render a
-            # newly appended account id without the required comma.
-            updated_headers = tomlkit.inline_table()
-            for name, value in headers.items():
-                if name.casefold() != "x-weave-force-model":
-                    updated_headers[name] = str(value)
-            provider_config["http_headers"] = updated_headers
+        providers = value.setdefault("model_providers", tomlkit.table())
+        weave = providers.setdefault("weave", tomlkit.table())
+        normalize_codex_provider(weave, base + "/v1")
+        if "headroom" in providers:
+            normalize_codex_provider(
+                providers["headroom"],
+                str(providers["headroom"].get("base_url", "http://127.0.0.1:8787/v1")),
+            )
+        value["model_provider"] = "weave"
+        value["openai_base_url"] = base + "/v1"
+        value["forced_login_method"] = "chatgpt"
 
-    update(home / ".codex/config.toml", tomlkit.loads, tomlkit.dumps, codex)
+    update(home / ".codex/config.toml", tomlkit.loads, tomlkit.dumps, codex, backup=False)
 
     def hermes(value):
         value.setdefault("providers", {})["weave"] = {

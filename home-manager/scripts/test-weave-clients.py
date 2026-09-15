@@ -87,9 +87,18 @@ esac
             }))
             (home / ".codex").mkdir()
             (home / ".codex/config.toml").write_text(
+                'model = "gpt-5.6-terra"\n'
+                'model_provider = "headroom"\n'
+                'forced_login_method = "api"\n'
                 '[model_providers.weave]\n'
+                'base_url = "http://127.0.0.1:8080/v1"\n'
+                'env_key = "OPENAI_API_KEY"\n'
+                'experimental_bearer_token = "legacy-bearer"\n'
                 'http_headers = { "X-Weave-Router-Key" = "rk_test", '
-                '"X-App" = "codex", "X-Weave-Force-Model" = "gpt-5.6-terra"}\n'
+                '"ChatGPT-Account-ID" = "legacy-account", "Authorization" = "Bearer old", '
+                '"X-App" = "codex", "X-Weave-Force-Model" = "gpt-5.6-terra" }\n'
+                '[model_providers.weave.env_http_headers]\n'
+                'X-Weave-Force-Model = "WEAVE_FORCE_MODEL"\n'
             )
             clients.configure(home, state, "rk_test_first")
             clients.configure(home, state, "rk_test_second")
@@ -109,9 +118,25 @@ esac
             self.assertEqual(len(droid["customModels"]), 2)
             self.assertEqual(droid["hooks"], {"PreToolUse": ["rtk"]})
             codex = tomlkit.loads((home / ".codex/config.toml").read_text())
-            headers = codex["model_providers"]["weave"]["http_headers"]
-            self.assertEqual(headers["X-App"], "codex")
-            self.assertNotIn("X-Weave-Force-Model", headers)
+            provider = codex["model_providers"]["weave"]
+            self.assertEqual(codex["model_provider"], "weave")
+            self.assertEqual(codex["forced_login_method"], "chatgpt")
+            self.assertEqual(codex["openai_base_url"], "http://127.0.0.1:8080/v1")
+            self.assertTrue(provider["requires_openai_auth"])
+            self.assertFalse(provider["supports_websockets"])
+            self.assertNotIn("env_key", provider)
+            self.assertNotIn("experimental_bearer_token", provider)
+            self.assertEqual(dict(provider["http_headers"]), {"X-App": "codex"})
+            self.assertEqual(
+                dict(provider["env_http_headers"]),
+                {
+                    "X-Weave-Router-Key": "WEAVE_ROUTER_KEY",
+                    "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
+                },
+            )
+            self.assertFalse((home / ".codex/config.toml.pre-weave").exists())
+            self.assertNotIn("rk_test", (home / ".codex/config.toml").read_text())
+            self.assertNotIn("legacy-account", (home / ".codex/config.toml").read_text())
             hermes = yaml.safe_load((home / ".hermes/config.yaml").read_text())
             self.assertEqual(hermes["model"]["provider"], "custom:weave")
             for path in [home / ".gemini/.env", home / ".factory/settings.json",

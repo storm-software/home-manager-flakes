@@ -15,6 +15,38 @@ HEADROOM_URL = "http://127.0.0.1:8787"
 WEAVE_URL = "http://127.0.0.1:8080"
 
 
+FORBIDDEN_STATIC_HEADERS = {
+    "authorization",
+    "chatgpt-account-id",
+    "x-weave-force-model",
+    "x-weave-router-key",
+}
+
+
+def normalize_codex_provider(provider: dict, base_url: str) -> None:
+    provider["base_url"] = base_url
+    provider["wire_api"] = "responses"
+    provider["requires_openai_auth"] = True
+    provider["supports_websockets"] = False
+    provider.pop("env_key", None)
+    provider.pop("experimental_bearer_token", None)
+
+    static_headers = tomlkit.inline_table()
+    for name, value in provider.get("http_headers", {}).items():
+        if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
+            static_headers[name] = str(value)
+    static_headers["X-App"] = "codex"
+    provider["http_headers"] = static_headers
+
+    env_headers = tomlkit.inline_table()
+    for name, value in provider.get("env_http_headers", {}).items():
+        if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
+            env_headers[name] = str(value)
+    env_headers["X-Weave-Router-Key"] = "WEAVE_ROUTER_KEY"
+    env_headers["ChatGPT-Account-ID"] = "CODEX_CHATGPT_ACCOUNT_ID"
+    provider["env_http_headers"] = env_headers
+
+
 def backup_once(path: Path) -> None:
     backup = path.with_name(path.name + ".pre-headroom")
     if path.exists() and not backup.exists():
@@ -50,31 +82,15 @@ def configure_codex(home: Path) -> None:
     except Exception as error:
         raise SystemExit(f"{path} is invalid TOML: {error}; refusing to overwrite it") from error
 
-    # Weave authenticates the local client with its rk_ key while preserving
-    # Authorization for the upstream ChatGPT OAuth credential. Keep Codex
-    # directly on Weave: Headroom deliberately routes ChatGPT session auth to
-    # chatgpt.com and therefore cannot relay that credential to another proxy.
+    # Keep Codex directly on Weave: Headroom deliberately routes ChatGPT
+    # session auth to chatgpt.com and therefore cannot relay it to another
+    # proxy. Credential header values are supplied by Codex's environment.
     providers = config.setdefault("model_providers", tomlkit.table())
-    weave = providers.get("weave")
-    weave_headers = weave.get("http_headers") if hasattr(weave, "get") else None
-    if not hasattr(weave_headers, "get") or not weave_headers.get("X-Weave-Router-Key"):
-        raise SystemExit(
-            f"{path} has no Weave router key; start weave-router before Headroom"
-        )
-
-    # Preserve the installer-owned headers, but remove any old force-model
-    # override so Weave can choose automatically from the enabled roster.
-    updated_headers = tomlkit.inline_table()
-    for name, value in weave_headers.items():
-        if name.casefold() != "x-weave-force-model":
-            updated_headers[name] = str(value)
-    weave["http_headers"] = updated_headers
-
-    backup_once(path)
+    weave = providers.setdefault("weave", tomlkit.table())
+    normalize_codex_provider(weave, f"{WEAVE_URL}/v1")
     config["model_provider"] = "weave"
-    config["openai_base_url"] = str(weave.get("base_url", f"{WEAVE_URL}/v1"))
-    weave["supports_websockets"] = False
-    weave["requires_openai_auth"] = True
+    config["openai_base_url"] = f"{WEAVE_URL}/v1"
+    config["forced_login_method"] = "chatgpt"
     path.write_text(tomlkit.dumps(config))
 
 

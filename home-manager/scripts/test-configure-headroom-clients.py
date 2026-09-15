@@ -25,9 +25,13 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             path.write_text(
                 'model = "gpt-5.6-luna"\n'
                 '[model_providers.weave]\n'
-                'requires_openai_auth = true\n'
+                'env_key = "OPENAI_API_KEY"\n'
+                'experimental_bearer_token = "legacy-bearer"\n'
                 'http_headers = { "X-Weave-Router-Key" = "rk_test", '
-                '"X-Weave-User-Name" = "test", "X-App" = "codex"}\n'
+                '"ChatGPT-Account-ID" = "legacy-account", "Authorization" = "Bearer old", '
+                '"X-App" = "codex", "X-Weave-Force-Model" = "gpt-5.6-terra" }\n'
+                '[model_providers.weave.env_http_headers]\n'
+                'X-Weave-Force-Model = "WEAVE_FORCE_MODEL"\n'
             )
 
             clients.configure_codex(home)
@@ -35,14 +39,20 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             config = tomlkit.parse(path.read_text())
             provider = config["model_providers"]["weave"]
             self.assertEqual(config["model_provider"], "weave")
+            self.assertEqual(config["forced_login_method"], "chatgpt")
             self.assertEqual(config["openai_base_url"], "http://127.0.0.1:8080/v1")
             self.assertTrue(provider["requires_openai_auth"])
             self.assertFalse(provider["supports_websockets"])
             self.assertNotIn("env_key", provider)
-            self.assertEqual(provider["http_headers"]["X-Weave-Router-Key"], "rk_test")
-            self.assertEqual(provider["http_headers"]["X-Weave-User-Name"], "test")
-            self.assertEqual(provider["http_headers"]["X-App"], "codex")
-            self.assertNotIn("X-Weave-Force-Model", provider["http_headers"])
+            self.assertNotIn("experimental_bearer_token", provider)
+            self.assertEqual(dict(provider["http_headers"]), {"X-App": "codex"})
+            self.assertEqual(
+                dict(provider["env_http_headers"]),
+                {
+                    "X-Weave-Router-Key": "WEAVE_ROUTER_KEY",
+                    "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
+                },
+            )
 
             clients.configure_codex(home)
             reparsed = tomllib.loads(path.read_text())
@@ -51,6 +61,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
                 "X-Weave-Force-Model",
                 reparsed["model_providers"]["weave"]["http_headers"],
             )
+            self.assertFalse((config_dir / "config.toml.pre-headroom").exists())
 
     def test_codex_removes_a_preexisting_force_model(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -71,16 +82,27 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             headers = config["model_providers"]["weave"]["http_headers"]
             self.assertNotIn("X-Weave-Force-Model", headers)
 
-    def test_codex_refuses_to_drop_local_router_auth(self):
+    def test_codex_creates_environment_backed_weave_provider(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
-            config_dir = home / ".codex"
-            config_dir.mkdir()
-            path = config_dir / "config.toml"
-            path.write_text('model = "gpt-5.6-sol"\n')
+            path = home / ".codex" / "config.toml"
+            path.parent.mkdir()
+            path.write_text('model = "gpt-5.6-terra"\n')
 
-            with self.assertRaisesRegex(SystemExit, "no Weave router key"):
-                clients.configure_codex(home)
+            clients.configure_codex(home)
+
+            config = tomlkit.parse(path.read_text())
+            provider = config["model_providers"]["weave"]
+            self.assertEqual(config["model_provider"], "weave")
+            self.assertEqual(config["forced_login_method"], "chatgpt")
+            self.assertEqual(provider["base_url"], "http://127.0.0.1:8080/v1")
+            self.assertEqual(
+                dict(provider["env_http_headers"]),
+                {
+                    "X-Weave-Router-Key": "WEAVE_ROUTER_KEY",
+                    "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
+                },
+            )
 
 
 if __name__ == "__main__":
