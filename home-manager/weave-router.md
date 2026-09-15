@@ -90,6 +90,13 @@ coherence.
 | Vibe | Merged OpenAI-compatible provider/model plus private `.vibe/.env` |
 | Hermes | Named custom provider using Chat Completions, selected as default |
 | Cursor | Manual Models setting, described below; no supported declarative setting in the upstream installer |
+| Zed | Launch **Zed (Weave Router)** from the desktop menu (or `zed-weave-router`). Its native Agent Panel uses the local OpenAI-compatible endpoint and shared Home Manager MCP servers; the Codex ACP entry continues to use Codex's router-managed configuration. |
+
+Zed's launcher reads `router-key` only at process start and exports it as the
+provider-specific `WEAVE_ROUTER_API_KEY` environment variable. It therefore
+does not put a router credential in `settings.json`, the Nix store, or the
+desktop entry. Start `weave-router.service` before launching it; restart Zed
+after a router-key rotation.
 
 Cursor: open **Settings → Models → Override OpenAI Base URL**, enter
 `http://127.0.0.1:8080/v1`, and paste the contents of `router-key` as the API

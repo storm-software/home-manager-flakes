@@ -22,9 +22,4 @@
       };
     };
   };
-
-  programs.codex = {
-    enable = false;
-    enableMcpIntegration = true;
-  };
 }

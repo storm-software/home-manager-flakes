@@ -17,6 +17,7 @@
   devenv = {
     enable = true;
     enableZshIntegration = true;
+    package = pkgs.unstable.devenv;
   };
 
   gh = import ./gh.nix { inherit user; };
@@ -66,7 +67,7 @@
     enableZshIntegration = true;
   };
 
-  # tmux = import ./tmux.nix { inherit pkgs; };
+  tmux = import ./tmux.nix { inherit pkgs; };
 
   fzf = import ./fzf.nix;
 
