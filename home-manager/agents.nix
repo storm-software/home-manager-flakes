@@ -182,7 +182,7 @@ in
       Restart = "on-failure";
       RestartSec = 5;
     };
-    # `activate --weave-router` starts this after the router has configured
-    # its client settings. Do not pull it in at login without that opt-in.
+    # The activation wrapper starts this after the router has configured
+    # its client settings. It is started by activation, not default.target.
   };
 }

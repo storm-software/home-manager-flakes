@@ -15,11 +15,12 @@ reference so Nix includes them:
 
 ```sh
 nix build path:.#homeConfigurations.development.activationPackage
-./result/activate --weave-router
+./result/activate
 ```
 
-The `--weave-router` flag starts the router and its dependent Headroom proxy
-after activation. Without it, neither service starts automatically. The initial container build
+The activation wrapper starts the router and its dependent Headroom proxy by
+default. Pass `--skip-weave-router` to skip starting those services, or
+`--skip-displaylink` to skip DisplayLink setup. The initial container build
 downloads Go/npm dependencies, native libraries and model weights; it can take
 several minutes and requires network access and several GB of disk space.
 The router source is pinned; upstream container base tags and dependency
@@ -37,7 +38,9 @@ The first start creates private files under `~/.local/state/weave-router/`
 
 - `providers.env`: add at least one upstream API key, preferably
   `OPENROUTER_API_KEY`. Optional alternatives are `ANTHROPIC_API_KEY`,
-  `OPENAI_API_KEY`, and `GOOGLE_API_KEY`.
+  and `GOOGLE_API_KEY`. Native Codex models use the existing ChatGPT OAuth
+  login and do not need `OPENAI_API_KEY`; setup removes that legacy assignment
+  from an existing file on its next run.
 - `secrets.env`: generated database password, dashboard admin password, and
   Tink encryption key for dashboard BYOK credentials.
 - `router-key`: generated `rk_...` client credential, reused across restarts.
@@ -61,7 +64,7 @@ No credentials enter the Nix store. Prompt-content telemetry is disabled.
 | Client from `agents.nix` | Configuration |
 | --- | --- |
 | Claude Code | Pinned upstream installer; local Messages API, preserves native auth and RTK hooks |
-| Codex | Pinned upstream installer; local Responses provider, preserves ChatGPT OAuth |
+| Codex | Pinned upstream installer; local Responses provider, preserves ChatGPT OAuth for native Codex models; other routed providers need a Weave deployment credential or BYOK key |
 | OpenCode | Pinned upstream installer; local provider selected |
 | pi | Pinned upstream installer; local provider and upstream pi extension |
 | Gemini | API-key auth, local Gemini base URL, explicit router authentication header in `.gemini/.env` |

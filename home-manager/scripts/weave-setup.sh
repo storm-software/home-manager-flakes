@@ -25,12 +25,22 @@ if [[ ! -f "$WEAVE_STATE/providers.env" ]]; then
   cat > "$WEAVE_STATE/providers.env" <<'ENV'
 # Add at least one upstream provider key here, then restart weave-router.
 # These are paid API credentials, not the local rk_ client key.
+# Native Codex models use the existing ChatGPT OAuth login; no separate
+# OpenAI API key is needed.
 # OPENROUTER_API_KEY=sk-or-v1-...
 # ANTHROPIC_API_KEY=sk-ant-...
-# OPENAI_API_KEY=sk-...
 # GOOGLE_API_KEY=...
 ENV
 fi
+python - "$WEAVE_STATE/providers.env" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+content = path.read_text()
+path.write_text(re.sub(r"(?m)^\s*(?:export\s+)?OPENAI_API_KEY=.*(?:\n|$)", "", content))
+PY
 chmod 600 "$WEAVE_STATE/secrets.env" "$WEAVE_STATE/providers.env"
 
 export DOCKER_HOST="unix://${XDG_RUNTIME_DIR:?}/weave-docker/docker.sock"

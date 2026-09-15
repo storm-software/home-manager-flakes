@@ -112,9 +112,9 @@ in
       TimeoutStopSec = 120;
       UMask = "0077";
     };
-    # Activation starts this explicitly through `activate --weave-router`.
-    # Leaving it out of default.target keeps the initial image build and
-    # client configuration opt-in.
+    # Activation starts this after the router has configured its initial state.
+    # Leaving it out of default.target prevents a second setup at login;
+    # activation starts it after installing the client settings.
   };
 
   xdg.configFile."weave-router/README.md".source = ./weave-router.md;

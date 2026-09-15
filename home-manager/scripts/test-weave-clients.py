@@ -49,13 +49,18 @@ esac
                 "WEAVE_CONFIGURE": str(scripts / "weave-clients.py"),
                 "XDG_RUNTIME_DIR": str(root),
             }
-            for _ in range(2):
-                subprocess.run(["bash", str(scripts / "weave-setup.sh")],
-                               env=env, check=True, capture_output=True, text=True)
+            subprocess.run(["bash", str(scripts / "weave-setup.sh")],
+                           env=env, check=True, capture_output=True, text=True)
+            with (root / "state/providers.env").open("a") as providers:
+                providers.write("OPENAI_API_KEY=obsolete-secret\n")
+            subprocess.run(["bash", str(scripts / "weave-setup.sh")],
+                           env=env, check=True, capture_output=True, text=True)
             calls = (root / "state/compose-calls").read_text().splitlines()
             self.assertEqual(calls.count("run --rm -T seed"), 1)
             self.assertEqual(sum("keygen.go" in call for call in calls), 1)
             self.assertEqual((root / "state/router-key").stat().st_mode & 0o777, 0o600)
+            providers = (root / "state/providers.env").read_text()
+            self.assertNotIn("OPENAI_API_KEY", providers)
 
     def test_repeated_setup_preserves_settings_and_rotates_only_managed_keys(self):
         with tempfile.TemporaryDirectory() as directory:
