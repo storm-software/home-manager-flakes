@@ -13,11 +13,6 @@ import tomlkit
 
 HEADROOM_URL = "http://127.0.0.1:8787"
 WEAVE_URL = "http://127.0.0.1:8080"
-CODEX_SUBSCRIPTION_MODELS = {
-    "gpt-5.6-sol",
-    "gpt-5.6-terra",
-    "gpt-5.6-luna",
-}
 
 
 def backup_once(path: Path) -> None:
@@ -67,23 +62,12 @@ def configure_codex(home: Path) -> None:
             f"{path} has no Weave router key; start weave-router before Headroom"
         )
 
-    # A self-hosted router with no provider API keys can serve only Codex's
-    # native ChatGPT-subscription family. Its default cluster roster contains
-    # paid-provider models, so constrain the request to the user's selected
-    # native model instead of failing with an empty eligible-provider pool.
-    # Convert tomlkit scalar nodes to plain strings before inserting them at a
-    # second location. Reusing a node also reuses its formatting trivia and can
-    # join adjacent assignments on a later idempotent run.
-    selected_model = str(config.get("model", "gpt-5.6-sol"))
-    if selected_model not in CODEX_SUBSCRIPTION_MODELS:
-        selected_model = "gpt-5.6-sol"
-    # Rebuild instead of extending the installer's inline table in place.
-    # tomlkit can otherwise retain closing-brace trivia without inserting the
-    # comma required before the new entry.
+    # Preserve the installer-owned headers, but remove any old force-model
+    # override so Weave can choose automatically from the enabled roster.
     updated_headers = tomlkit.inline_table()
     for name, value in weave_headers.items():
-        updated_headers[name] = value
-    updated_headers["X-Weave-Force-Model"] = selected_model
+        if name.casefold() != "x-weave-force-model":
+            updated_headers[name] = str(value)
     weave["http_headers"] = updated_headers
 
     backup_once(path)

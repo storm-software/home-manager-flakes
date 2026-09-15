@@ -42,19 +42,17 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             self.assertEqual(provider["http_headers"]["X-Weave-Router-Key"], "rk_test")
             self.assertEqual(provider["http_headers"]["X-Weave-User-Name"], "test")
             self.assertEqual(provider["http_headers"]["X-App"], "codex")
-            self.assertEqual(provider["http_headers"]["X-Weave-Force-Model"], "gpt-5.6-luna")
+            self.assertNotIn("X-Weave-Force-Model", provider["http_headers"])
 
             clients.configure_codex(home)
             reparsed = tomllib.loads(path.read_text())
             self.assertEqual(reparsed["model"], "gpt-5.6-luna")
-            self.assertEqual(
-                reparsed["model_providers"]["weave"]["http_headers"][
-                    "X-Weave-Force-Model"
-                ],
-                "gpt-5.6-luna",
+            self.assertNotIn(
+                "X-Weave-Force-Model",
+                reparsed["model_providers"]["weave"]["http_headers"],
             )
 
-    def test_codex_falls_back_to_subscription_backed_model(self):
+    def test_codex_removes_a_preexisting_force_model(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             config_dir = home / ".codex"
@@ -63,14 +61,15 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             path.write_text(
                 'model = "gpt-6-astra"\n'
                 '[model_providers.weave]\n'
-                'http_headers = { "X-Weave-Router-Key" = "rk_test" }\n'
+                'http_headers = { "X-Weave-Router-Key" = "rk_test", '
+                '"X-Weave-Force-Model" = "gpt-5.6-terra" }\n'
             )
 
             clients.configure_codex(home)
 
             config = tomlkit.parse(path.read_text())
             headers = config["model_providers"]["weave"]["http_headers"]
-            self.assertEqual(headers["X-Weave-Force-Model"], "gpt-5.6-sol")
+            self.assertNotIn("X-Weave-Force-Model", headers)
 
     def test_codex_refuses_to_drop_local_router_auth(self):
         with tempfile.TemporaryDirectory() as directory:
