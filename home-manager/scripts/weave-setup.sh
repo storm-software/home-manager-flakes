@@ -94,6 +94,17 @@ printf 'header = "X-Weave-Router-Key: %s"\n' "$WEAVE_ROUTER_KEY" |
 
 # Upstream owns its four supported integrations and preserves unrelated
 # settings, including Codex OAuth and RTK hooks. Logs can contain credentials.
+# Its Codex installer creates prompt-skill emitters as executable but not
+# owner-writable under this service's 0077 umask. Make only previously
+# installed Weave-managed emitters writable before it refreshes them. This
+# avoids touching user skills and lets repeated activations complete.
+for emit in "$WEAVE_CLIENT_HOME"/.codex/skills/*/scripts/emit.sh; do
+  skill="${emit%/scripts/emit.sh}/SKILL.md"
+  if [[ -f "$emit" && ! -L "$emit" && -f "$skill" ]] &&
+    grep -Fq '<!-- weave-router managed ' "$skill"; then
+    chmod u+w "$emit"
+  fi
+done
 for client in claude codex opencode pi; do
   if ! bash "$WEAVE_SOURCE/install/install.sh" --"$client" --scope user \
     --base-url http://127.0.0.1:8080 --non-interactive \
