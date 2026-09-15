@@ -79,20 +79,20 @@ let
   };
   setup = pkgs.writeShellApplication {
     name = "weave-router-setup";
-    runtimeInputs = [
+    runtimeInputs = with pkgs; [
       compose
       python
-      pkgs.bash
-      pkgs.coreutils
-      pkgs.curl
-      pkgs.jq
-      pkgs.gnugrep
-      pkgs.gnused
-      pkgs.gawk
-      pkgs.git
-      pkgs.nodejs_24
-      pkgs.util-linux
-      pkgs.docker
+      bash
+      coreutils
+      curl
+      jq
+      gnugrep
+      gnused
+      gawk
+      git
+      nodejs_24
+      util-linux
+      docker
     ];
     text = ''
       export WEAVE_STATE=${lib.escapeShellArg state}
@@ -106,12 +106,12 @@ let
   };
   loginCodex = pkgs.writeShellApplication {
     name = "weave-router-login-codex";
-    runtimeInputs = [
-      pkgs.bash
-      pkgs.coreutils
-      pkgs.curl
-      pkgs.jq
-      pkgs.openssl
+    runtimeInputs = with pkgs; [
+      bash
+      coreutils
+      curl
+      jq
+      openssl
     ];
     text = ''
       state=${lib.escapeShellArg state}
