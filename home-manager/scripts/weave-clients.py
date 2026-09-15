@@ -88,6 +88,25 @@ def configure(home, state, key):
 
     update(home / ".vibe/config.toml", tomlkit.loads, tomlkit.dumps, vibe)
 
+    def codex(value):
+        # The upstream installer can add a force-model header for Codex. Keep
+        # routing enabled, but leave selection to Weave rather than pinning a
+        # model across all future sessions. The router recognizes ChatGPT OAuth
+        # only when Codex sends both its bearer and account id.
+        providers = value.get("model_providers", {})
+        auth_path = home / ".codex/auth.json"
+        auth = json.loads(auth_path.read_text()) if auth_path.exists() else {}
+        account_id = auth.get("tokens", {}).get("account_id")
+        for provider in ("weave", "headroom"):
+            headers = providers.get(provider, {}).get("http_headers", {})
+            for name in list(headers):
+                if name.casefold() == "x-weave-force-model":
+                    del headers[name]
+            if account_id:
+                headers["ChatGPT-Account-ID"] = account_id
+
+    update(home / ".codex/config.toml", tomlkit.loads, tomlkit.dumps, codex)
+
     def hermes(value):
         value.setdefault("providers", {})["weave"] = {
             "api": base + "/v1", "api_key": key, "transport": "chat_completions"}
