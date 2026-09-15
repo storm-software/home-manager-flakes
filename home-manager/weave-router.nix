@@ -7,12 +7,50 @@
 
 let
   revision = "7909ce56d6c79b1a341f774bb0fb36a36601392d";
-  source = pkgs.fetchFromGitHub {
-    owner = "weave-os";
-    repo = "router";
-    rev = revision;
-    hash = "sha256-qVzEbpuYicdy2IQFwisC8GaJHPPQgpdq5clp8dd3WHg=";
+  source = pkgs.applyPatches {
+    name = "weave-router-${revision}-codex-oauth-routing";
+    src = pkgs.fetchFromGitHub {
+      owner = "weave-os";
+      repo = "router";
+      rev = revision;
+      hash = "sha256-qVzEbpuYicdy2IQFwisC8GaJHPPQgpdq5clp8dd3WHg=";
+    };
+    patches = [ ./patches/weave-router-codex-env-headers.patch ];
+    # Codex keeps its ChatGPT OAuth bearer in Authorization while the router
+    # key is in X-Weave-Router-Key. The pinned server discovers that pair while
+    # filtering models, but can drop OpenAI from the final Responses eligibility
+    # set. Keep the valid OAuth path present through that handoff.
+    postPatch = ''
+      target=internal/server/middleware/auth.go
+      substituteInPlace "$target" --replace-fail \
+        $'\t\tfinishAuthSpan(authSpan, nil)\n' \
+        $'\t\t// Codex preserves its ChatGPT OAuth bearer in Authorization while the router key rides in X-Weave-Router-Key.\n\t\t// Validate the standard bearer and account-id pair before using it, so ordinary API keys never become subscriptions.\n\t\tif strings.TrimSpace(c.GetHeader(OpenAISubscriptionHeader)) == "" {\n\t\t\tif raw, ok := strings.CutPrefix(c.GetHeader("Authorization"), "Bearer "); ok {\n\t\t\t\tsub := strings.TrimSpace(raw)\n\t\t\t\tacct := strings.TrimSpace(c.GetHeader("ChatGPT-Account-ID"))\n\t\t\t\tif requestcontext.CodexSubscriptionCreds(sub, acct) != nil {\n\t\t\t\t\tctx = context.WithValue(ctx, proxy.OpenAISubscriptionContextKey{}, sub)\n\t\t\t\t\tctx = context.WithValue(ctx, proxy.OpenAIAccountIDContextKey{}, acct)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tfinishAuthSpan(authSpan, nil)\n'
+      substituteInPlace "$target" --replace-fail \
+        $'\t"weave-os/router/internal/proxy"\n' \
+        $'\t"weave-os/router/internal/proxy"\n\t"weave-os/router/internal/requestcontext"\n'
+      target=internal/proxy/service.go
+      substituteInPlace "$target" --replace-fail \
+        $'\tif billing.SubscriptionOnlyFromContext(ctx) {\n\t\tenabledProviders = restrictToSubscriptionProviders(ctx, r.Header, enabledProviders)\n\t}\n\n\t// Codex (ChatGPT) subscription passthrough:' \
+        $'\tif billing.SubscriptionOnlyFromContext(ctx) {\n\t\tenabledProviders = restrictToSubscriptionProviders(ctx, r.Header, enabledProviders)\n\t}\n\n\t// The router-keyed Codex path carries ChatGPT OAuth in Authorization. Keep\n\t// its native OpenAI lane eligible after every policy/subscription filter.\n\tif raw, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer "); ok {\n\t\tif requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")) != nil {\n\t\t\tenabledProviders[providers.ProviderOpenAI] = struct{}{}\n\t\t}\n\t}\n\n\t// Codex (ChatGPT) subscription passthrough:'
+      substituteInPlace "$target" --replace-fail \
+        $'\tif s.codexSubscriptionExhausted(ctx, r.Header) {\n\t\tctx = withSuppressedCodexSubscription(ctx)\n\t}\n\tctx = resolveAndInjectCredentials(ctx, decision.Provider, decision.Model, r.Header)\n\topts.FastMode = fastModeForAttempt(ctx, decision.Model, decision.Provider)\n' \
+        $'\tif s.codexSubscriptionExhausted(ctx, r.Header) {\n\t\tctx = withSuppressedCodexSubscription(ctx)\n\t}\n\tctx = resolveAndInjectCredentials(ctx, decision.Provider, decision.Model, r.Header)\n\t// Codex preserves its ChatGPT OAuth bearer while using a router key. The\n\t// installation policy may have removed the transient subscription context,\n\t// so restore only a validated bearer for the native Codex model family.\n\t// This makes the OpenAI adapter choose chatgpt.com/backend-api/codex rather\n\t// than the API-key-only api.openai.com endpoint.\n\tif decision.Provider == providers.ProviderOpenAI && !servedOnCodexSubscription(ctx) {\n\t\tif raw, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer "); ok {\n\t\t\tif sub := requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")); sub != nil && requestcontext.CodexSubscriptionCoversModel(decision.Model) {\n\t\t\t\tctx = context.WithValue(ctx, CredentialsContextKey{}, sub)\n\t\t\t}\n\t\t}\n\t}\n\topts.FastMode = fastModeForAttempt(ctx, decision.Model, decision.Provider)\n'
+      if grep -Fq 'local headers_parts="\"X-Weave-Router-Key\" = \"''${esc_key}\""' install/install.sh; then
+        echo "Codex installer still serializes the Weave router key" >&2
+        exit 1
+      fi
+      grep -Fq 'env_http_headers = { "X-Weave-Router-Key" = "WEAVE_ROUTER_KEY", "ChatGPT-Account-ID" = "CODEX_CHATGPT_ACCOUNT_ID" }' install/install.sh
+      if grep -Fq 'forceModel = feats.Model' internal/proxy/service.go; then
+        echo "Codex OAuth path must not force the incoming model" >&2
+        exit 1
+      fi
+      grep -Fq 'if requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")) != nil {' internal/proxy/service.go
+      grep -Fq 'enabledProviders[providers.ProviderOpenAI] = struct{}{}' internal/proxy/service.go
+      grep -Fq 'if sub := requestcontext.CodexSubscriptionCreds(raw, r.Header.Get("ChatGPT-Account-ID")); sub != nil && requestcontext.CodexSubscriptionCoversModel(decision.Model) {' internal/proxy/service.go
+      grep -Fq 'ctx = context.WithValue(ctx, CredentialsContextKey{}, sub)' internal/proxy/service.go
+    '';
   };
+  imageTag = "${revision}-codex-oauth-routing";
   state = "${config.xdg.stateHome}/weave-router";
   python = pkgs.python3.withPackages (ps: [
     ps.pyyaml
@@ -21,7 +59,7 @@ let
   # Keep upstream's dependency graph, migrations, native libraries and model
   # assets together. Only deployment-specific settings differ from upstream.
   composeFile = pkgs.runCommand "weave-router-compose.json" { } ''
-    ${python}/bin/python ${./scripts/weave-compose.py} ${source} ${lib.escapeShellArg state} ${./scripts/weave-keygen.go} ${revision} > "$out"
+    ${python}/bin/python ${./scripts/weave-compose.py} ${source} ${lib.escapeShellArg state} ${./scripts/weave-keygen.go} ${revision} weave-router:${imageTag} > "$out"
   '';
   compose = pkgs.writeShellApplication {
     name = "weave-router-compose";
@@ -55,7 +93,7 @@ let
     text = ''
       export WEAVE_STATE=${lib.escapeShellArg state}
       export WEAVE_SOURCE=${source}
-      export WEAVE_IMAGE=weave-router:${revision}
+      export WEAVE_IMAGE=weave-router:${imageTag}
       export WEAVE_REVISION=${revision}
       export WEAVE_CLIENT_HOME=${lib.escapeShellArg config.home.homeDirectory}
       export WEAVE_CONFIGURE=${./scripts/weave-clients.py}

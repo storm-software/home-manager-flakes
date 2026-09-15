@@ -1,0 +1,47 @@
+--- a/install/install.sh
++++ b/install/install.sh
+@@ -664,3 +664,2 @@
+-  local esc_key esc_email esc_name esc_url esc_status
+-  esc_key="$(toml_escape "$block_key")"
++  local esc_email esc_name esc_url esc_status
+   esc_email="$(toml_escape "$block_email")"
+@@ -676,7 +675,15 @@
+-  local headers_parts="\"X-Weave-Router-Key\" = \"${esc_key}\""
+-  if [ -n "$block_email" ]; then
+-    headers_parts="${headers_parts}, \"X-Weave-User-Email\" = \"${esc_email}\""
++  local headers_parts=""
++  append_header() {
++    local entry="$1"
++    if [[ -n "$headers_parts" ]]; then
++      headers_parts="${headers_parts}, ${entry}"
++    else
++      headers_parts="$entry"
++    fi
++  }
++  if [[ -n "$block_email" ]]; then
++    append_header "\"X-Weave-User-Email\" = \"${esc_email}\""
+   fi
+-  if [ -n "$block_name" ]; then
+-    headers_parts="${headers_parts}, \"X-Weave-User-Name\" = \"${esc_name}\""
++  if [[ -n "$block_name" ]]; then
++    append_header "\"X-Weave-User-Name\" = \"${esc_name}\""
+   fi
+@@ -686,5 +693,6 @@
+-  headers_parts="${headers_parts}, \"X-App\" = \"codex\""
++  append_header '"X-App" = "codex"'
+   # No strategy header: pinning one here freezes installed clients on whatever
+   # policy was current at install time, so a deployment-default change never
+   # reaches them. Every endpoint, hosted or self-hosted, uses its own default.
+   local headers_line="http_headers = { ${headers_parts} }"
++  local env_headers_line='env_http_headers = { "X-Weave-Router-Key" = "WEAVE_ROUTER_KEY", "ChatGPT-Account-ID" = "CODEX_CHATGPT_ACCOUNT_ID" }'
+@@ -756,3 +764,4 @@
+ requires_openai_auth = true
+ ${headers_line}
++${env_headers_line}
+ ${hook_block}
+@@ -861,3 +870,3 @@
+-  # 0600: the file holds a router key. Even at user scope, mode 644 would
+-  # leak the key to any local user on a shared box.
++  # 0600: the file may contain private user configuration, even though this
++  # managed block no longer contains the router key.
+   chmod 600 "$config_file"

@@ -6,6 +6,8 @@ import sys
 import yaml
 
 source, state, keygen = map(Path, sys.argv[1:4])
+revision = sys.argv[4]
+image = sys.argv[5]
 stack = yaml.safe_load((source / "docker-compose.yml").read_text())
 services = stack["services"]
 del services["hmm-sidecar"]
@@ -26,8 +28,8 @@ for name in ("server", "seed"):
     services[name]["environment"]["DATABASE_URL"] = dsn
 server = services["server"]
 server["build"]["context"] = str(source)
-server["build"]["args"] = {"ROUTER_SHA": sys.argv[4]}
-server["image"] = f"weave-router:{sys.argv[4]}"
+server["build"]["args"] = {"ROUTER_SHA": revision}
+server["image"] = image
 server["ports"] = ["127.0.0.1:8080:8080"]
 server["env_file"] = [str(state / "secrets.env"), str(state / "providers.env")]
 server["environment"]["ROUTER_DEPLOYMENT_MODE"] = "selfhosted"
