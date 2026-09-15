@@ -31,6 +31,7 @@ server["image"] = f"weave-router:{sys.argv[4]}"
 server["ports"] = ["127.0.0.1:8080:8080"]
 server["env_file"] = [str(state / "secrets.env"), str(state / "providers.env")]
 server["environment"]["ROUTER_DEPLOYMENT_MODE"] = "selfhosted"
+server["environment"]["ROUTER_SUBSCRIPTION_POOLS_ENABLED"] = "true"
 server["environment"]["WV_CAPTURE_CONTENT"] = "off"
 services["seed"]["volumes"].append(f"{keygen}:/keygen.go:ro")
 json.dump(stack, sys.stdout, indent=2)

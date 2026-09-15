@@ -91,12 +91,9 @@ def configure(home, state, key):
     def codex(value):
         # The upstream installer can add a force-model header for Codex. Keep
         # routing enabled, but leave selection to Weave rather than pinning a
-        # model across all future sessions. The router recognizes ChatGPT OAuth
-        # only when Codex sends both its bearer and account id.
+        # model across all future sessions. The upstream installer preserves
+        # Codex OAuth; the router also keeps an encrypted enrolled refresh token.
         providers = value.get("model_providers", {})
-        auth_path = home / ".codex/auth.json"
-        auth = json.loads(auth_path.read_text()) if auth_path.exists() else {}
-        account_id = auth.get("tokens", {}).get("account_id")
         for provider in ("weave", "headroom"):
             provider_config = providers.get(provider, {})
             headers = provider_config.get("http_headers", {})
@@ -109,8 +106,6 @@ def configure(home, state, key):
             for name, value in headers.items():
                 if name.casefold() != "x-weave-force-model":
                     updated_headers[name] = str(value)
-            if account_id:
-                updated_headers["ChatGPT-Account-ID"] = str(account_id)
             provider_config["http_headers"] = updated_headers
 
     update(home / ".codex/config.toml", tomlkit.loads, tomlkit.dumps, codex)

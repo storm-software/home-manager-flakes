@@ -6,12 +6,12 @@
 }:
 
 let
-  revision = "5bd5d81a703175943259fafb7df45816b90a97b7";
+  revision = "7909ce56d6c79b1a341f774bb0fb36a36601392d";
   source = pkgs.fetchFromGitHub {
     owner = "weave-os";
     repo = "router";
     rev = revision;
-    hash = "sha256-oyT9e8Y7K+ng+U3LXy36XLxVplTSAhVw4wKzTusO8iA=";
+    hash = "sha256-qVzEbpuYicdy2IQFwisC8GaJHPPQgpdq5clp8dd3WHg=";
   };
   state = "${config.xdg.stateHome}/weave-router";
   python = pkgs.python3.withPackages (ps: [
@@ -62,11 +62,54 @@ let
       exec bash ${./scripts/weave-setup.sh} "$@"
     '';
   };
+  loginCodex = pkgs.writeShellApplication {
+    name = "weave-router-login-codex";
+    runtimeInputs = [
+      pkgs.bash
+      pkgs.coreutils
+      pkgs.curl
+      pkgs.jq
+      pkgs.openssl
+    ];
+    text = ''
+      state=${lib.escapeShellArg state}
+      key_file="$state/router-key"
+      if [[ ! -s "$key_file" ]]; then
+        echo 'Weave Router has no client key; start weave-router.service first.' >&2
+        exit 1
+      fi
+
+      response="$(mktemp)"
+      trap 'rm -f "$response"' EXIT
+      status="$(${pkgs.coreutils}/bin/printf 'header = "X-Weave-Router-Key: %s"\n' "$(<"$key_file")" |
+        curl --config - --silent --show-error --output "$response" --write-out '%{http_code}' \
+          http://127.0.0.1:8080/v1/subscriptions/accounts)"
+      if [[ "$status" != 200 ]]; then
+        echo "Could not inspect Weave subscription accounts (HTTP $status)." >&2
+        exit 1
+      fi
+      if jq -e 'any(.[]; .provider == "codex" and .enabled == true)' "$response" >/dev/null; then
+        echo 'ChatGPT subscription is already enrolled with Weave Router.'
+        exit 0
+      fi
+      if [[ ! -t 0 ]]; then
+        echo 'ChatGPT OAuth enrollment requires an interactive terminal.' >&2
+        echo 'Run weave-router-login-codex from a terminal.' >&2
+        exit 1
+      fi
+
+      export WEAVE_ROUTER_KEY
+      WEAVE_ROUTER_KEY="$(<"$key_file")"
+      exec bash ${source}/install/install.sh login codex --codex --scope user \
+        --base-url http://127.0.0.1:8080
+    '';
+  };
 in
 {
   home.packages = [
     compose
     setup
+    loginCodex
   ];
 
   # Dedicated rootless daemon: does not change the user's Docker context or

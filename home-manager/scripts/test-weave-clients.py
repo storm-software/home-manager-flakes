@@ -52,7 +52,10 @@ esac
             subprocess.run(["bash", str(scripts / "weave-setup.sh")],
                            env=env, check=True, capture_output=True, text=True)
             with (root / "state/providers.env").open("a") as providers:
-                providers.write("OPENAI_API_KEY=obsolete-secret\n")
+                providers.write(
+                    "OPENAI_API_KEY=obsolete-secret\n"
+                    "export OPENAI_API_TOKEN=also-obsolete\n"
+                )
             subprocess.run(["bash", str(scripts / "weave-setup.sh")],
                            env=env, check=True, capture_output=True, text=True)
             calls = (root / "state/compose-calls").read_text().splitlines()
@@ -61,6 +64,7 @@ esac
             self.assertEqual((root / "state/router-key").stat().st_mode & 0o777, 0o600)
             providers = (root / "state/providers.env").read_text()
             self.assertNotIn("OPENAI_API_KEY", providers)
+            self.assertNotIn("OPENAI_API_TOKEN", providers)
 
     def test_repeated_setup_preserves_settings_and_rotates_only_managed_keys(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -85,11 +89,8 @@ esac
             (home / ".codex/config.toml").write_text(
                 '[model_providers.weave]\n'
                 'http_headers = { "X-Weave-Router-Key" = "rk_test", '
-                '"X-App" = "codex"}\n'
+                '"X-App" = "codex", "X-Weave-Force-Model" = "gpt-5.6-terra"}\n'
             )
-            (home / ".codex/auth.json").write_text(json.dumps({
-                "tokens": {"account_id": "account_test"},
-            }))
             clients.configure(home, state, "rk_test_first")
             clients.configure(home, state, "rk_test_second")
             gemini = json.loads((home / ".gemini/settings.json").read_text())
@@ -110,7 +111,7 @@ esac
             codex = tomlkit.loads((home / ".codex/config.toml").read_text())
             headers = codex["model_providers"]["weave"]["http_headers"]
             self.assertEqual(headers["X-App"], "codex")
-            self.assertEqual(headers["ChatGPT-Account-ID"], "account_test")
+            self.assertNotIn("X-Weave-Force-Model", headers)
             hermes = yaml.safe_load((home / ".hermes/config.yaml").read_text())
             self.assertEqual(hermes["model"]["provider"], "custom:weave")
             for path in [home / ".gemini/.env", home / ".factory/settings.json",

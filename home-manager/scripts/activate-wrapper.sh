@@ -79,5 +79,13 @@ if [[ "$setup_displaylink" == true ]]; then
 fi
 
 if [[ "$setup_weave_router" == true ]]; then
-  systemctl --user start weave-router.service headroom.service
+  systemctl --user restart weave-router.service
+  systemctl --user restart headroom.service
+
+  login="$HOME/.nix-profile/bin/weave-router-login-codex"
+  if [[ ! -x "$login" ]]; then
+    echo "$0: weave-router-login-codex was not installed by activation" >&2
+    exit 1
+  fi
+  "$login"
 fi

@@ -37,12 +37,9 @@ The first start creates private files under `~/.local/state/weave-router/`
 (or the configured XDG state directory):
 
 - `providers.env`: optional upstream API keys, preferably `OPENROUTER_API_KEY`,
-  expand routing beyond subscription-backed models. Native Codex models use
-  the existing ChatGPT OAuth login and do not need `OPENAI_API_KEY`; setup
-  removes that legacy assignment from an existing file on its next run. With
-  no provider keys, the Codex configuration forces the selected native
-  Sol/Terra/Luna model directly through Weave because the self-hosted cluster
-  cannot route to models outside the ChatGPT subscription.
+  expand routing beyond subscription-backed models. ChatGPT OAuth does not use
+  `OPENAI_API_KEY` or `OPENAI_API_TOKEN`; setup removes either legacy assignment
+  from an existing file on its next run.
 - `secrets.env`: generated database password, dashboard admin password, and
   Tink encryption key for dashboard BYOK credentials.
 - `router-key`: generated `rk_...` client credential, reused across restarts.
@@ -60,6 +57,24 @@ Open <http://127.0.0.1:8080/ui/> and use `ROUTER_ADMIN_PASSWORD` from
 API key or a supported subscription credential; an `rk_` key alone is not an
 upstream credential. Upstream API usage is billed by the provider.
 No credentials enter the Nix store. Prompt-content telemetry is disabled.
+
+Activation enables the router's encrypted subscription pool and runs
+`weave-router-login-codex` after the service is ready. On first use, follow the
+printed OpenAI device-login URL and code to enroll the ChatGPT Pro account. A
+later activation detects the enabled Codex account and skips login. The refresh
+token is encrypted in the local PostgreSQL volume; it is not written to
+`providers.env` or the Nix store. Run these commands to inspect or refresh it:
+
+```sh
+npx @weave-os/router status --codex
+npx @weave-os/router accounts list --codex
+weave-router-login-codex
+```
+
+No force-model or hard-pin setting is installed. The self-hosted router retains
+its `cluster` default and scores each task automatically; session pinning may
+still keep a multi-turn conversation on its initially routed model for
+coherence.
 
 ## Client coverage
 
