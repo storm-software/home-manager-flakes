@@ -21,7 +21,14 @@
       "root"
       "${user.system.username}"
     ];
-    substituters = [ "https://cache.nixos.org" ];
+    substituters = [
+      "https://cache.nixos.org"
+      "https://storm-software.cachix.org"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "storm-software.cachix.org-1:Jbb6J3ZVqIQaF/7Ckd0b3qQlIPgoV4C1bEMxX1YTQEk="
+    ];
     experimental-features = [
       "flakes"
       "nix-command"

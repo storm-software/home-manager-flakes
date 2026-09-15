@@ -1,6 +1,13 @@
 {
   description = "Storm Software - Development User";
 
+  nixConfig = {
+    extra-substituters = [ "https://storm-software.cachix.org" ];
+    extra-trusted-public-keys = [
+      "storm-software.cachix.org-1:Jbb6J3ZVqIQaF/7Ckd0b3qQlIPgoV4C1bEMxX1YTQEk="
+    ];
+  };
+
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
     home-manager = {
