@@ -93,7 +93,7 @@ let
       : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
       mkdir -p ${lib.escapeShellArg headroomHome}
       export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
-      exec docker run --rm \
+      exec docker run --rm --entrypoint headroom \
         --network host \
         --user "$(id -u):$(id -g)" \
         --workdir /workspace \
@@ -102,7 +102,7 @@ let
         --env HEADROOM_CONFIG_DIR=/tmp/headroom-home/.headroom/config \
         --volume "$PWD:/workspace" \
         --volume ${lib.escapeShellArg "${headroomHome}:/tmp/headroom-home/.headroom"} \
-        ${headroomImage} headroom "$@"
+        ${headroomImage} "$@"
     '';
   };
   headroomProxy = pkgs.writeShellApplication {
@@ -125,7 +125,7 @@ let
         --env HEADROOM_BEACON=off \
         --env DO_NOT_TRACK=1 \
         --volume ${lib.escapeShellArg "${headroomHome}:/tmp/headroom-home/.headroom"} \
-        ${headroomImage} headroom proxy \
+        ${headroomImage} \
           --host 127.0.0.1 \
           --port 8787 \
           --mode cache \
@@ -142,8 +142,6 @@ in
     caveman
     headroom
   ];
-
-  home.sessionVariables.HEADROOM_CODEX_UPSTREAM_BASE_URL = "http://127.0.0.1:8080";
 
   # RTK writes global hooks and prompt files outside the Home Manager profile.
   # Remove the integrations this module formerly installed, once, before RTK
@@ -168,8 +166,9 @@ in
     fi
   '';
 
-  # Headroom runs ahead of the self-hosted Weave Router. It starts only after
-  # Weave has installed its client settings, then updates Headroom-owned fields.
+  # Headroom starts after Weave has installed its client settings. The helper
+  # keeps Claude on Headroom, but points Codex directly at Weave so ChatGPT OAuth
+  # reaches the router instead of Headroom's fixed subscription endpoint.
   systemd.user.services.headroom = {
     Unit = {
       Description = "Headroom context-optimization proxy";

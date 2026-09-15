@@ -36,11 +36,13 @@ This daemon uses its own socket and storage; your Docker context is unchanged.
 The first start creates private files under `~/.local/state/weave-router/`
 (or the configured XDG state directory):
 
-- `providers.env`: add at least one upstream API key, preferably
-  `OPENROUTER_API_KEY`. Optional alternatives are `ANTHROPIC_API_KEY`,
-  and `GOOGLE_API_KEY`. Native Codex models use the existing ChatGPT OAuth
-  login and do not need `OPENAI_API_KEY`; setup removes that legacy assignment
-  from an existing file on its next run.
+- `providers.env`: optional upstream API keys, preferably `OPENROUTER_API_KEY`,
+  expand routing beyond subscription-backed models. Native Codex models use
+  the existing ChatGPT OAuth login and do not need `OPENAI_API_KEY`; setup
+  removes that legacy assignment from an existing file on its next run. With
+  no provider keys, the Codex configuration forces the selected native
+  Sol/Terra/Luna model directly through Weave because the self-hosted cluster
+  cannot route to models outside the ChatGPT subscription.
 - `secrets.env`: generated database password, dashboard admin password, and
   Tink encryption key for dashboard BYOK credentials.
 - `router-key`: generated `rk_...` client credential, reused across restarts.

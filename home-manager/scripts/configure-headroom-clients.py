@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Configure Headroom as the local proxy while keeping Weave as upstream."""
+"""Configure Headroom clients while keeping Codex OAuth directly on Weave."""
 
 from __future__ import annotations
 
@@ -12,6 +12,12 @@ import tomlkit
 
 
 HEADROOM_URL = "http://127.0.0.1:8787"
+WEAVE_URL = "http://127.0.0.1:8080"
+CODEX_SUBSCRIPTION_MODELS = {
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna",
+}
 
 
 def backup_once(path: Path) -> None:
@@ -49,18 +55,42 @@ def configure_codex(home: Path) -> None:
     except Exception as error:
         raise SystemExit(f"{path} is invalid TOML: {error}; refusing to overwrite it") from error
 
-    backup_once(path)
-    config["model_provider"] = "headroom"
-    config["openai_base_url"] = f"{HEADROOM_URL}/v1"
+    # Weave authenticates the local client with its rk_ key while preserving
+    # Authorization for the upstream ChatGPT OAuth credential. Keep Codex
+    # directly on Weave: Headroom deliberately routes ChatGPT session auth to
+    # chatgpt.com and therefore cannot relay that credential to another proxy.
     providers = config.setdefault("model_providers", tomlkit.table())
-    provider = providers.setdefault("headroom", tomlkit.table())
-    provider["name"] = "Headroom via Weave Router"
-    provider["base_url"] = f"{HEADROOM_URL}/v1"
-    provider["supports_websockets"] = True
-    provider["requires_openai_auth"] = True
-    headers = tomlkit.inline_table()
-    headers["X-Headroom-Base-Url"] = "HEADROOM_CODEX_UPSTREAM_BASE_URL"
-    provider["env_http_headers"] = headers
+    weave = providers.get("weave")
+    weave_headers = weave.get("http_headers") if hasattr(weave, "get") else None
+    if not hasattr(weave_headers, "get") or not weave_headers.get("X-Weave-Router-Key"):
+        raise SystemExit(
+            f"{path} has no Weave router key; start weave-router before Headroom"
+        )
+
+    # A self-hosted router with no provider API keys can serve only Codex's
+    # native ChatGPT-subscription family. Its default cluster roster contains
+    # paid-provider models, so constrain the request to the user's selected
+    # native model instead of failing with an empty eligible-provider pool.
+    # Convert tomlkit scalar nodes to plain strings before inserting them at a
+    # second location. Reusing a node also reuses its formatting trivia and can
+    # join adjacent assignments on a later idempotent run.
+    selected_model = str(config.get("model", "gpt-5.6-sol"))
+    if selected_model not in CODEX_SUBSCRIPTION_MODELS:
+        selected_model = "gpt-5.6-sol"
+    # Rebuild instead of extending the installer's inline table in place.
+    # tomlkit can otherwise retain closing-brace trivia without inserting the
+    # comma required before the new entry.
+    updated_headers = tomlkit.inline_table()
+    for name, value in weave_headers.items():
+        updated_headers[name] = value
+    updated_headers["X-Weave-Force-Model"] = selected_model
+    weave["http_headers"] = updated_headers
+
+    backup_once(path)
+    config["model_provider"] = "weave"
+    config["openai_base_url"] = str(weave.get("base_url", f"{WEAVE_URL}/v1"))
+    weave["supports_websockets"] = False
+    weave["requires_openai_auth"] = True
     path.write_text(tomlkit.dumps(config))
 
 
