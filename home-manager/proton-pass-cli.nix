@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgsUnstable, ... }:
 
 # Proton Pass CLI (`pass-cli`) is a user tool. The nixpkgs wrapper already
 # sets PROTON_PASS_NO_UPDATE_CHECK. The SSH agent owns SSH_AUTH_SOCK
@@ -6,7 +6,7 @@
 {
   services.proton-pass-agent = {
     enable = true;
-    package = pkgs.unstable.proton-pass-cli;
+    package = pkgsUnstable.proton-pass-cli;
   };
 
   home.sessionVariables = {

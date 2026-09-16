@@ -27,7 +27,7 @@ in
     ./codex.nix
     ./dircolors.nix
     (import ./github-copilot-cli.nix { inherit pkgs; })
-    (import ./proton-pass-cli.nix { inherit pkgs; })
+    ./proton-pass-cli.nix
     ./intelli-shell.nix
     ./mcp.nix
     ./zed.nix

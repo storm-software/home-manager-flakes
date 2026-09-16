@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  pkgsUnstable,
   ...
 }:
 
@@ -130,11 +131,39 @@ let
     '';
   };
 
+  secretspecPassCli = pkgs.writeShellApplication {
+    name = "secretspec-pass-cli";
+    runtimeInputs = [
+      pkgs.bash
+      pkgsUnstable.proton-pass-cli
+    ];
+    text = ''
+      exec bash ${./scripts/secretspec-pass-cli.sh} "$@"
+    '';
+  };
+
+  codexSecretsEnv = pkgs.writeShellApplication {
+    name = "codex-secrets-env";
+    runtimeInputs = [
+      pkgs.bash
+      pkgs.coreutils
+      pkgs.secretspec
+      secretspecPassCli
+      codexRouterEnv
+    ];
+    text = ''
+      export SECRETSPEC_FILE=${lib.escapeShellArg "${../secretspec.toml}"}
+      export SECRETSPEC_PROTONPASS_CLI_PATH=${lib.escapeShellArg "${secretspecPassCli}/bin/secretspec-pass-cli"}
+      export CODEX_ROUTER_ENV=${lib.escapeShellArg "${codexRouterEnv}/bin/codex-router-env"}
+      exec bash ${./scripts/codex-secrets-env.sh} "$@"
+    '';
+  };
+
   codex = pkgs.writeShellApplication {
     name = "codex";
-    runtimeInputs = [ codexRouterEnv ];
+    runtimeInputs = [ codexSecretsEnv ];
     text = ''
-      exec ${codexRouterEnv}/bin/codex-router-env exec ${pkgs.codex}/bin/codex "$@"
+      exec ${codexSecretsEnv}/bin/codex-secrets-env exec ${pkgs.codex}/bin/codex "$@"
     '';
     meta = pkgs.codex.meta // {
       mainProgram = "codex";
@@ -142,7 +171,7 @@ let
   };
 in
 {
-  options.storm.codex.routerEnvPackage = lib.mkOption {
+  options.storm.codex.secretsEnvPackage = lib.mkOption {
     type = lib.types.package;
     readOnly = true;
     internal = true;
@@ -177,6 +206,7 @@ in
     home.packages = [
       codex
       codexRouterEnv
+      codexSecretsEnv
       installCodexConfig
     ];
 
@@ -185,6 +215,6 @@ in
         ${codexConfig} ${lib.escapeShellArg config.home.homeDirectory}
     '';
 
-    storm.codex.routerEnvPackage = codexRouterEnv;
+    storm.codex.secretsEnvPackage = codexSecretsEnv;
   };
 }

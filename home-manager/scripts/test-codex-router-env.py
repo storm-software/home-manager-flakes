@@ -27,7 +27,10 @@ class CodexRouterEnvTests(unittest.TestCase):
             "print(json.dumps({"
             "'args': sys.argv[1:], "
             "'router_key': os.environ.get('WEAVE_ROUTER_KEY'), "
-            "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID')}))\n"
+            "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID'), "
+            "'context7_authorization': os.environ.get('CONTEXT7_AUTHORIZATION'), "
+            "'context7_api_key': os.environ.get('CONTEXT7_API_KEY'), "
+            "'firecrawl_api_key': os.environ.get('FIRECRAWL_API_KEY')}))\n"
         )
         self.mock_codex.chmod(0o755)
         self.systemctl_record = self.root / "systemctl.json"
@@ -70,6 +73,9 @@ class CodexRouterEnvTests(unittest.TestCase):
         }
         env.pop("WEAVE_ROUTER_KEY", None)
         env.pop("CODEX_CHATGPT_ACCOUNT_ID", None)
+        env.pop("CONTEXT7_AUTHORIZATION", None)
+        env.pop("CONTEXT7_API_KEY", None)
+        env.pop("FIRECRAWL_API_KEY", None)
         if inherited:
             env.update(inherited)
         return subprocess.run(
@@ -98,6 +104,9 @@ class CodexRouterEnvTests(unittest.TestCase):
                 "args": ["--version"],
                 "router_key": "rk_test",
                 "account_id": "acct_test",
+                "context7_authorization": None,
+                "context7_api_key": None,
+                "firecrawl_api_key": None,
             },
         )
 
@@ -110,6 +119,9 @@ class CodexRouterEnvTests(unittest.TestCase):
         recorded = json.loads(result.stdout)
         self.assertEqual(recorded["args"], ["login"])
         self.assertIsNone(recorded["account_id"])
+        self.assertIsNone(recorded["context7_authorization"])
+        self.assertIsNone(recorded["context7_api_key"])
+        self.assertIsNone(recorded["firecrawl_api_key"])
 
     def test_exec_loads_router_key_without_trailing_newline(self):
         (self.state / "weave-router/router-key").write_text("rk_test")
@@ -120,6 +132,9 @@ class CodexRouterEnvTests(unittest.TestCase):
         recorded = json.loads(result.stdout)
         self.assertEqual(recorded["args"], ["login"])
         self.assertEqual(recorded["router_key"], "rk_test")
+        self.assertIsNone(recorded["context7_authorization"])
+        self.assertIsNone(recorded["context7_api_key"])
+        self.assertIsNone(recorded["firecrawl_api_key"])
 
     def test_exec_clears_inherited_values_when_sources_are_absent(self):
         result = self.run_helper(
@@ -136,6 +151,100 @@ class CodexRouterEnvTests(unittest.TestCase):
         recorded = json.loads(result.stdout)
         self.assertIsNone(recorded["router_key"])
         self.assertIsNone(recorded["account_id"])
+        self.assertIsNone(recorded["context7_authorization"])
+        self.assertIsNone(recorded["context7_api_key"])
+        self.assertIsNone(recorded["firecrawl_api_key"])
+
+    def test_exec_prefers_explicit_secretspec_values(self):
+        self.write_credentials()
+
+        result = self.run_helper(
+            "--from-secretspec",
+            "exec",
+            str(self.mock_codex),
+            "--version",
+            inherited={
+                "WEAVE_ROUTER_KEY": "vault-router-key",
+                "CODEX_CHATGPT_ACCOUNT_ID": "vault-account-id",
+                "CONTEXT7_AUTHORIZATION": "Bearer vault-context7",
+                "CONTEXT7_API_KEY": "vault-context7-key",
+                "FIRECRAWL_API_KEY": "vault-firecrawl-key",
+            },
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            json.loads(result.stdout),
+            {
+                "args": ["--version"],
+                "router_key": "vault-router-key",
+                "account_id": "vault-account-id",
+                "context7_authorization": "Bearer vault-context7",
+                "context7_api_key": "vault-context7-key",
+                "firecrawl_api_key": "vault-firecrawl-key",
+            },
+        )
+
+    def test_exec_clears_unmarked_mcp_values(self):
+        result = self.run_helper(
+            "exec",
+            str(self.mock_codex),
+            "--version",
+            inherited={
+                "CONTEXT7_AUTHORIZATION": "stale-context7-authorization",
+                "CONTEXT7_API_KEY": "stale-context7-key",
+                "FIRECRAWL_API_KEY": "stale-firecrawl-key",
+            },
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        recorded = json.loads(result.stdout)
+        self.assertIsNone(recorded["context7_authorization"])
+        self.assertIsNone(recorded["context7_api_key"])
+        self.assertIsNone(recorded["firecrawl_api_key"])
+
+    def test_exec_falls_back_to_local_sources_for_missing_secretspec_router_values(self):
+        self.write_credentials()
+
+        result = self.run_helper(
+            "--from-secretspec",
+            "exec",
+            str(self.mock_codex),
+            "--version",
+            inherited={
+                "CONTEXT7_AUTHORIZATION": "Bearer vault-context7",
+                "CONTEXT7_API_KEY": "vault-context7-key",
+                "FIRECRAWL_API_KEY": "vault-firecrawl-key",
+            },
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            json.loads(result.stdout),
+            {
+                "args": ["--version"],
+                "router_key": "rk_test",
+                "account_id": "acct_test",
+                "context7_authorization": "Bearer vault-context7",
+                "context7_api_key": "vault-context7-key",
+                "firecrawl_api_key": "vault-firecrawl-key",
+            },
+        )
+
+    def test_exec_warns_when_secretspec_omits_mcp_credentials(self):
+        result = self.run_helper(
+            "--from-secretspec",
+            "exec",
+            str(self.mock_codex),
+            "--version",
+            inherited={
+                "WEAVE_ROUTER_KEY": "vault-router-key",
+                "CODEX_CHATGPT_ACCOUNT_ID": "vault-account-id",
+            },
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("MCP credentials unavailable", result.stderr)
 
     def test_import_passes_names_not_values_on_argv(self):
         self.write_credentials()

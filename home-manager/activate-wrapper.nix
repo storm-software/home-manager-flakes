@@ -8,8 +8,8 @@
 let
   activateWrapper = pkgs.runCommand "activate-wrapper" { } ''
     substitute ${./scripts/activate-wrapper.sh} "$out" \
-      --replace-fail '@codex_router_env@' \
-      '${config.storm.codex.routerEnvPackage}/bin/codex-router-env'
+      --replace-fail '@codex_secrets_env@' \
+      '${config.storm.codex.secretsEnvPackage}/bin/codex-secrets-env'
     chmod +x "$out"
   '';
 in

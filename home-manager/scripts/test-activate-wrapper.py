@@ -29,10 +29,10 @@ class ActivateWrapperTests(unittest.TestCase):
             self.bin / "systemctl",
             "printf 'systemctl %s\\n' \"$*\" >> \"$ACTIVATION_LOG\"",
         )
-        router_env = self.root / "codex-router-env"
+        secrets_env = self.root / "codex-secrets-env"
         self.make_command(
-            router_env,
-            "printf 'codex-router-env %s\\n' \"$*\" >> \"$ACTIVATION_LOG\"",
+            secrets_env,
+            "printf 'codex-secrets-env %s\\n' \"$*\" >> \"$ACTIVATION_LOG\"",
         )
         self.make_command(
             self.profile_bin / "weave-router-login-codex",
@@ -43,7 +43,10 @@ class ActivateWrapperTests(unittest.TestCase):
             "printf '%s\\n' 'displaylink-setup' >> \"$ACTIVATION_LOG\"",
         )
 
-        wrapper = SOURCE.read_text().replace("@codex_router_env@", str(router_env))
+        wrapper = (
+            SOURCE.read_text()
+            .replace("@codex_secrets_env@", str(secrets_env))
+        )
         self.activate = self.result / "activate"
         self.activate.write_text(wrapper)
         self.activate.chmod(0o755)
@@ -79,7 +82,7 @@ class ActivateWrapperTests(unittest.TestCase):
             [
                 "activate-inner",
                 "systemctl --user restart weave-router.service",
-                "codex-router-env import",
+                "codex-secrets-env import",
                 "systemctl --user restart headroom.service",
                 "weave-router-login-codex",
             ],

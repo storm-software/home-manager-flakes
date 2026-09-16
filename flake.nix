@@ -108,6 +108,9 @@
     {
       homeConfigurations.${user.system.username} = homeManagerConfiguration {
         pkgs = pkgs.stable;
+        extraSpecialArgs = {
+          pkgsUnstable = pkgs.unstable;
+        };
         modules = [
           ({ lib, ... }: {
             home.activation.ensureNixAccessTokensFile = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

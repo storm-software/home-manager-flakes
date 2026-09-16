@@ -80,7 +80,7 @@ fi
 
 if [[ "$setup_weave_router" == true ]]; then
   systemctl --user restart weave-router.service
-  @codex_router_env@ import
+  @codex_secrets_env@ import
   systemctl --user restart headroom.service
 
   login="$HOME/.nix-profile/bin/weave-router-login-codex"
