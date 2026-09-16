@@ -82,39 +82,6 @@ let
     mcp_servers = codexMcpServers;
     plugins."prisma@plugins-cli".enabled = true;
 
-    hooks = {
-      SessionStart = [
-        {
-          hooks = [
-            {
-              type = "command";
-              command = "${config.home.homeDirectory}/.codex/.weave/codex-status.sh";
-            }
-          ];
-        }
-      ];
-      Stop = [
-        {
-          hooks = [
-            {
-              type = "command";
-              command = "${config.home.homeDirectory}/.codex/.weave/codex-status.sh";
-            }
-          ];
-        }
-      ];
-      UserPromptSubmit = [
-        {
-          hooks = [
-            {
-              type = "command";
-              command = "${config.home.homeDirectory}/.codex/.weave/codex-directive.sh";
-            }
-          ];
-        }
-      ];
-    };
-
     projects =
       lib.genAttrs
         [
@@ -200,6 +167,10 @@ in
       {
         assertion = !(codexSettings.model_providers.weave ? env_key);
         message = "Codex must use ChatGPT OAuth, not OPENAI_API_KEY";
+      }
+      {
+        assertion = !(codexSettings ? hooks);
+        message = "The Weave installer owns Codex hook registrations; the Nix baseline must not duplicate them";
       }
     ];
 
