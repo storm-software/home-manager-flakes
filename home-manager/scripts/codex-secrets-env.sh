@@ -11,8 +11,8 @@ fi
 
 export SECRETSPEC_REASON="${SECRETSPEC_REASON:-Resolve Codex runtime secrets}"
 
-if secretspec -f "$SECRETSPEC_FILE" check --profile codex --no-prompt >/dev/null 2>&1; then
-  exec secretspec -f "$SECRETSPEC_FILE" run --profile codex -- \
+if secretspec -f "$SECRETSPEC_FILE" check --profile agents --no-prompt >/dev/null 2>&1; then
+  exec secretspec -f "$SECRETSPEC_FILE" run --profile agents -- \
     "$CODEX_ROUTER_ENV" --from-secretspec "$@"
 fi
 

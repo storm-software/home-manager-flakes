@@ -24,13 +24,16 @@ class CodexRouterEnvTests(unittest.TestCase):
         self.mock_codex.write_text(
             "#!/usr/bin/env python3\n"
             "import json, os, sys\n"
-            "print(json.dumps({"
+            "record = {"
             "'args': sys.argv[1:], "
             "'router_key': os.environ.get('WEAVE_ROUTER_KEY'), "
             "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID'), "
             "'context7_authorization': os.environ.get('CONTEXT7_AUTHORIZATION'), "
             "'context7_api_key': os.environ.get('CONTEXT7_API_KEY'), "
-            "'firecrawl_api_key': os.environ.get('FIRECRAWL_API_KEY')}))\n"
+            "'firecrawl_api_key': os.environ.get('FIRECRAWL_API_KEY')}\n"
+            "github_token = os.environ.get('CODEX_GITHUB_PERSONAL_ACCESS_TOKEN')\n"
+            "if github_token is not None: record['github_personal_access_token'] = github_token\n"
+            "print(json.dumps(record))\n"
         )
         self.mock_codex.chmod(0o755)
         self.systemctl_record = self.root / "systemctl.json"
@@ -76,6 +79,8 @@ class CodexRouterEnvTests(unittest.TestCase):
         env.pop("CONTEXT7_AUTHORIZATION", None)
         env.pop("CONTEXT7_API_KEY", None)
         env.pop("FIRECRAWL_API_KEY", None)
+        env.pop("GITHUB_TOKEN", None)
+        env.pop("CODEX_GITHUB_PERSONAL_ACCESS_TOKEN", None)
         if inherited:
             env.update(inherited)
         return subprocess.run(
@@ -169,6 +174,7 @@ class CodexRouterEnvTests(unittest.TestCase):
                 "CONTEXT7_AUTHORIZATION": "Bearer vault-context7",
                 "CONTEXT7_API_KEY": "vault-context7-key",
                 "FIRECRAWL_API_KEY": "vault-firecrawl-key",
+                "GITHUB_TOKEN": "vault-github-token",
             },
         )
 
@@ -182,7 +188,23 @@ class CodexRouterEnvTests(unittest.TestCase):
                 "context7_authorization": "Bearer vault-context7",
                 "context7_api_key": "vault-context7-key",
                 "firecrawl_api_key": "vault-firecrawl-key",
+                "github_personal_access_token": "vault-github-token",
             },
+        )
+
+    def test_exec_maps_github_secretspec_token_to_codex_mcp_variable(self):
+        result = self.run_helper(
+            "--from-secretspec",
+            "exec",
+            str(self.mock_codex),
+            "--version",
+            inherited={"GITHUB_TOKEN": "vault-github-token"},
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            json.loads(result.stdout)["github_personal_access_token"],
+            "vault-github-token",
         )
 
     def test_exec_clears_unmarked_mcp_values(self):

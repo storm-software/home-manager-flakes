@@ -23,14 +23,17 @@ class CodexSecretsEnvTests(unittest.TestCase):
         self.router.write_text(
             "#!/usr/bin/env python3\n"
             "import json, os, pathlib, sys\n"
-            "pathlib.Path(os.environ['ROUTER_RECORD']).write_text(json.dumps({\n"
+            "record = {\n"
             "  'args': sys.argv[1:],\n"
             "  'router_key': os.environ.get('WEAVE_ROUTER_KEY'),\n"
             "  'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID'),\n"
             "  'context7_authorization': os.environ.get('CONTEXT7_AUTHORIZATION'),\n"
             "  'context7_api_key': os.environ.get('CONTEXT7_API_KEY'),\n"
             "  'firecrawl_api_key': os.environ.get('FIRECRAWL_API_KEY'),\n"
-            "}))\n"
+            "}\n"
+            "github_token = os.environ.get('CODEX_GITHUB_PERSONAL_ACCESS_TOKEN')\n"
+            "if github_token is not None: record['github_personal_access_token'] = github_token\n"
+            "pathlib.Path(os.environ['ROUTER_RECORD']).write_text(json.dumps(record))\n"
         )
         self.router.chmod(0o755)
 
@@ -49,6 +52,7 @@ class CodexSecretsEnvTests(unittest.TestCase):
             "  'CONTEXT7_AUTHORIZATION': 'Bearer vault-context7',\n"
             "  'CONTEXT7_API_KEY': 'vault-context7-key',\n"
             "  'FIRECRAWL_API_KEY': 'vault-firecrawl-key',\n"
+            "  'GITHUB_TOKEN': 'vault-github-token',\n"
             "}\n"
             "os.execvpe(command[0], command, env)\n"
         )

@@ -18,10 +18,12 @@ if [[ "$from_secretspec" == true ]]; then
   secretspec_context7_authorization="${CONTEXT7_AUTHORIZATION:-}"
   secretspec_context7_api_key="${CONTEXT7_API_KEY:-}"
   secretspec_firecrawl_api_key="${FIRECRAWL_API_KEY:-}"
+  secretspec_github_token="${GITHUB_TOKEN:-}"
 fi
 
 unset WEAVE_ROUTER_KEY CODEX_CHATGPT_ACCOUNT_ID \
-  CONTEXT7_AUTHORIZATION CONTEXT7_API_KEY FIRECRAWL_API_KEY
+  CONTEXT7_AUTHORIZATION CONTEXT7_API_KEY FIRECRAWL_API_KEY GITHUB_TOKEN \
+  CODEX_GITHUB_PERSONAL_ACCESS_TOKEN
 
 if [[ "$from_secretspec" == true && -n "$secretspec_router_key" ]]; then
   export WEAVE_ROUTER_KEY="$secretspec_router_key"
@@ -48,6 +50,7 @@ if [[ "$from_secretspec" == true ]]; then
   [[ -n "$secretspec_context7_authorization" ]] && export CONTEXT7_AUTHORIZATION="$secretspec_context7_authorization"
   [[ -n "$secretspec_context7_api_key" ]] && export CONTEXT7_API_KEY="$secretspec_context7_api_key"
   [[ -n "$secretspec_firecrawl_api_key" ]] && export FIRECRAWL_API_KEY="$secretspec_firecrawl_api_key"
+  [[ -n "$secretspec_github_token" ]] && export CODEX_GITHUB_PERSONAL_ACCESS_TOKEN="$secretspec_github_token"
 fi
 
 case "${1:-}" in
@@ -60,9 +63,10 @@ case "${1:-}" in
     if [[ "$from_secretspec" == true ]] && {
       [[ -z "${CONTEXT7_AUTHORIZATION:-}" ]] ||
       [[ -z "${CONTEXT7_API_KEY:-}" ]] ||
-      [[ -z "${FIRECRAWL_API_KEY:-}" ]]
+      [[ -z "${FIRECRAWL_API_KEY:-}" ]] ||
+      [[ -z "${CODEX_GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]]
     }; then
-      echo "Codex MCP credentials unavailable from Proton Pass; Context7 or Firecrawl may not authenticate." >&2
+      echo "Codex MCP credentials unavailable from Proton Pass; Context7, Firecrawl, or GitHub may not authenticate." >&2
     fi
     exec "$@"
     ;;

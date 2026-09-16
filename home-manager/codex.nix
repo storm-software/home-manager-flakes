@@ -30,6 +30,14 @@ let
       // lib.optionalAttrs (remoteEnvHeaders != { }) {
         env_http_headers = remoteEnvHeaders;
       }
+      // lib.optionalAttrs (
+        lib.elem name [
+          "github/github-mcp-server"
+          "io.github.github/github-mcp-server"
+        ]
+      ) {
+        bearer_token_env_var = "CODEX_GITHUB_PERSONAL_ACCESS_TOKEN";
+      }
     else
       let
         inheritedEnv = lib.filterAttrs (
@@ -92,12 +100,14 @@ let
           "/home/development/repos/home-manager-flakes"
           "/home/development/repos/media-kit"
           "/home/development/repos/powerlines"
+          "/home/development/repos/power-plant"
           "/home/development/repos/razorwind"
           "/home/development/repos/shell-shock"
           "/home/development/repos/sourcebook"
           "/home/development/repos/storm-dev"
           "/home/development/repos/storm-ops"
           "/home/development/repos/stryke"
+          "/home/development/repos/telepathic"
         ]
         (_path: {
           trust_level = "trusted";
