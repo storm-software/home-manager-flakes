@@ -30,14 +30,15 @@ let
       // lib.optionalAttrs (remoteEnvHeaders != { }) {
         env_http_headers = remoteEnvHeaders;
       }
-      // lib.optionalAttrs (
-        lib.elem name [
-          "github/github-mcp-server"
-          "io.github.github/github-mcp-server"
-        ]
-      ) {
-        bearer_token_env_var = "CODEX_GITHUB_PERSONAL_ACCESS_TOKEN";
-      }
+      //
+        lib.optionalAttrs
+          (lib.elem name [
+            "github/github-mcp-server"
+            "io.github.github/github-mcp-server"
+          ])
+          {
+            bearer_token_env_var = "CODEX_GITHUB_PERSONAL_ACCESS_TOKEN";
+          }
     else
       let
         inheritedEnv = lib.filterAttrs (
@@ -65,7 +66,7 @@ let
     personality = "pragmatic";
     service_tier = "default";
     forced_login_method = "chatgpt";
-    openai_base_url = "http://127.0.0.1:8080/v1";
+    # openai_base_url = "http://127.0.0.1:8080/v1";
 
     features = {
       hooks = true;
@@ -76,18 +77,18 @@ let
       generate_memories = true;
       use_memories = true;
     };
-    model_providers.weave = {
-      name = "Weave Router";
-      base_url = "http://127.0.0.1:8080/v1";
-      wire_api = "responses";
-      requires_openai_auth = true;
-      supports_websockets = false;
-      http_headers.X-App = "codex";
-      env_http_headers = {
-        X-Weave-Router-Key = "WEAVE_ROUTER_KEY";
-        ChatGPT-Account-ID = "CODEX_CHATGPT_ACCOUNT_ID";
-      };
-    };
+    # model_providers.weave = {
+    #   name = "Weave Router";
+    #   base_url = "http://127.0.0.1:8080/v1";
+    #   wire_api = "responses";
+    #   requires_openai_auth = true;
+    #   supports_websockets = false;
+    #   http_headers.X-App = "codex";
+    #   env_http_headers = {
+    #     X-Weave-Router-Key = "WEAVE_ROUTER_KEY";
+    #     ChatGPT-Account-ID = "CODEX_CHATGPT_ACCOUNT_ID";
+    #   };
+    # };
     mcp_servers = codexMcpServers;
     plugins."prisma@plugins-cli".enabled = true;
 
