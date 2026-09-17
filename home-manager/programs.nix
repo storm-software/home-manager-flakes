@@ -17,7 +17,7 @@
   devenv = {
     enable = true;
     enableZshIntegration = true;
-    package = pkgs.unstable.devenv;
+    package = pkgs.stable.devenv;
   };
 
   gh = import ./gh.nix { inherit user; };
