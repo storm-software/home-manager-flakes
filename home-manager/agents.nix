@@ -116,6 +116,13 @@ let
       : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
       mkdir -p ${lib.escapeShellArg headroomHome}
       export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
+      upstream_args=()
+      if [[ "''${STORM_SETUP_WEAVE_ROUTER:-1}" != 0 ]]; then
+        upstream_args+=(
+          --openai-api-url http://127.0.0.1:8080
+          --anthropic-api-url http://127.0.0.1:8080
+        )
+      fi
       exec docker run --rm --name headroom-proxy \
         --network host \
         --user "$(id -u):$(id -g)" \
@@ -129,8 +136,7 @@ let
           --host 127.0.0.1 \
           --port 8787 \
           --mode cache \
-          --openai-api-url http://127.0.0.1:8080 \
-          --anthropic-api-url http://127.0.0.1:8080 \
+          "''${upstream_args[@]}" \
           --no-telemetry
     '';
   };
@@ -166,14 +172,14 @@ in
     fi
   '';
 
-  # Headroom starts after Weave has installed its client settings. The helper
-  # keeps Claude on Headroom, but points Codex directly at Weave so ChatGPT OAuth
-  # reaches the router instead of Headroom's fixed subscription endpoint.
+  # Headroom uses the shared rootless Docker daemon. It sends requests through
+  # Weave Router by default, or directly to native providers when Weave is
+  # skipped during activation.
   systemd.user.services.headroom = {
     Unit = {
       Description = "Headroom context-optimization proxy";
-      Requires = [ "weave-router.service" ];
-      After = [ "weave-router.service" ];
+      Requires = [ "weave-docker.service" ];
+      After = [ "weave-docker.service" ];
     };
     Service = {
       ExecStartPre = "${configureHeadroomClients}/bin/configure-headroom-clients";
@@ -181,7 +187,7 @@ in
       Restart = "on-failure";
       RestartSec = 5;
     };
-    # The activation wrapper starts this after the router has configured
-    # its client settings. It is started by activation, not default.target.
+    # The activation wrapper starts this after installing the agent settings.
+    # It is started by activation, not default.target.
   };
 }

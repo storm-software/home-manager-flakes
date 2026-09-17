@@ -18,11 +18,12 @@ nix build path:.#homeConfigurations.development.activationPackage
 ./result/activate
 ```
 
-The activation wrapper starts the router and its dependent Headroom proxy by
-default. Pass `--skip-weave-router` to skip starting those services, or
-`--skip-displaylink` to skip DisplayLink setup. The initial container build
-downloads Go/npm dependencies, native libraries and model weights; it can take
-several minutes and requires network access and several GB of disk space.
+The activation wrapper starts the router and Headroom proxy by default. Pass
+`--skip-weave-router` to leave the router stopped and run Headroom directly
+against the native providers, or `--skip-displaylink` to skip DisplayLink
+setup. The initial container build downloads Go/npm dependencies, native
+libraries and model weights; it can take several minutes and requires network
+access and several GB of disk space.
 The router source is pinned; upstream container base tags and dependency
 downloads are resolved at container build time, not by a Nix sandbox build.
 

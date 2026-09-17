@@ -81,6 +81,7 @@ class ActivateWrapperTests(unittest.TestCase):
             self.log.read_text().splitlines(),
             [
                 "activate-inner weave=1",
+                "systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER",
                 "systemctl --user restart weave-router.service",
                 "codex-secrets-env import",
                 "systemctl --user restart headroom.service",
@@ -88,11 +89,19 @@ class ActivateWrapperTests(unittest.TestCase):
             ],
         )
 
-    def test_skip_weave_router_skips_services_import_and_login(self):
+    def test_skip_weave_router_still_imports_environment_and_starts_headroom(self):
         result = self.run_activate("--skip-displaylink", "--skip-weave-router")
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.log.read_text().splitlines(), ["activate-inner weave=0"])
+        self.assertEqual(
+            self.log.read_text().splitlines(),
+            [
+                "activate-inner weave=0",
+                "systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER",
+                "codex-secrets-env import",
+                "systemctl --user restart headroom.service",
+            ],
+        )
 
 
 if __name__ == "__main__":

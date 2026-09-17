@@ -52,7 +52,7 @@ Backup options (same as home-manager switch):
 
 Other options:
   --skip-displaylink   Skip displaylink-setup after successful activation
-  --skip-weave-router  Skip starting Weave Router after successful activation
+  --skip-weave-router  Run Headroom without starting Weave Router
   --driver-version N
                    Activation driver version (0 or 1)
   -h, --help       Show this help message
@@ -73,6 +73,8 @@ fi
 
 "$inner" "${remaining[@]}"
 
+systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER
+
 if [[ "$setup_displaylink" == true ]]; then
   setup="$HOME/.nix-profile/bin/displaylink-setup"
   if [[ ! -x "$setup" ]]; then
@@ -86,9 +88,12 @@ fi
 
 if [[ "$setup_weave_router" == true ]]; then
   systemctl --user restart weave-router.service
-  @codex_secrets_env@ import
-  systemctl --user restart headroom.service
+fi
 
+@codex_secrets_env@ import
+systemctl --user restart headroom.service
+
+if [[ "$setup_weave_router" == true ]]; then
   login="$HOME/.nix-profile/bin/weave-router-login-codex"
   if [[ ! -x "$login" ]]; then
     echo "$0: weave-router-login-codex was not installed by activation" >&2
