@@ -23,7 +23,7 @@ class ActivateWrapperTests(unittest.TestCase):
 
         self.make_command(
             self.result / "activate-inner",
-            "printf '%s\\n' 'activate-inner' >> \"$ACTIVATION_LOG\"",
+            "printf 'activate-inner weave=%s\\n' \"${STORM_SETUP_WEAVE_ROUTER:-unset}\" >> \"$ACTIVATION_LOG\"",
         )
         self.make_command(
             self.bin / "systemctl",
@@ -80,7 +80,7 @@ class ActivateWrapperTests(unittest.TestCase):
         self.assertEqual(
             self.log.read_text().splitlines(),
             [
-                "activate-inner",
+                "activate-inner weave=1",
                 "systemctl --user restart weave-router.service",
                 "codex-secrets-env import",
                 "systemctl --user restart headroom.service",
@@ -92,7 +92,7 @@ class ActivateWrapperTests(unittest.TestCase):
         result = self.run_activate("--skip-displaylink", "--skip-weave-router")
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.log.read_text().splitlines(), ["activate-inner"])
+        self.assertEqual(self.log.read_text().splitlines(), ["activate-inner weave=0"])
 
 
 if __name__ == "__main__":

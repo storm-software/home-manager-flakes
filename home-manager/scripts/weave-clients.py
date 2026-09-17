@@ -121,17 +121,17 @@ def configure(home, state, key):
     update(home / ".vibe/config.toml", tomlkit.loads, tomlkit.dumps, vibe)
 
     def codex(value):
-        # providers = value.setdefault("model_providers", tomlkit.table())
-        # weave = providers.setdefault("weave", tomlkit.table())
-        # normalize_codex_provider(weave, base + "/v1", key)
-        # if "headroom" in providers:
-        #     normalize_codex_provider(
-        #         providers["headroom"],
-        #         str(providers["headroom"].get("base_url", "http://127.0.0.1:8787/v1")),
-        #         key,
-        #     )
-        # value["model_provider"] = "weave"
-        # value["openai_base_url"] = base + "/v1"
+        providers = value.setdefault("model_providers", tomlkit.table())
+        weave = providers.setdefault("weave", tomlkit.table())
+        normalize_codex_provider(weave, base + "/v1", key)
+        if "headroom" in providers:
+            normalize_codex_provider(
+                providers["headroom"],
+                str(providers["headroom"].get("base_url", "http://127.0.0.1:8787/v1")),
+                key,
+            )
+        value["model_provider"] = "weave"
+        value["openai_base_url"] = base + "/v1"
         value["forced_login_method"] = "chatgpt"
 
     update(home / ".codex/config.toml", tomlkit.loads, tomlkit.dumps, codex, backup=False)

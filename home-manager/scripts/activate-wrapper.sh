@@ -65,6 +65,12 @@ USAGE
   esac
 done
 
+if [[ "$setup_weave_router" == true ]]; then
+  export STORM_SETUP_WEAVE_ROUTER=1
+else
+  export STORM_SETUP_WEAVE_ROUTER=0
+fi
+
 "$inner" "${remaining[@]}"
 
 if [[ "$setup_displaylink" == true ]]; then

@@ -61,13 +61,10 @@ let
   tomlFormat = pkgs.formats.toml { };
   codexSettings = {
     model = "gpt-5.6-terra";
-    # model_provider = "weave";
     model_reasoning_effort = "high";
     personality = "pragmatic";
     service_tier = "default";
     forced_login_method = "chatgpt";
-    # openai_base_url = "http://127.0.0.1:8080/v1";
-
     features = {
       hooks = true;
       memories = true;
@@ -77,18 +74,6 @@ let
       generate_memories = true;
       use_memories = true;
     };
-    # model_providers.weave = {
-    #   name = "Weave Router";
-    #   base_url = "http://127.0.0.1:8080/v1";
-    #   wire_api = "responses";
-    #   requires_openai_auth = true;
-    #   supports_websockets = false;
-    #   http_headers.X-App = "codex";
-    #   env_http_headers = {
-    #     X-Weave-Router-Key = "WEAVE_ROUTER_KEY";
-    #     ChatGPT-Account-ID = "CODEX_CHATGPT_ACCOUNT_ID";
-    #   };
-    # };
     mcp_servers = codexMcpServers;
     plugins."prisma@plugins-cli".enabled = true;
 
@@ -115,7 +100,25 @@ let
         });
   };
 
-  codexConfig = tomlFormat.generate "codex-config.toml" codexSettings;
+  weaveCodexSettings = codexSettings // {
+    model_provider = "weave";
+    openai_base_url = "http://127.0.0.1:8080/v1";
+    model_providers.weave = {
+      name = "Weave Router";
+      base_url = "http://127.0.0.1:8080/v1";
+      wire_api = "responses";
+      requires_openai_auth = true;
+      supports_websockets = false;
+      http_headers.X-App = "codex";
+      env_http_headers = {
+        X-Weave-Router-Key = "WEAVE_ROUTER_KEY";
+        ChatGPT-Account-ID = "CODEX_CHATGPT_ACCOUNT_ID";
+      };
+    };
+  };
+
+  directCodexConfig = tomlFormat.generate "codex-config-direct.toml" codexSettings;
+  weaveCodexConfig = tomlFormat.generate "codex-config-weave.toml" weaveCodexSettings;
 
   installCodexConfig = pkgs.writeShellApplication {
     name = "install-codex-config";
@@ -189,30 +192,30 @@ in
   };
 
   config = {
-    # assertions = [
-    #   {
-    #     assertion = lib.all (server: lib.all builtins.isString (lib.attrValues server.env)) (
-    #       lib.attrValues config.programs.mcp.servers
-    #     );
-    #     message = "Codex MCP translation currently requires string env references";
-    #   }
-    #   {
-    #     assertion = codexSettings.model == "gpt-5.6-terra";
-    #     message = "Codex must use gpt-5.6-terra as its request model";
-    #   }
-    #   {
-    #     assertion = !(codexSettings.model_providers.weave.http_headers ? X-Weave-Force-Model);
-    #     message = "Codex must not force a Weave model";
-    #   }
-    #   {
-    #     assertion = !(codexSettings.model_providers.weave ? env_key);
-    #     message = "Codex must use ChatGPT OAuth, not OPENAI_API_KEY";
-    #   }
-    #   {
-    #     assertion = !(codexSettings ? hooks);
-    #     message = "The Weave installer owns Codex hook registrations; the Nix baseline must not duplicate them";
-    #   }
-    # ];
+    assertions = [
+      {
+        assertion = lib.all (server: lib.all builtins.isString (lib.attrValues server.env)) (
+          lib.attrValues config.programs.mcp.servers
+        );
+        message = "Codex MCP translation currently requires string env references";
+      }
+      {
+        assertion = weaveCodexSettings.model == "gpt-5.6-terra";
+        message = "Codex must use gpt-5.6-terra as its request model";
+      }
+      {
+        assertion = !(weaveCodexSettings.model_providers.weave.http_headers ? X-Weave-Force-Model);
+        message = "Codex must not force a Weave model";
+      }
+      {
+        assertion = !(weaveCodexSettings.model_providers.weave ? env_key);
+        message = "Codex must use ChatGPT OAuth, not OPENAI_API_KEY";
+      }
+      {
+        assertion = !(codexSettings ? hooks);
+        message = "The Weave installer owns Codex hook registrations; the Nix baseline must not duplicate them";
+      }
+    ];
 
     home.packages = [
       codex
@@ -222,8 +225,13 @@ in
     ];
 
     home.activation.installCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      if [ "''${STORM_SETUP_WEAVE_ROUTER:-1}" = 0 ]; then
+        codex_config=${directCodexConfig}
+      else
+        codex_config=${weaveCodexConfig}
+      fi
       $DRY_RUN_CMD ${installCodexConfig}/bin/install-codex-config \
-        ${codexConfig} ${lib.escapeShellArg config.home.homeDirectory}
+        "$codex_config" ${lib.escapeShellArg config.home.homeDirectory}
     '';
 
     storm.codex.secretsEnvPackage = codexSecretsEnv;

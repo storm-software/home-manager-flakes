@@ -1,8 +1,8 @@
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://public.storm-cdn.com/storm-software/media/socials-1280x640-dark.gif">
-  <source media="(prefers-color-scheme: light)" srcset="https://public.storm-cdn.com/storm-software/media/socials-1280x640-light.gif">
-<img src="https://public.storm-cdn.com/storm-software/media/socials-1280x640-dark.gif" width="100%" alt="Storm Software" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://public.storm-cdn.com/storm-software/media/socials-1280x427-dark.gif">
+  <source media="(prefers-color-scheme: light)" srcset="https://public.storm-cdn.com/storm-software/media/socials-1280x427-light.gif">
+<img src="https://public.storm-cdn.com/storm-software/media/socials-1280x427-dark.gif" width="100%" alt="Storm Software" />
 </picture>
 </div>
 <br />
@@ -23,6 +23,16 @@ A repository containing various NixOS Home Manager configurations that are used 
 
 <br />
 <h3 align="center">💻 Visit <a href="https://stormsoftware.com" target="_blank">stormsoftware.com</a> to stay up to date with this developer</h3>
+
+## Installation
+
+To install the NixOS Home Manager flake configurations on your local system, you can use the following commands:
+
+```bash
+nix build "github:storm-software/home-manager-flakes#homeConfigurations.development.activationPackage"
+
+./result/activate
+```
 
 ## Acknowledgements
 
