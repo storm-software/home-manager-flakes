@@ -61,7 +61,7 @@ let
   tomlFormat = pkgs.formats.toml { };
   codexSettings = {
     model = "gpt-5.6-terra";
-    model_provider = "weave";
+    # model_provider = "weave";
     model_reasoning_effort = "high";
     personality = "pragmatic";
     service_tier = "default";
