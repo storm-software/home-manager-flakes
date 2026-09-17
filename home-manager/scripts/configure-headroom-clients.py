@@ -98,11 +98,11 @@ def configure_codex(home: Path) -> None:
     # proxy. Preserve the private router key materialized by Weave setup so the
     # upstream status CLI can authenticate; the OAuth account ID stays in the
     # environment.
-    providers = config.setdefault("model_providers", tomlkit.table())
-    weave = providers.setdefault("weave", tomlkit.table())
-    normalize_codex_provider(weave, f"{WEAVE_URL}/v1")
-    config["model_provider"] = "weave"
-    config["openai_base_url"] = f"{WEAVE_URL}/v1"
+    # providers = config.setdefault("model_providers", tomlkit.table())
+    # weave = providers.setdefault("weave", tomlkit.table())
+    # normalize_codex_provider(weave, f"{WEAVE_URL}/v1")
+    # config["model_provider"] = "weave"
+    # config["openai_base_url"] = f"{WEAVE_URL}/v1"
     config["forced_login_method"] = "chatgpt"
     path.write_text(tomlkit.dumps(config))
 
