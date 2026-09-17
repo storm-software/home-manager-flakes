@@ -45,11 +45,16 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             self.assertFalse(provider["supports_websockets"])
             self.assertNotIn("env_key", provider)
             self.assertNotIn("experimental_bearer_token", provider)
-            self.assertEqual(dict(provider["http_headers"]), {"X-App": "codex"})
+            self.assertEqual(
+                dict(provider["http_headers"]),
+                {
+                    "X-Weave-Router-Key": "rk_test",
+                    "X-App": "codex",
+                },
+            )
             self.assertEqual(
                 dict(provider["env_http_headers"]),
                 {
-                    "X-Weave-Router-Key": "WEAVE_ROUTER_KEY",
                     "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
                 },
             )

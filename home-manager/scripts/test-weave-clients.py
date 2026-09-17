@@ -126,16 +126,21 @@ esac
             self.assertFalse(provider["supports_websockets"])
             self.assertNotIn("env_key", provider)
             self.assertNotIn("experimental_bearer_token", provider)
-            self.assertEqual(dict(provider["http_headers"]), {"X-App": "codex"})
+            self.assertEqual(
+                dict(provider["http_headers"]),
+                {
+                    "X-App": "codex",
+                    "X-Weave-Router-Key": "rk_test_second",
+                },
+            )
             self.assertEqual(
                 dict(provider["env_http_headers"]),
                 {
-                    "X-Weave-Router-Key": "WEAVE_ROUTER_KEY",
                     "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
                 },
             )
             self.assertFalse((home / ".codex/config.toml.pre-weave").exists())
-            self.assertNotIn("rk_test", (home / ".codex/config.toml").read_text())
+            self.assertNotIn("rk_test_first", (home / ".codex/config.toml").read_text())
             self.assertNotIn("legacy-account", (home / ".codex/config.toml").read_text())
             hermes = yaml.safe_load((home / ".hermes/config.yaml").read_text())
             self.assertEqual(hermes["model"]["provider"], "custom:weave")

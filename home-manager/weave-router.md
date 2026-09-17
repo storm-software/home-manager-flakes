@@ -43,6 +43,9 @@ The first start creates private files under `~/.local/state/weave-router/`
 - `secrets.env`: generated database password, dashboard admin password, and
   Tink encryption key for dashboard BYOK credentials.
 - `router-key`: generated `rk_...` client credential, reused across restarts.
+  Router setup also materializes this key in the mode-`0600` mutable
+  `~/.codex/config.toml` so the upstream Codex status command can authenticate;
+  the secret-free Nix-store template contains only an environment reference.
 - `client.env`: runtime credentials/settings loaded by the Copilot wrapper.
 
 Edit `providers.env`, then run:

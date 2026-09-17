@@ -18,7 +18,7 @@ FORBIDDEN_STATIC_HEADERS = {
 }
 
 
-def normalize_codex_provider(provider: dict, base_url: str) -> None:
+def normalize_codex_provider(provider: dict, base_url: str, router_key: str) -> None:
     provider["base_url"] = base_url
     provider["wire_api"] = "responses"
     provider["requires_openai_auth"] = True
@@ -31,13 +31,13 @@ def normalize_codex_provider(provider: dict, base_url: str) -> None:
         if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
             static_headers[name] = str(value)
     static_headers["X-App"] = "codex"
+    static_headers["X-Weave-Router-Key"] = router_key
     provider["http_headers"] = static_headers
 
     env_headers = tomlkit.inline_table()
     for name, value in provider.get("env_http_headers", {}).items():
         if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
             env_headers[name] = str(value)
-    env_headers["X-Weave-Router-Key"] = "WEAVE_ROUTER_KEY"
     env_headers["ChatGPT-Account-ID"] = "CODEX_CHATGPT_ACCOUNT_ID"
     provider["env_http_headers"] = env_headers
 
@@ -123,11 +123,12 @@ def configure(home, state, key):
     def codex(value):
         providers = value.setdefault("model_providers", tomlkit.table())
         weave = providers.setdefault("weave", tomlkit.table())
-        normalize_codex_provider(weave, base + "/v1")
+        normalize_codex_provider(weave, base + "/v1", key)
         if "headroom" in providers:
             normalize_codex_provider(
                 providers["headroom"],
                 str(providers["headroom"].get("base_url", "http://127.0.0.1:8787/v1")),
+                key,
             )
         value["model_provider"] = "weave"
         value["openai_base_url"] = base + "/v1"

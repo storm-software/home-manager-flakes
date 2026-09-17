@@ -31,10 +31,20 @@ def normalize_codex_provider(provider: dict, base_url: str) -> None:
     provider.pop("env_key", None)
     provider.pop("experimental_bearer_token", None)
 
+    router_key = next(
+        (
+            str(value)
+            for name, value in provider.get("http_headers", {}).items()
+            if name.casefold() == "x-weave-router-key" and str(value)
+        ),
+        None,
+    )
     static_headers = tomlkit.inline_table()
     for name, value in provider.get("http_headers", {}).items():
         if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
             static_headers[name] = str(value)
+    if router_key is not None:
+        static_headers["X-Weave-Router-Key"] = router_key
     static_headers["X-App"] = "codex"
     provider["http_headers"] = static_headers
 
@@ -42,7 +52,8 @@ def normalize_codex_provider(provider: dict, base_url: str) -> None:
     for name, value in provider.get("env_http_headers", {}).items():
         if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
             env_headers[name] = str(value)
-    env_headers["X-Weave-Router-Key"] = "WEAVE_ROUTER_KEY"
+    if router_key is None:
+        env_headers["X-Weave-Router-Key"] = "WEAVE_ROUTER_KEY"
     env_headers["ChatGPT-Account-ID"] = "CODEX_CHATGPT_ACCOUNT_ID"
     provider["env_http_headers"] = env_headers
 
@@ -84,7 +95,9 @@ def configure_codex(home: Path) -> None:
 
     # Keep Codex directly on Weave: Headroom deliberately routes ChatGPT
     # session auth to chatgpt.com and therefore cannot relay it to another
-    # proxy. Credential header values are supplied by Codex's environment.
+    # proxy. Preserve the private router key materialized by Weave setup so the
+    # upstream status CLI can authenticate; the OAuth account ID stays in the
+    # environment.
     providers = config.setdefault("model_providers", tomlkit.table())
     weave = providers.setdefault("weave", tomlkit.table())
     normalize_codex_provider(weave, f"{WEAVE_URL}/v1")
