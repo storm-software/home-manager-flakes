@@ -25,8 +25,9 @@ FORBIDDEN_STATIC_HEADERS = {
 
 
 def normalize_codex_provider(
-    provider: dict, base_url: str, *, use_weave_router: bool
+    provider: dict, name: str, base_url: str, *, use_weave_router: bool
 ) -> None:
+    provider["name"] = name
     provider["base_url"] = base_url
     provider["wire_api"] = "responses"
     provider["requires_openai_auth"] = True
@@ -96,24 +97,29 @@ def configure_codex(home: Path, *, use_weave_router: bool) -> None:
     except Exception as error:
         raise SystemExit(f"{path} is invalid TOML: {error}; refusing to overwrite it") from error
 
-    # providers = config.setdefault("model_providers", tomlkit.table())
-    # if use_weave_router:
-    #     # Keep Codex directly on Weave when the router is enabled. Headroom
-    #     # remains in front of Claude and relays that traffic to Weave.
-    #     provider_name = "weave"
-    #     base_url = f"{WEAVE_URL}/v1"
-    # else:
-    #     # Both keys are needed for ChatGPT subscription users: model_provider
-    #     # selects Headroom for API-key mode, while openai_base_url prevents
-    #     # Codex's built-in subscription provider from bypassing the proxy.
-    #     provider_name = "headroom"
-    #     base_url = f"{HEADROOM_URL}/v1"
-    # provider = providers.setdefault(provider_name, tomlkit.table())
-    # normalize_codex_provider(
-    #     provider, base_url, use_weave_router=use_weave_router
-    # )
-    # config["model_provider"] = provider_name
-    # config["openai_base_url"] = base_url
+    providers = config.setdefault("model_providers", tomlkit.table())
+    if use_weave_router:
+        # Keep Codex directly on Weave when the router is enabled. Headroom
+        # remains in front of Claude and relays that traffic to Weave.
+        provider_name = "weave"
+        provider_display_name = "Weave Router"
+        base_url = f"{WEAVE_URL}/v1"
+    else:
+        # Both keys are needed for ChatGPT subscription users: model_provider
+        # selects Headroom for API-key mode, while openai_base_url prevents
+        # Codex's built-in subscription provider from bypassing the proxy.
+        provider_name = "headroom"
+        provider_display_name = "Headroom"
+        base_url = f"{HEADROOM_URL}/v1"
+    provider = providers.setdefault(provider_name, tomlkit.table())
+    normalize_codex_provider(
+        provider,
+        provider_display_name,
+        base_url,
+        use_weave_router=use_weave_router,
+    )
+    config["model_provider"] = provider_name
+    config["openai_base_url"] = base_url
     config["forced_login_method"] = "chatgpt"
     path.write_text(tomlkit.dumps(config))
 

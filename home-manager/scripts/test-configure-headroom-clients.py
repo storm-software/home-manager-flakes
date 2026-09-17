@@ -39,6 +39,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             config = tomlkit.parse(path.read_text())
             provider = config["model_providers"]["headroom"]
             self.assertEqual(config["model_provider"], "headroom")
+            self.assertEqual(provider["name"], "Headroom")
             self.assertEqual(config["forced_login_method"], "chatgpt")
             self.assertEqual(config["openai_base_url"], "http://127.0.0.1:8787/v1")
             self.assertTrue(provider["requires_openai_auth"])
@@ -114,6 +115,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             config = tomlkit.parse(path.read_text())
             provider = config["model_providers"]["weave"]
             self.assertEqual(config["model_provider"], "weave")
+            self.assertEqual(provider["name"], "Weave Router")
             self.assertEqual(config["openai_base_url"], "http://127.0.0.1:8080/v1")
             self.assertEqual(provider["base_url"], "http://127.0.0.1:8080/v1")
             self.assertEqual(
