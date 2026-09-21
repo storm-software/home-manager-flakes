@@ -9,7 +9,9 @@ let
   activateWrapper = pkgs.runCommand "activate-wrapper" { } ''
     substitute ${./scripts/activate-wrapper.sh} "$out" \
       --replace-fail '@codex_secrets_env@' \
-      '${config.storm.codex.secretsEnvPackage}/bin/codex-secrets-env'
+      '${config.storm.codex.secretsEnvPackage}/bin/codex-secrets-env' \
+      --replace-fail '@storm_agent_setup_mode@' \
+      '${pkgs.bash}/bin/bash ${./scripts/storm-agent-setup-mode.sh}'
     chmod +x "$out"
   '';
 in

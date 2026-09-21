@@ -73,11 +73,28 @@ let
   };
   headroomImage = "ghcr.io/headroomlabs-ai/headroom@sha256:4e559273659ebc5ce8711a60278e288550fa596377af18a7058e10036d63ef0b";
   headroomHome = "${config.home.homeDirectory}/.headroom";
+  agentSetupState = "${config.xdg.stateHome}/storm/agent-setup.env";
   headroomPython = pkgs.python3.withPackages (ps: [ ps.tomlkit ]);
+  agentSetupMode = pkgs.writeShellApplication {
+    name = "storm-agent-setup-mode";
+    runtimeInputs = [
+      pkgs.bash
+      pkgs.coreutils
+    ];
+    text = ''
+      export STORM_AGENT_SETUP_STATE=${lib.escapeShellArg agentSetupState}
+      exec bash ${./scripts/storm-agent-setup-mode.sh} "$@"
+    '';
+  };
   configureHeadroomClients = pkgs.writeShellApplication {
     name = "configure-headroom-clients";
-    runtimeInputs = [ headroomPython ];
+    runtimeInputs = [
+      agentSetupMode
+      headroomPython
+    ];
     text = ''
+      setup_mode="$(storm-agent-setup-mode)"
+      export STORM_SETUP_WEAVE_ROUTER="$setup_mode"
       exec ${headroomPython}/bin/python ${./scripts/configure-headroom-clients.py} \
         ${lib.escapeShellArg config.home.homeDirectory}
     '';
@@ -111,13 +128,14 @@ let
       pkgs.bash
       pkgs.coreutils
       pkgs.docker
+      agentSetupMode
     ];
     text = ''
       : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
       mkdir -p ${lib.escapeShellArg headroomHome}
       export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
       upstream_args=()
-      if [[ "''${STORM_SETUP_WEAVE_ROUTER:-1}" != 0 ]]; then
+      if [[ "$(storm-agent-setup-mode)" != 0 ]]; then
         upstream_args+=(
           --openai-api-url http://127.0.0.1:8080
           --anthropic-api-url http://127.0.0.1:8080
@@ -187,7 +205,8 @@ in
       Restart = "on-failure";
       RestartSec = 5;
     };
-    # The activation wrapper starts this after installing the agent settings.
-    # It is started by activation, not default.target.
+    # Start standalone Headroom at login. Its setup mode is persisted by the
+    # activation wrapper, so this does not start the optional Weave router.
+    Install.WantedBy = [ "default.target" ];
   };
 }

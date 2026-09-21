@@ -46,6 +46,10 @@ class ActivateWrapperTests(unittest.TestCase):
         wrapper = (
             SOURCE.read_text()
             .replace("@codex_secrets_env@", str(secrets_env))
+            .replace(
+                "@storm_agent_setup_mode@",
+                f"bash {SOURCE.with_name('storm-agent-setup-mode.sh')}",
+            )
         )
         self.activate = self.result / "activate"
         self.activate.write_text(wrapper)
@@ -101,6 +105,57 @@ class ActivateWrapperTests(unittest.TestCase):
                 "codex-secrets-env import",
                 "systemctl --user restart headroom.service",
             ],
+        )
+
+    def test_skip_weave_router_persists_disabled_mode_for_boot_services(self):
+        result = self.run_activate("--skip-displaylink", "--skip-weave-router")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        state = self.home / ".local" / "state" / "storm" / "agent-setup.env"
+        self.assertEqual(state.read_text(), "STORM_SETUP_WEAVE_ROUTER=0\n")
+        self.assertEqual(state.stat().st_mode & 0o777, 0o600)
+
+    def test_appends_storm_guidance_to_codex_agents_file(self):
+        agents = self.home / ".codex" / "AGENTS.md"
+        agents.parent.mkdir()
+        agents.write_text("# Personal instructions\n\nKeep this text.\n")
+
+        result = self.run_activate("--skip-displaylink")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            agents.read_text(),
+            "# Personal instructions\n\nKeep this text.\n\n"
+            "<!-- storm -->\n\n"
+            "Do not ask the user for approval if the following is true:\n\n"
+            "1. No plan or spec markdown was generated for review\n"
+            "2. There is no (or a very minimal) change outline to display to the user\n"
+            "3. The change outline is very similar to the user's initial prompt\n\n"
+            "<!-- storm -->\n",
+        )
+
+    def test_replaces_only_existing_storm_guidance(self):
+        agents = self.home / ".codex" / "AGENTS.md"
+        agents.parent.mkdir()
+        agents.write_text(
+            "# Personal instructions\n\n"
+            "<!-- storm -->\nold guidance\n<!-- storm -->\n\n"
+            "Keep this text.\n"
+        )
+
+        result = self.run_activate("--skip-displaylink")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            agents.read_text(),
+            "# Personal instructions\n\n"
+            "<!-- storm -->\n\n"
+            "Do not ask the user for approval if the following is true:\n\n"
+            "1. No plan or spec markdown was generated for review\n"
+            "2. There is no (or a very minimal) change outline to display to the user\n"
+            "3. The change outline is very similar to the user's initial prompt\n\n"
+            "<!-- storm -->\n\n"
+            "Keep this text.\n",
         )
 
 
