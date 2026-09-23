@@ -131,7 +131,7 @@ def main() -> None:
     configure_claude(home)
     configure_codex(
         home,
-        use_weave_router=os.environ.get("STORM_SETUP_WEAVE_ROUTER", "1") != "0",
+        use_weave_router=os.environ.get("STORM_SETUP_WEAVE_ROUTER", "0") == "1",
     )
 
 

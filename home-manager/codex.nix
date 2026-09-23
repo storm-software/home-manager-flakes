@@ -225,10 +225,10 @@ in
     ];
 
     home.activation.installCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [ "''${STORM_SETUP_WEAVE_ROUTER:-1}" = 0 ]; then
-        codex_config=${directCodexConfig}
-      else
+      if [ "''${STORM_SETUP_WEAVE_ROUTER:-0}" = 1 ]; then
         codex_config=${weaveCodexConfig}
+      else
+        codex_config=${directCodexConfig}
       fi
       $DRY_RUN_CMD ${installCodexConfig}/bin/install-codex-config \
         "$codex_config" ${lib.escapeShellArg config.home.homeDirectory}

@@ -26,9 +26,9 @@ read_mode() {
         ;;
     esac
   fi
-  # Preserve the historical behavior until the first activation records a
-  # selection. Every subsequent service start uses the persisted selection.
-  mode="${mode:-1}"
+  # Keep Weave Router opt-in until activation records a selection. Every
+  # subsequent service start uses the persisted selection.
+  mode="${mode:-0}"
   validate_mode "$mode"
   printf '%s\n' "$mode"
 }

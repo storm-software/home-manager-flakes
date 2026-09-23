@@ -18,10 +18,9 @@ nix build path:.#homeConfigurations.development.activationPackage
 ./result/activate
 ```
 
-The activation wrapper starts the router and Headroom proxy by default. Pass
-`--skip-weave-router` to leave the router stopped and run Headroom directly
-against the native providers, or `--skip-displaylink` to skip DisplayLink
-setup. The initial container build downloads Go/npm dependencies, native
+The activation wrapper starts Headroom by default. Pass `--weave-router` to
+also start the router, or `--skip-displaylink` to skip DisplayLink setup. The
+initial container build downloads Go/npm dependencies, native
 libraries and model weights; it can take several minutes and requires network
 access and several GB of disk space.
 The router source is pinned; upstream container base tags and dependency
@@ -62,11 +61,11 @@ API key or a supported subscription credential; an `rk_` key alone is not an
 upstream credential. Upstream API usage is billed by the provider.
 No credentials enter the Nix store. Prompt-content telemetry is disabled.
 
-Activation enables the router's encrypted subscription pool and runs
-`weave-router-login-codex` after the service is ready. On first use, follow the
-printed OpenAI device-login URL and code to enroll the ChatGPT Pro account. A
-later activation detects the enabled Codex account and skips login. The refresh
-token is encrypted in the local PostgreSQL volume; it is not written to
+Activation with `--weave-router` enables the router's encrypted subscription
+pool and runs `weave-router-login-codex` after the service is ready. On first
+use, follow the printed OpenAI device-login URL and code to enroll the ChatGPT
+Pro account. A later activation detects the enabled Codex account and skips
+login. The refresh token is encrypted in the local PostgreSQL volume; it is not written to
 `providers.env` or the Nix store. Run these commands to inspect or refresh it:
 
 ```sh

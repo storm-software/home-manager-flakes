@@ -190,9 +190,9 @@ in
     fi
   '';
 
-  # Headroom uses the shared rootless Docker daemon. It sends requests through
-  # Weave Router by default, or directly to native providers when Weave is
-  # skipped during activation.
+  # Headroom uses the shared rootless Docker daemon. It sends requests directly
+  # to native providers by default, or through Weave Router when activation
+  # explicitly enables it.
   systemd.user.services.headroom = {
     Unit = {
       Description = "Headroom context-optimization proxy";

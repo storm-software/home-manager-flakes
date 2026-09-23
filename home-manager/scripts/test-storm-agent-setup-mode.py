@@ -18,6 +18,15 @@ class StormAgentSetupModeTests(unittest.TestCase):
             check=False,
         )
 
+    def test_missing_mode_defaults_to_weave_router_disabled(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state = Path(directory) / "agent-setup.env"
+
+            result = self.run_mode(state)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, "0\n")
+
     def test_persisted_disabled_mode_overrides_boot_default(self):
         with tempfile.TemporaryDirectory() as directory:
             state = Path(directory) / "agent-setup.env"

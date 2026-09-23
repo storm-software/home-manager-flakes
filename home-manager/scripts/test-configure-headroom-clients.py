@@ -1,5 +1,8 @@
 import importlib.util
+import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import tomllib
 import unittest
@@ -16,6 +19,27 @@ spec.loader.exec_module(clients)
 
 
 class ConfigureHeadroomClientsTests(unittest.TestCase):
+    def test_main_defaults_to_headroom_without_a_weave_mode(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            path = home / ".codex" / "config.toml"
+            path.parent.mkdir()
+            path.write_text('model = "gpt-5.6-terra"\n')
+            environment = os.environ.copy()
+            environment.pop("STORM_SETUP_WEAVE_ROUTER", None)
+
+            result = subprocess.run(
+                [sys.executable, str(Path(__file__).with_name("configure-headroom-clients.py")), str(home)],
+                env=environment,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = tomlkit.parse(path.read_text())
+            self.assertEqual(config["model_provider"], "headroom")
+
     def test_codex_preserves_oauth_and_routes_through_headroom(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
@@ -103,7 +127,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
                 },
             )
 
-    def test_codex_keeps_weave_as_the_default_upstream(self):
+    def test_codex_uses_weave_when_enabled(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             path = home / ".codex" / "config.toml"

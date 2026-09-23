@@ -23,7 +23,7 @@ class ActivateWrapperTests(unittest.TestCase):
 
         self.make_command(
             self.result / "activate-inner",
-            "printf 'activate-inner weave=%s\\n' \"${STORM_SETUP_WEAVE_ROUTER:-unset}\" >> \"$ACTIVATION_LOG\"",
+            "printf 'activate-inner weave=%s args=%s\\n' \"${STORM_SETUP_WEAVE_ROUTER:-unset}\" \"$*\" >> \"$ACTIVATION_LOG\"",
         )
         self.make_command(
             self.bin / "systemctl",
@@ -77,14 +77,29 @@ class ActivateWrapperTests(unittest.TestCase):
             check=False,
         )
 
-    def test_imports_codex_environment_between_router_and_headroom(self):
+    def test_defaults_to_headroom_without_starting_weave_router(self):
         result = self.run_activate("--skip-displaylink")
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(
             self.log.read_text().splitlines(),
             [
-                "activate-inner weave=1",
+                "activate-inner weave=0 args=",
+                "systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER",
+                "systemctl --user stop weave-router.service",
+                "codex-secrets-env import",
+                "systemctl --user restart headroom.service",
+            ],
+        )
+
+    def test_weave_router_flag_starts_router_before_headroom(self):
+        result = self.run_activate("--skip-displaylink", "--weave-router")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            self.log.read_text().splitlines(),
+            [
+                "activate-inner weave=1 args=",
                 "systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER",
                 "systemctl --user restart weave-router.service",
                 "codex-secrets-env import",
@@ -93,22 +108,25 @@ class ActivateWrapperTests(unittest.TestCase):
             ],
         )
 
-    def test_skip_weave_router_still_imports_environment_and_starts_headroom(self):
-        result = self.run_activate("--skip-displaylink", "--skip-weave-router")
+    def test_default_mode_stops_a_previously_enabled_weave_router(self):
+        enabled = self.run_activate("--skip-displaylink", "--weave-router")
+        disabled = self.run_activate("--skip-displaylink")
 
-        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(enabled.returncode, 0, enabled.stderr)
+        self.assertEqual(disabled.returncode, 0, disabled.stderr)
         self.assertEqual(
-            self.log.read_text().splitlines(),
+            self.log.read_text().splitlines()[-5:],
             [
-                "activate-inner weave=0",
+                "activate-inner weave=0 args=",
                 "systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER",
+                "systemctl --user stop weave-router.service",
                 "codex-secrets-env import",
                 "systemctl --user restart headroom.service",
             ],
         )
 
-    def test_skip_weave_router_persists_disabled_mode_for_boot_services(self):
-        result = self.run_activate("--skip-displaylink", "--skip-weave-router")
+    def test_default_mode_persists_weave_router_as_disabled_for_boot_services(self):
+        result = self.run_activate("--skip-displaylink")
 
         self.assertEqual(result.returncode, 0, result.stderr)
         state = self.home / ".local" / "state" / "storm" / "agent-setup.env"
