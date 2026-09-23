@@ -5,30 +5,32 @@ state_file="${STORM_AGENT_SETUP_STATE:-${XDG_STATE_HOME:-$HOME/.local/state}/sto
 
 validate_mode() {
   case "$1" in
-    0|1) ;;
+    mindctl|weave|direct) ;;
     *)
-      echo "storm-agent-setup-mode: expected setup mode 0 or 1, got '$1'" >&2
+      echo "storm-agent-setup-mode: expected mindctl, weave, or direct, got '$1'" >&2
       exit 1
       ;;
   esac
 }
 
 read_mode() {
-  local mode="${STORM_SETUP_WEAVE_ROUTER:-}"
+  local mode="${STORM_AGENT_ROUTER_MODE:-}"
   if [[ -z "$mode" && -r "$state_file" ]]; then
     local assignment
     IFS= read -r assignment < "$state_file" || true
     case "$assignment" in
-      STORM_SETUP_WEAVE_ROUTER=*) mode="${assignment#STORM_SETUP_WEAVE_ROUTER=}" ;;
+      STORM_AGENT_ROUTER_MODE=*) mode="${assignment#STORM_AGENT_ROUTER_MODE=}" ;;
+      STORM_SETUP_WEAVE_ROUTER=1) mode=weave ;;
+      STORM_SETUP_WEAVE_ROUTER=0) mode=mindctl ;;
       *)
         echo "storm-agent-setup-mode: invalid state file '$state_file'" >&2
         exit 1
         ;;
     esac
   fi
-  # Keep Weave Router opt-in until activation records a selection. Every
-  # subsequent service start uses the persisted selection.
-  mode="${mode:-0}"
+  # Mindctl is the default until activation records another selection. Every
+  # subsequent service start uses the persisted router mode.
+  mode="${mode:-mindctl}"
   validate_mode "$mode"
   printf '%s\n' "$mode"
 }
@@ -41,7 +43,7 @@ write_mode() {
   local temporary
   temporary="$(mktemp "${state_file}.XXXXXX")"
   trap 'rm -f "$temporary"' EXIT
-  printf 'STORM_SETUP_WEAVE_ROUTER=%s\n' "$mode" > "$temporary"
+  printf 'STORM_AGENT_ROUTER_MODE=%s\n' "$mode" > "$temporary"
   mv -f "$temporary" "$state_file"
   trap - EXIT
 }
@@ -54,7 +56,7 @@ case "${1:-read}" in
     write_mode "${2:-}"
     ;;
   *)
-    echo "usage: storm-agent-setup-mode [read|write 0|1]" >&2
+    echo "usage: storm-agent-setup-mode [read|write mindctl|weave|direct]" >&2
     exit 2
     ;;
 esac

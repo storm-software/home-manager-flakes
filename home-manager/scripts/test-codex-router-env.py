@@ -19,6 +19,7 @@ class CodexRouterEnvTests(unittest.TestCase):
         self.bin = self.root / "bin"
         self.codex_home.mkdir(parents=True)
         (self.state / "weave-router").mkdir(parents=True)
+        (self.state / "mindctl").mkdir(parents=True)
         self.bin.mkdir()
         self.mock_codex = self.bin / "mock-codex"
         self.mock_codex.write_text(
@@ -31,6 +32,8 @@ class CodexRouterEnvTests(unittest.TestCase):
             "'context7_authorization': os.environ.get('CONTEXT7_AUTHORIZATION'), "
             "'context7_api_key': os.environ.get('CONTEXT7_API_KEY'), "
             "'firecrawl_api_key': os.environ.get('FIRECRAWL_API_KEY')}\n"
+            "mindctl_token = os.environ.get('MINDCTL_GATEWAY_TOKEN')\n"
+            "if mindctl_token is not None: record['mindctl_gateway_token'] = mindctl_token\n"
             "github_token = os.environ.get('CODEX_GITHUB_PERSONAL_ACCESS_TOKEN')\n"
             "if github_token is not None: record['github_personal_access_token'] = github_token\n"
             "print(json.dumps(record))\n"
@@ -81,6 +84,7 @@ class CodexRouterEnvTests(unittest.TestCase):
         env.pop("FIRECRAWL_API_KEY", None)
         env.pop("GITHUB_TOKEN", None)
         env.pop("CODEX_GITHUB_PERSONAL_ACCESS_TOKEN", None)
+        env.pop("MINDCTL_GATEWAY_TOKEN", None)
         if inherited:
             env.update(inherited)
         return subprocess.run(
@@ -114,6 +118,21 @@ class CodexRouterEnvTests(unittest.TestCase):
                 "firecrawl_api_key": None,
             },
         )
+
+    def test_exec_loads_mindctl_gateway_token_from_private_runtime_state(self):
+        (self.state / "mindctl" / "secrets.env").write_text(
+            "MINDCTL_GATEWAY_TOKEN=mindctl-test-token\n"
+            "LAYA_CLASSIFIER_TOKEN=laya-test-token\n"
+            "MINDCTL_ENCRYPTION_KEY=encryption-test-key\n"
+        )
+
+        result = self.run_helper("exec", str(self.mock_codex), "--version")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        recorded = json.loads(result.stdout)
+        self.assertEqual(recorded["mindctl_gateway_token"], "mindctl-test-token")
+        self.assertNotIn("laya-test-token", result.stdout)
+        self.assertNotIn("encryption-test-key", result.stdout)
 
     def test_exec_allows_login_when_account_id_is_missing(self):
         (self.state / "weave-router/router-key").write_text("rk_test\n")

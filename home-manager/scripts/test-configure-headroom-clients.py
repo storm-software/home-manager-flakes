@@ -19,14 +19,14 @@ spec.loader.exec_module(clients)
 
 
 class ConfigureHeadroomClientsTests(unittest.TestCase):
-    def test_main_defaults_to_headroom_without_a_weave_mode(self):
+    def test_main_defaults_to_mindctl_without_an_explicit_mode(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             path = home / ".codex" / "config.toml"
             path.parent.mkdir()
             path.write_text('model = "gpt-5.6-terra"\n')
             environment = os.environ.copy()
-            environment.pop("STORM_SETUP_WEAVE_ROUTER", None)
+            environment.pop("STORM_AGENT_ROUTER_MODE", None)
 
             result = subprocess.run(
                 [sys.executable, str(Path(__file__).with_name("configure-headroom-clients.py")), str(home)],
@@ -38,7 +38,8 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
 
             self.assertEqual(result.returncode, 0, result.stderr)
             config = tomlkit.parse(path.read_text())
-            self.assertEqual(config["model_provider"], "headroom")
+            self.assertEqual(config["model_provider"], "mindctl")
+            self.assertEqual(config["model"], "mindctl-auto")
 
     def test_codex_preserves_oauth_and_routes_through_headroom(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -58,7 +59,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
                 'X-Weave-Force-Model = "WEAVE_FORCE_MODEL"\n'
             )
 
-            clients.configure_codex(home, use_weave_router=False)
+            clients.configure_codex(home, router_mode="direct")
 
             config = tomlkit.parse(path.read_text())
             provider = config["model_providers"]["headroom"]
@@ -78,7 +79,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
                 },
             )
 
-            clients.configure_codex(home, use_weave_router=False)
+            clients.configure_codex(home, router_mode="direct")
             reparsed = tomllib.loads(path.read_text())
             self.assertEqual(reparsed["model"], "gpt-5.6-luna")
             self.assertNotIn(
@@ -100,7 +101,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
                 '"X-Weave-Force-Model" = "gpt-5.6-terra" }\n'
             )
 
-            clients.configure_codex(home, use_weave_router=False)
+            clients.configure_codex(home, router_mode="direct")
 
             config = tomlkit.parse(path.read_text())
             headers = config["model_providers"]["headroom"]["http_headers"]
@@ -113,7 +114,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             path.parent.mkdir()
             path.write_text('model = "gpt-5.6-terra"\n')
 
-            clients.configure_codex(home, use_weave_router=False)
+            clients.configure_codex(home, router_mode="direct")
 
             config = tomlkit.parse(path.read_text())
             provider = config["model_providers"]["headroom"]
@@ -134,7 +135,7 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             path.parent.mkdir()
             path.write_text('model = "gpt-5.6-terra"\n')
 
-            clients.configure_codex(home, use_weave_router=True)
+            clients.configure_codex(home, router_mode="weave")
 
             config = tomlkit.parse(path.read_text())
             provider = config["model_providers"]["weave"]
@@ -146,6 +147,36 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
                 dict(provider["env_http_headers"]),
                 {
                     "X-Weave-Router-Key": "WEAVE_ROUTER_KEY",
+                    "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
+                },
+            )
+
+    def test_codex_uses_mindctl_auto_with_oauth_and_environment_gateway_token(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            path = home / ".codex" / "config.toml"
+            path.parent.mkdir()
+            path.write_text('model = "gpt-5.6-terra"\n')
+
+            clients.configure_codex(home, router_mode="mindctl")
+
+            config = tomlkit.parse(path.read_text())
+            provider = config["model_providers"]["mindctl"]
+            self.assertEqual(config["model"], "mindctl-auto")
+            self.assertEqual(config["model_provider"], "mindctl")
+            self.assertEqual(config["openai_base_url"], "http://127.0.0.1:8080/v1")
+            self.assertEqual(config["forced_login_method"], "chatgpt")
+            self.assertEqual(provider["name"], "Mindctl")
+            self.assertEqual(provider["base_url"], "http://127.0.0.1:8080/v1")
+            self.assertEqual(provider["wire_api"], "responses")
+            self.assertTrue(provider["requires_openai_auth"])
+            self.assertNotIn("env_key", provider)
+            self.assertNotIn("experimental_bearer_token", provider)
+            self.assertEqual(dict(provider["http_headers"]), {"X-App": "codex"})
+            self.assertEqual(
+                dict(provider["env_http_headers"]),
+                {
+                    "X-Mindctl-Token": "MINDCTL_GATEWAY_TOKEN",
                     "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
                 },
             )

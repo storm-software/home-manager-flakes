@@ -18,8 +18,9 @@ nix build path:.#homeConfigurations.development.activationPackage
 ./result/activate
 ```
 
-The activation wrapper starts Headroom by default. Pass `--weave-router` to
-also start the router, or `--skip-displaylink` to skip DisplayLink setup. The
+The activation wrapper starts Mindctl, its local Laya classifier, and Headroom
+by default. Pass `--weave-router` to use Weave instead, or `--skip-displaylink`
+to skip DisplayLink setup. The
 initial container build downloads Go/npm dependencies, native
 libraries and model weights; it can take several minutes and requires network
 access and several GB of disk space.

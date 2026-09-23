@@ -21,17 +21,18 @@ FORBIDDEN_STATIC_HEADERS = {
     "chatgpt-account-id",
     "x-weave-force-model",
     "x-weave-router-key",
+    "x-mindctl-token",
 }
 
 
 def normalize_codex_provider(
-    provider: dict, name: str, base_url: str, *, use_weave_router: bool
+    provider: dict, name: str, base_url: str, *, router_mode: str
 ) -> None:
     provider["name"] = name
     provider["base_url"] = base_url
     provider["wire_api"] = "responses"
     provider["requires_openai_auth"] = True
-    provider["supports_websockets"] = not use_weave_router
+    provider["supports_websockets"] = router_mode == "direct"
     provider.pop("env_key", None)
     provider.pop("experimental_bearer_token", None)
 
@@ -47,7 +48,7 @@ def normalize_codex_provider(
     for name, value in provider.get("http_headers", {}).items():
         if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
             static_headers[name] = str(value)
-    if use_weave_router and router_key is not None:
+    if router_mode == "weave" and router_key is not None:
         static_headers["X-Weave-Router-Key"] = router_key
     static_headers["X-App"] = "codex"
     provider["http_headers"] = static_headers
@@ -56,8 +57,10 @@ def normalize_codex_provider(
     for name, value in provider.get("env_http_headers", {}).items():
         if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
             env_headers[name] = str(value)
-    if use_weave_router and router_key is None:
+    if router_mode == "weave" and router_key is None:
         env_headers["X-Weave-Router-Key"] = "WEAVE_ROUTER_KEY"
+    if router_mode == "mindctl":
+        env_headers["X-Mindctl-Token"] = "MINDCTL_GATEWAY_TOKEN"
     env_headers["ChatGPT-Account-ID"] = "CODEX_CHATGPT_ACCOUNT_ID"
     provider["env_http_headers"] = env_headers
 
@@ -88,7 +91,7 @@ def configure_claude(home: Path) -> None:
     path.write_text(json.dumps(settings, indent=2) + "\n")
 
 
-def configure_codex(home: Path, *, use_weave_router: bool) -> None:
+def configure_codex(home: Path, *, router_mode: str) -> None:
     path = home / ".codex" / "config.toml"
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = path.read_text() if path.exists() else ""
@@ -98,12 +101,17 @@ def configure_codex(home: Path, *, use_weave_router: bool) -> None:
         raise SystemExit(f"{path} is invalid TOML: {error}; refusing to overwrite it") from error
 
     providers = config.setdefault("model_providers", tomlkit.table())
-    if use_weave_router:
+    if router_mode == "weave":
         # Keep Codex directly on Weave when the router is enabled. Headroom
         # remains in front of Claude and relays that traffic to Weave.
         provider_name = "weave"
         provider_display_name = "Weave Router"
         base_url = f"{WEAVE_URL}/v1"
+    elif router_mode == "mindctl":
+        provider_name = "mindctl"
+        provider_display_name = "Mindctl"
+        base_url = f"{WEAVE_URL}/v1"
+        config["model"] = "mindctl-auto"
     else:
         # Both keys are needed for ChatGPT subscription users: model_provider
         # selects Headroom for API-key mode, while openai_base_url prevents
@@ -116,7 +124,7 @@ def configure_codex(home: Path, *, use_weave_router: bool) -> None:
         provider,
         provider_display_name,
         base_url,
-        use_weave_router=use_weave_router,
+        router_mode=router_mode,
     )
     config["model_provider"] = provider_name
     config["openai_base_url"] = base_url
@@ -131,7 +139,7 @@ def main() -> None:
     configure_claude(home)
     configure_codex(
         home,
-        use_weave_router=os.environ.get("STORM_SETUP_WEAVE_ROUTER", "0") == "1",
+        router_mode=os.environ.get("STORM_AGENT_ROUTER_MODE", "mindctl"),
     )
 
 

@@ -94,7 +94,7 @@ let
     ];
     text = ''
       setup_mode="$(storm-agent-setup-mode)"
-      export STORM_SETUP_WEAVE_ROUTER="$setup_mode"
+      export STORM_AGENT_ROUTER_MODE="$setup_mode"
       exec ${headroomPython}/bin/python ${./scripts/configure-headroom-clients.py} \
         ${lib.escapeShellArg config.home.homeDirectory}
     '';
@@ -135,12 +135,19 @@ let
       mkdir -p ${lib.escapeShellArg headroomHome}
       export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
       upstream_args=()
-      if [[ "$(storm-agent-setup-mode)" != 0 ]]; then
-        upstream_args+=(
-          --openai-api-url http://127.0.0.1:8080
-          --anthropic-api-url http://127.0.0.1:8080
-        )
-      fi
+      case "$(storm-agent-setup-mode)" in
+        mindctl)
+          # Mindctl v0.1.5 exposes the OpenAI Responses contract only.
+          upstream_args+=(--openai-api-url http://127.0.0.1:8080)
+          ;;
+        weave)
+          upstream_args+=(
+            --openai-api-url http://127.0.0.1:8080
+            --anthropic-api-url http://127.0.0.1:8080
+          )
+          ;;
+        direct) ;;
+      esac
       exec docker run --rm --name headroom-proxy \
         --network host \
         --user "$(id -u):$(id -g)" \
@@ -160,7 +167,10 @@ let
   };
 in
 {
-  imports = [ ./weave-router.nix ];
+  imports = [
+    ./mindctl-router.nix
+    ./weave-router.nix
+  ];
 
   home.packages = [
     caveman
@@ -190,9 +200,9 @@ in
     fi
   '';
 
-  # Headroom uses the shared rootless Docker daemon. It sends requests directly
-  # to native providers by default, or through Weave Router when activation
-  # explicitly enables it.
+  # Headroom uses the shared rootless Docker daemon. It sends requests through
+  # Mindctl by default, through Weave when explicitly selected, or directly to
+  # native providers when activation disables Mindctl.
   systemd.user.services.headroom = {
     Unit = {
       Description = "Headroom context-optimization proxy";
@@ -205,8 +215,8 @@ in
       Restart = "on-failure";
       RestartSec = 5;
     };
-    # Start standalone Headroom at login. Its setup mode is persisted by the
-    # activation wrapper, so this does not start the optional Weave router.
+    # Router selection is persisted by the activation wrapper and reused at
+    # login by the service's setup helpers.
     Install.WantedBy = [ "default.target" ];
   };
 }

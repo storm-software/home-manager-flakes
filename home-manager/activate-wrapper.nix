@@ -10,6 +10,8 @@ let
     substitute ${./scripts/activate-wrapper.sh} "$out" \
       --replace-fail '@codex_secrets_env@' \
       '${config.storm.codex.secretsEnvPackage}/bin/codex-secrets-env' \
+      --replace-fail '@mindctl_router_setup@' \
+      '${config.storm.mindctl.setupPackage}/bin/mindctl-router-setup' \
       --replace-fail '@storm_agent_setup_mode@' \
       '${pkgs.bash}/bin/bash ${./scripts/storm-agent-setup-mode.sh}'
     chmod +x "$out"

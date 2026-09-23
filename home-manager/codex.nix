@@ -117,7 +117,26 @@ let
     };
   };
 
+  mindctlCodexSettings = codexSettings // {
+    model = "mindctl-auto";
+    model_provider = "mindctl";
+    openai_base_url = "http://127.0.0.1:8080/v1";
+    model_providers.mindctl = {
+      name = "Mindctl";
+      base_url = "http://127.0.0.1:8080/v1";
+      wire_api = "responses";
+      requires_openai_auth = true;
+      supports_websockets = false;
+      http_headers.X-App = "codex";
+      env_http_headers = {
+        X-Mindctl-Token = "MINDCTL_GATEWAY_TOKEN";
+        ChatGPT-Account-ID = "CODEX_CHATGPT_ACCOUNT_ID";
+      };
+    };
+  };
+
   directCodexConfig = tomlFormat.generate "codex-config-direct.toml" codexSettings;
+  mindctlCodexConfig = tomlFormat.generate "codex-config-mindctl.toml" mindctlCodexSettings;
   weaveCodexConfig = tomlFormat.generate "codex-config-weave.toml" weaveCodexSettings;
 
   installCodexConfig = pkgs.writeShellApplication {
@@ -212,6 +231,10 @@ in
         message = "Codex must use ChatGPT OAuth, not OPENAI_API_KEY";
       }
       {
+        assertion = !(mindctlCodexSettings.model_providers.mindctl ? env_key);
+        message = "Mindctl must use ChatGPT OAuth, not OPENAI_API_KEY";
+      }
+      {
         assertion = !(codexSettings ? hooks);
         message = "The Weave installer owns Codex hook registrations; the Nix baseline must not duplicate them";
       }
@@ -225,11 +248,15 @@ in
     ];
 
     home.activation.installCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [ "''${STORM_SETUP_WEAVE_ROUTER:-0}" = 1 ]; then
-        codex_config=${weaveCodexConfig}
-      else
-        codex_config=${directCodexConfig}
-      fi
+      case "''${STORM_AGENT_ROUTER_MODE:-mindctl}" in
+        mindctl) codex_config=${mindctlCodexConfig} ;;
+        weave) codex_config=${weaveCodexConfig} ;;
+        direct) codex_config=${directCodexConfig} ;;
+        *)
+          echo "Unknown agent router mode: ''${STORM_AGENT_ROUTER_MODE}" >&2
+          exit 1
+          ;;
+      esac
       $DRY_RUN_CMD ${installCodexConfig}/bin/install-codex-config \
         "$codex_config" ${lib.escapeShellArg config.home.homeDirectory}
     '';

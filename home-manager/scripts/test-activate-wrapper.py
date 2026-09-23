@@ -23,7 +23,7 @@ class ActivateWrapperTests(unittest.TestCase):
 
         self.make_command(
             self.result / "activate-inner",
-            "printf 'activate-inner weave=%s args=%s\\n' \"${STORM_SETUP_WEAVE_ROUTER:-unset}\" \"$*\" >> \"$ACTIVATION_LOG\"",
+            "printf 'activate-inner mode=%s weave=%s args=%s\\n' \"${STORM_AGENT_ROUTER_MODE:-unset}\" \"${STORM_SETUP_WEAVE_ROUTER:-unset}\" \"$*\" >> \"$ACTIVATION_LOG\"",
         )
         self.make_command(
             self.bin / "systemctl",
@@ -42,10 +42,16 @@ class ActivateWrapperTests(unittest.TestCase):
             self.profile_bin / "displaylink-setup",
             "printf '%s\\n' 'displaylink-setup' >> \"$ACTIVATION_LOG\"",
         )
+        mindctl_setup = self.root / "mindctl-router-setup"
+        self.make_command(
+            mindctl_setup,
+            "printf '%s\\n' 'mindctl-router-setup' >> \"$ACTIVATION_LOG\"",
+        )
 
         wrapper = (
             SOURCE.read_text()
             .replace("@codex_secrets_env@", str(secrets_env))
+            .replace("@mindctl_router_setup@", str(mindctl_setup))
             .replace(
                 "@storm_agent_setup_mode@",
                 f"bash {SOURCE.with_name('storm-agent-setup-mode.sh')}",
@@ -77,16 +83,19 @@ class ActivateWrapperTests(unittest.TestCase):
             check=False,
         )
 
-    def test_defaults_to_headroom_without_starting_weave_router(self):
+    def test_defaults_to_mindctl_and_stops_weave(self):
         result = self.run_activate("--skip-displaylink")
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(
             self.log.read_text().splitlines(),
             [
-                "activate-inner weave=0 args=",
-                "systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER",
+                "activate-inner mode=mindctl weave=0 args=",
+                "systemctl --user import-environment STORM_AGENT_ROUTER_MODE STORM_SETUP_WEAVE_ROUTER",
                 "systemctl --user stop weave-router.service",
+                "mindctl-router-setup",
+                "systemctl --user restart mindctl-laya.service",
+                "systemctl --user restart mindctl-router.service",
                 "codex-secrets-env import",
                 "systemctl --user restart headroom.service",
             ],
@@ -99,8 +108,9 @@ class ActivateWrapperTests(unittest.TestCase):
         self.assertEqual(
             self.log.read_text().splitlines(),
             [
-                "activate-inner weave=1 args=",
-                "systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER",
+                "activate-inner mode=weave weave=1 args=",
+                "systemctl --user import-environment STORM_AGENT_ROUTER_MODE STORM_SETUP_WEAVE_ROUTER",
+                "systemctl --user stop mindctl-router.service mindctl-laya.service",
                 "systemctl --user restart weave-router.service",
                 "codex-secrets-env import",
                 "systemctl --user restart headroom.service",
@@ -108,29 +118,42 @@ class ActivateWrapperTests(unittest.TestCase):
             ],
         )
 
-    def test_default_mode_stops_a_previously_enabled_weave_router(self):
-        enabled = self.run_activate("--skip-displaylink", "--weave-router")
-        disabled = self.run_activate("--skip-displaylink")
+    def test_skip_mindctl_router_stops_both_routers(self):
+        result = self.run_activate("--skip-displaylink", "--skip-mindctl-router")
 
-        self.assertEqual(enabled.returncode, 0, enabled.stderr)
-        self.assertEqual(disabled.returncode, 0, disabled.stderr)
+        self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(
-            self.log.read_text().splitlines()[-5:],
+            self.log.read_text().splitlines(),
             [
-                "activate-inner weave=0 args=",
-                "systemctl --user import-environment STORM_SETUP_WEAVE_ROUTER",
+                "activate-inner mode=direct weave=0 args=",
+                "systemctl --user import-environment STORM_AGENT_ROUTER_MODE STORM_SETUP_WEAVE_ROUTER",
                 "systemctl --user stop weave-router.service",
+                "systemctl --user stop mindctl-router.service mindctl-laya.service",
                 "codex-secrets-env import",
                 "systemctl --user restart headroom.service",
             ],
         )
 
-    def test_default_mode_persists_weave_router_as_disabled_for_boot_services(self):
+    def test_weave_router_wins_over_skip_mindctl_regardless_of_order(self):
+        for arguments in (
+            ("--skip-mindctl-router", "--weave-router"),
+            ("--weave-router", "--skip-mindctl-router"),
+        ):
+            with self.subTest(arguments=arguments):
+                self.log.unlink(missing_ok=True)
+                result = self.run_activate("--skip-displaylink", *arguments)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn(
+                    "systemctl --user restart weave-router.service",
+                    self.log.read_text().splitlines(),
+                )
+
+    def test_default_mode_persists_mindctl_for_boot_services(self):
         result = self.run_activate("--skip-displaylink")
 
         self.assertEqual(result.returncode, 0, result.stderr)
         state = self.home / ".local" / "state" / "storm" / "agent-setup.env"
-        self.assertEqual(state.read_text(), "STORM_SETUP_WEAVE_ROUTER=0\n")
+        self.assertEqual(state.read_text(), "STORM_AGENT_ROUTER_MODE=mindctl\n")
         self.assertEqual(state.stat().st_mode & 0o777, 0o600)
 
     def test_appends_storm_guidance_to_codex_agents_file(self):
