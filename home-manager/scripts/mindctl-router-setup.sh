@@ -236,7 +236,9 @@ models:
     capabilities: [chat, tools, images, json_schema, web_search]
     context_window: 128000
     max_output_tokens: 16384
-    available: true
+    # This research preview is not available to every ChatGPT Pro account.
+    # Keep the proven default route deterministic until the user enables it.
+    available: false
     input_price: 0
     cached_input_price_usd_per_million: 0
     output_price: 0

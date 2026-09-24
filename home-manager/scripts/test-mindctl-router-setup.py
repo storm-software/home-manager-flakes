@@ -62,6 +62,8 @@ class MindctlRouterSetupTests(unittest.TestCase):
             self.assertEqual([model["id"] for model in config["models"]], OPENAI_MODEL_IDS)
             self.assertIn("web_search", config["models"][0]["capabilities"])
             self.assertIn("images", config["models"][0]["capabilities"])
+            spark = next(model for model in config["models"] if model["id"] == "gpt-5.3-codex-spark")
+            self.assertFalse(spark["available"])
             self.assertEqual(config_path.stat().st_mode & 0o777, 0o600)
             self.assertEqual(secrets_path.stat().st_mode & 0o777, 0o600)
             self.assertEqual(laya_secrets_path.stat().st_mode & 0o777, 0o600)
