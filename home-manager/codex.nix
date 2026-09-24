@@ -202,6 +202,27 @@ let
       mainProgram = "codex";
     };
   };
+
+  codexVscode = pkgs.writeShellApplication {
+    name = "codex-vscode";
+    runtimeInputs = [
+      pkgs.bash
+      pkgs.coreutils
+      codexSecretsEnv
+    ];
+    text = ''
+      export CODEX_SECRETS_ENV=${lib.escapeShellArg "${codexSecretsEnv}/bin/codex-secrets-env"}
+      exec bash ${./scripts/codex-vscode.sh} "$@"
+    '';
+  };
+
+  configureCodexVscode = pkgs.writeShellApplication {
+    name = "configure-codex-vscode";
+    runtimeInputs = [ pkgs.python3 ];
+    text = ''
+      exec python3 ${./scripts/configure-codex-vscode.py} "$@"
+    '';
+  };
 in
 {
   options.storm.codex.secretsEnvPackage = lib.mkOption {
@@ -244,6 +265,8 @@ in
       codex
       codexRouterEnv
       codexSecretsEnv
+      codexVscode
+      configureCodexVscode
       installCodexConfig
     ];
 
@@ -267,6 +290,16 @@ in
       esac
       $DRY_RUN_CMD ${installCodexConfig}/bin/install-codex-config \
         "$codex_config" ${lib.escapeShellArg config.home.homeDirectory}
+    '';
+
+    # The VS Code extension normally launches its bundled Codex directly,
+    # bypassing the managed PATH wrapper. Point it at a compatibility launcher
+    # that still selects the newest extension-bundled binary while loading the
+    # same router credentials as terminal sessions.
+    home.activation.configureCodexVscode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD ${configureCodexVscode}/bin/configure-codex-vscode \
+        ${lib.escapeShellArg "${config.xdg.configHome}/Code - Insiders/User/settings.json"} \
+        ${lib.escapeShellArg "${codexVscode}/bin/codex-vscode"}
     '';
 
     storm.codex.secretsEnvPackage = codexSecretsEnv;

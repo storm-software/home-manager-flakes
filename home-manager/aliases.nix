@@ -47,7 +47,6 @@
     dc = "docker compose";
     diff = "diff --color=auto";
     grep = "grep --color=auto";
-    npm = "pnpm";
     szsh = "source ~/.zshrc";
     zj = "zellij";
 
@@ -63,7 +62,7 @@
 
     # Reload the Home Manager configuration (after git push)
     hmr = "home-manager switch -b backup --flake github:storm-software/home-manager-flakes && source ${user.system.homeDirectory}/.zshrc";
-    hmf = "nix build \"github:storm-software/home-manager-flakes#homeConfigurations.development.activationPackage\"";
+    hm-build = "nix build \"github:storm-software/home-manager-flakes#homeConfigurations.development.activationPackage\"";
     hm-activate = "${user.system.homeDirectory}/result/activate";
 
     # Run Nix garbage collection

@@ -118,7 +118,5 @@
 
   kodi = import ./kodi.nix { inherit user pkgs; };
 
-  #   thunderbird = import ./thunderbird.nix { inherit pkgs user; };
-
-  #   khal = import ./khal.nix { inherit pkgs; };
+  npm.enable = true;
 }
