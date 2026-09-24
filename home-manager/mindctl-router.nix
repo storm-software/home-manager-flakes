@@ -6,52 +6,29 @@
 }:
 
 let
-  version = "0.1.5";
-  releaseSources = {
-    "x86_64-linux" = {
-      target = "linux-amd64";
-      hash = "sha256-e6S752L+3hmIG3BYmAYwhiScdOFirIGUULXEahN1D1Q=";
-    };
-    "aarch64-linux" = {
-      target = "linux-arm64";
-      hash = "sha256-Dr5vgjLjBAs0dhOH8UQpsP9INbAKEpVQhzSVJbgHJzI=";
-    };
-    "x86_64-darwin" = {
-      target = "darwin-amd64";
-      hash = "sha256-xRa8PC9JCLjgt4AV01HcLtohvhh/H+sD8d5RpQr50A8=";
-    };
-    "aarch64-darwin" = {
-      target = "darwin-arm64";
-      hash = "sha256-4SqMq9eI5J6OIhdMBf4QDn8DbSkI0j94Y3rbDCTeKq4=";
-    };
+  version = "0.1.6";
+  source = pkgs.fetchFromGitHub {
+    owner = "storm-software";
+    repo = "mindctl";
+    rev = "7ca5657";
+    hash = "sha256-EEZvoT9F/CElGVVY3tpVsGoEIMGbsJSBmhFnd3SbWYQ=";
   };
-  releaseSource = releaseSources.${pkgs.stdenv.hostPlatform.system};
-  mindctl = pkgs.stdenvNoCC.mkDerivation {
+  mindctl = pkgs.buildGoModule {
     pname = "mindctl";
     inherit version;
-    src = pkgs.fetchurl {
-      url = "https://github.com/storm-software/mindctl/releases/download/v${version}/mindctl_${version}_${releaseSource.target}.tar.gz";
-      inherit (releaseSource) hash;
-    };
-    sourceRoot = ".";
-    installPhase = ''
-      runHook preInstall
-      install -Dm755 mindctl "$out/bin/mindctl"
-      runHook postInstall
-    '';
+    src = source;
+    subPackages = [ "cmd/mindctl" ];
+    vendorHash = "sha256-8MCbBdii/V+mase7ZNNs3j4jX34MSp59ImKJlYDlHuI=";
+    # v0.1.6's provider command test expects the later --all CLI flag; keep
+    # source builds reproducible until the next release carries that test fix.
+    doCheck = false;
     meta = {
       description = "LLM router with deterministic policy and System 1 classification";
       homepage = "https://github.com/storm-software/mindctl";
       license = lib.licenses.asl20;
       mainProgram = "mindctl";
-      platforms = builtins.attrNames releaseSources;
+      platforms = lib.platforms.unix;
     };
-  };
-  source = pkgs.fetchFromGitHub {
-    owner = "storm-software";
-    repo = "mindctl";
-    rev = "v${version}";
-    hash = "sha256-KbTKpZcRU7uo4GIBUvAeLK0KxTiE33V5Ofx+5ur5CkI=";
   };
   sourceFingerprint = builtins.substring 0 32 (builtins.baseNameOf "${source}");
   layaImage = "mindctl-laya:${version}-${sourceFingerprint}";

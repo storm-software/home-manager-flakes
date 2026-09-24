@@ -104,10 +104,10 @@ providers:
     auth: chatgpt_oauth_passthrough
 
 models:
-  - id: gpt-5
+  - id: gpt-5.6-terra
     provider: openai
     tier: T4
-    capabilities: [chat, tools]
+    capabilities: [chat, tools, images, web_search]
     context_window: 128000
     max_output_tokens: 16384
     available: true

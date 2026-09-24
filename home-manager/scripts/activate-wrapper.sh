@@ -168,6 +168,14 @@ if [[ "$setup_weave_router" == true ]]; then
   systemctl --user restart weave-router.service
 else
   systemctl --user stop weave-router.service
+  weave_compose="$HOME/.nix-profile/bin/weave-router-compose"
+  weave_secrets="$HOME/.local/state/weave-router/secrets.env"
+  # weave-router is a oneshot unit, so systemd does not run ExecStop when the
+  # unit is already inactive. Stop a managed Compose stack explicitly before
+  # starting Mindctl, otherwise its server can retain port 8080.
+  if [[ -s "$weave_secrets" && -x "$weave_compose" ]]; then
+    "$weave_compose" stop
+  fi
   if [[ "$router_mode" == mindctl ]]; then
     @mindctl_router_setup@
     systemctl --user restart mindctl-laya.service

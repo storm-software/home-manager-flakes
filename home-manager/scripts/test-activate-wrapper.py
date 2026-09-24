@@ -16,10 +16,13 @@ class ActivateWrapperTests(unittest.TestCase):
         self.home = self.root / "home"
         self.bin = self.root / "bin"
         self.profile_bin = self.home / ".nix-profile" / "bin"
+        self.weave_state = self.home / ".local" / "state" / "weave-router"
         self.log = self.root / "activation.log"
         self.result.mkdir()
         self.bin.mkdir()
         self.profile_bin.mkdir(parents=True)
+        self.weave_state.mkdir(parents=True)
+        (self.weave_state / "secrets.env").write_text("ROUTER_SECRET=test\n")
 
         self.make_command(
             self.result / "activate-inner",
@@ -37,6 +40,10 @@ class ActivateWrapperTests(unittest.TestCase):
         self.make_command(
             self.profile_bin / "weave-router-login-codex",
             "printf '%s\\n' 'weave-router-login-codex' >> \"$ACTIVATION_LOG\"",
+        )
+        self.make_command(
+            self.profile_bin / "weave-router-compose",
+            "printf 'weave-router-compose %s\\n' \"$*\" >> \"$ACTIVATION_LOG\"",
         )
         self.make_command(
             self.profile_bin / "displaylink-setup",
@@ -93,6 +100,7 @@ class ActivateWrapperTests(unittest.TestCase):
                 "activate-inner mode=mindctl weave=0 args=",
                 "systemctl --user import-environment STORM_AGENT_ROUTER_MODE STORM_SETUP_WEAVE_ROUTER",
                 "systemctl --user stop weave-router.service",
+                "weave-router-compose stop",
                 "mindctl-router-setup",
                 "systemctl --user restart mindctl-laya.service",
                 "systemctl --user restart mindctl-router.service",
@@ -128,6 +136,7 @@ class ActivateWrapperTests(unittest.TestCase):
                 "activate-inner mode=direct weave=0 args=",
                 "systemctl --user import-environment STORM_AGENT_ROUTER_MODE STORM_SETUP_WEAVE_ROUTER",
                 "systemctl --user stop weave-router.service",
+                "weave-router-compose stop",
                 "systemctl --user stop mindctl-router.service mindctl-laya.service",
                 "codex-secrets-env import",
                 "systemctl --user restart headroom.service",

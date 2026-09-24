@@ -41,7 +41,10 @@ class MindctlRouterSetupTests(unittest.TestCase):
             self.assertEqual(config["classifier"]["token_env"], "LAYA_CLASSIFIER_TOKEN")
             self.assertEqual(config["sqlite"]["path"], str(root / "state" / "mindctl" / "mindctl.db"))
             self.assertEqual(config["providers"], [{"id": "openai", "base_url": "https://chatgpt.com/backend-api/codex", "auth": "chatgpt_oauth_passthrough"}])
-            self.assertEqual(config["models"][0]["id"], "gpt-5")
+            self.assertEqual(config["models"][0]["id"], "gpt-5.6-terra")
+
+            self.assertIn("web_search", config["models"][0]["capabilities"])
+            self.assertIn("images", config["models"][0]["capabilities"])
             self.assertEqual(config_path.stat().st_mode & 0o777, 0o600)
             self.assertEqual(secrets_path.stat().st_mode & 0o777, 0o600)
             self.assertEqual(laya_secrets_path.stat().st_mode & 0o777, 0o600)
