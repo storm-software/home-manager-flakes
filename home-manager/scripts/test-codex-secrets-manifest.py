@@ -13,6 +13,7 @@ SECRET_NAMES = {
     "FIRECRAWL_API_KEY",
     "GITHUB_TOKEN",
 }
+MINDCTL_SECRET_NAMES = {"DEEPSEEK_API_TOKEN", "MUSE_API_TOKEN"}
 
 
 class CodexSecretSpecManifestTests(unittest.TestCase):
@@ -25,6 +26,19 @@ class CodexSecretSpecManifestTests(unittest.TestCase):
         self.assertEqual(profile["defaults"]["providers"], ["protonpass-agents"])
         self.assertEqual(set(profile) - {"defaults"}, SECRET_NAMES)
         for name in SECRET_NAMES:
+            secret = profile[name]
+            self.assertFalse(secret["required"])
+            self.assertEqual(secret["ref"]["item"], ITEM_PREFIX + name)
+
+    def test_mindctl_profile_limits_vault_access_to_optional_provider_tokens(self):
+        with MANIFEST.open("rb") as stream:
+            manifest = tomllib.load(stream)
+
+        profile = manifest["profiles"]["mindctl"]
+        self.assertEqual(profile["defaults"]["inherit"], False)
+        self.assertEqual(profile["defaults"]["providers"], ["protonpass-agents"])
+        self.assertEqual(set(profile) - {"defaults"}, MINDCTL_SECRET_NAMES)
+        for name in MINDCTL_SECRET_NAMES:
             secret = profile[name]
             self.assertFalse(secret["required"])
             self.assertEqual(secret["ref"]["item"], ITEM_PREFIX + name)

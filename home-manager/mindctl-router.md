@@ -1,6 +1,6 @@
 # Local Mindctl Router
 
-Home Manager installs Mindctl v0.1.5 and the matching local Laya System 1
+Home Manager installs Mindctl v0.1.13 and the matching local Laya System 1
 classifier. The activation wrapper selects Mindctl by default, writes
 `$XDG_CONFIG_HOME/mindctl/config.yaml`, starts Laya on `127.0.0.1:8091`, starts
 Mindctl on `127.0.0.1:8080`, and routes Codex through `mindctl-auto` while
@@ -19,6 +19,11 @@ Generated gateway, classifier, and encryption values live only in the private
 Laya container receives a separate `laya.env` containing only its classifier
 token.
 SQLite data is stored in `$XDG_STATE_HOME/mindctl/mindctl.db`.
+
+Optional `DEEPSEEK_API_TOKEN` and `MUSE_API_TOKEN` values are resolved from the
+`mindctl` SecretSpec profile when the service starts. They remain outside the
+Nix store and enable Mindctl's DeepSeek and Muse providers; if Proton Pass is
+unavailable, the ChatGPT OAuth route still starts without those providers.
 
 Use `--skip-mindctl-router` to stop Mindctl and Laya and run standalone
 Headroom. Use `--weave-router` to stop Mindctl and Laya and select Weave; Weave

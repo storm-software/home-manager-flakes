@@ -9,23 +9,41 @@ import yaml
 
 
 SCRIPT = Path(__file__).with_name("mindctl-router-setup.sh")
+OPENAI_MODEL_IDS = [
+    "gpt-6-astra",
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna",
+    "gpt-5.3-codex",
+    "gpt-5.3-codex-spark",
+]
+MUSE_MODEL_IDS = ["muse-spark-1.3", "muse-spark-1.3-contributor"]
+DEEPSEEK_MODEL_IDS = ["deepseek-v4-flash", "deepseek-v4-pro"]
 
 
 class MindctlRouterSetupTests(unittest.TestCase):
-    def run_setup(self, root: Path) -> subprocess.CompletedProcess[str]:
+    def run_setup(
+        self, root: Path, provider_tokens: dict[str, str] | None = None
+    ) -> subprocess.CompletedProcess[str]:
+        environment = os.environ | {
+            "MINDCTL_CONFIG_HOME": str(root / "config"),
+            "MINDCTL_STATE_HOME": str(root / "state"),
+        }
+        environment.pop("DEEPSEEK_API_TOKEN", None)
+        environment.pop("MUSE_API_TOKEN", None)
+        if provider_tokens:
+            environment.update(provider_tokens)
         return subprocess.run(
             ["bash", str(SCRIPT)],
-            env=os.environ
-            | {
-                "MINDCTL_CONFIG_HOME": str(root / "config"),
-                "MINDCTL_STATE_HOME": str(root / "state"),
-            },
+            env=environment,
             text=True,
             capture_output=True,
             check=False,
         )
 
-    def test_writes_laya_oauth_config_and_private_runtime_secrets(self):
+    def test_writes_laya_and_oauth_config_without_optional_provider_tokens(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
 
@@ -41,8 +59,7 @@ class MindctlRouterSetupTests(unittest.TestCase):
             self.assertEqual(config["classifier"]["token_env"], "LAYA_CLASSIFIER_TOKEN")
             self.assertEqual(config["sqlite"]["path"], str(root / "state" / "mindctl" / "mindctl.db"))
             self.assertEqual(config["providers"], [{"id": "openai", "base_url": "https://chatgpt.com/backend-api/codex", "auth": "chatgpt_oauth_passthrough"}])
-            self.assertEqual(config["models"][0]["id"], "gpt-5.6-terra")
-
+            self.assertEqual([model["id"] for model in config["models"]], OPENAI_MODEL_IDS)
             self.assertIn("web_search", config["models"][0]["capabilities"])
             self.assertIn("images", config["models"][0]["capabilities"])
             self.assertEqual(config_path.stat().st_mode & 0o777, 0o600)
@@ -58,6 +75,36 @@ class MindctlRouterSetupTests(unittest.TestCase):
             )
             self.assertNotIn("MINDCTL_GATEWAY_TOKEN", laya_secrets_path.read_text())
             self.assertNotIn("MINDCTL_ENCRYPTION_KEY", laya_secrets_path.read_text())
+
+    def test_includes_each_optional_provider_only_when_its_token_is_available(self):
+        token_cases = [
+            ({"DEEPSEEK_API_TOKEN": "deepseek-token"}, "deepseek", DEEPSEEK_MODEL_IDS),
+            ({"MUSE_API_TOKEN": "muse-token"}, "meta", MUSE_MODEL_IDS),
+            (
+                {"DEEPSEEK_API_TOKEN": "deepseek-token", "MUSE_API_TOKEN": "muse-token"},
+                "deepseek",
+                DEEPSEEK_MODEL_IDS,
+            ),
+        ]
+        for provider_tokens, provider_id, provider_model_ids in token_cases:
+            with self.subTest(provider_tokens=provider_tokens), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+
+                result = self.run_setup(root, provider_tokens)
+
+                self.assertEqual(result.returncode, 0, result.stderr)
+                config = yaml.safe_load((root / "config" / "mindctl" / "config.yaml").read_text())
+                self.assertIn(provider_id, {provider["id"] for provider in config["providers"]})
+                self.assertEqual(
+                    [model["id"] for model in config["models"] if model["provider"] == provider_id],
+                    provider_model_ids,
+                )
+                expected_model_ids = OPENAI_MODEL_IDS.copy()
+                if "MUSE_API_TOKEN" in provider_tokens:
+                    expected_model_ids += MUSE_MODEL_IDS
+                if "DEEPSEEK_API_TOKEN" in provider_tokens:
+                    expected_model_ids += DEEPSEEK_MODEL_IDS
+                self.assertEqual([model["id"] for model in config["models"]], expected_model_ids)
 
     def test_reactivation_preserves_secrets_and_backs_up_manual_config_once(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -102,12 +102,138 @@ providers:
   - id: openai
     base_url: https://chatgpt.com/backend-api/codex
     auth: chatgpt_oauth_passthrough
+EOF
 
+if [[ -n "${DEEPSEEK_API_TOKEN:-}" ]]; then
+  cat >> "$temporary_config" <<'EOF'
+  - id: deepseek
+    base_url: https://api.deepseek.com
+    auth: api_key
+    api_key_env: DEEPSEEK_API_TOKEN
+EOF
+fi
+
+if [[ -n "${MUSE_API_TOKEN:-}" ]]; then
+  cat >> "$temporary_config" <<'EOF'
+  - id: meta
+    base_url: https://api.meta.ai/v1
+    auth: api_key
+    api_key_env: MUSE_API_TOKEN
+EOF
+fi
+
+cat >> "$temporary_config" <<'EOF'
 models:
+  - id: gpt-6-astra
+    provider: openai
+    tier: T6
+    capabilities: [chat, tools, images, json_schema, web_search]
+    context_window: 128000
+    max_output_tokens: 16384
+    available: true
+    input_price: 10
+    cached_input_price_usd_per_million: 1
+    output_price: 50
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
+  - id: gpt-6-sol
+    provider: openai
+    tier: T5
+    capabilities: [chat, tools, images, json_schema, web_search]
+    context_window: 128000
+    max_output_tokens: 16384
+    available: true
+    input_price: 2
+    cached_input_price_usd_per_million: 0.2
+    output_price: 10
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
+  - id: gpt-6-luna
+    provider: openai
+    tier: T3
+    capabilities: [chat, tools, images, json_schema, web_search]
+    context_window: 128000
+    max_output_tokens: 16384
+    available: true
+    input_price: 0.1
+    cached_input_price_usd_per_million: 0.01
+    output_price: 0.5
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
+  - id: gpt-5.6-sol
+    provider: openai
+    tier: T5
+    capabilities: [chat, tools, images, json_schema, web_search]
+    context_window: 128000
+    max_output_tokens: 16384
+    available: true
+    input_price: 4
+    cached_input_price_usd_per_million: 0.4
+    output_price: 20
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
   - id: gpt-5.6-terra
     provider: openai
     tier: T4
-    capabilities: [chat, tools, images, web_search]
+    capabilities: [chat, tools, images, json_schema, web_search]
+    context_window: 128000
+    max_output_tokens: 16384
+    available: true
+    input_price: 2
+    cached_input_price_usd_per_million: 0.2
+    output_price: 12
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
+  - id: gpt-5.6-luna
+    provider: openai
+    tier: T2
+    capabilities: [chat, tools, images, json_schema, web_search]
+    context_window: 128000
+    max_output_tokens: 16384
+    available: true
+    input_price: 0.2
+    cached_input_price_usd_per_million: 0.02
+    output_price: 1.2
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
+  - id: gpt-5.3-codex
+    provider: openai
+    tier: T4
+    capabilities: [chat, tools, images, json_schema, web_search]
+    context_window: 128000
+    max_output_tokens: 16384
+    available: true
+    input_price: 3.5
+    cached_input_price_usd_per_million: 0.35
+    output_price: 28
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors:
+      coding: 1
+
+  - id: gpt-5.3-codex-spark
+    provider: openai
+    tier: T4
+    capabilities: [chat, tools, images, json_schema, web_search]
     context_window: 128000
     max_output_tokens: 16384
     available: true
@@ -117,8 +243,77 @@ models:
     per_request_price_usd: 0
     latency_p95: 0s
     success_prior: 1
+    task_success_priors:
+      coding: 1
+EOF
+
+if [[ -n "${MUSE_API_TOKEN:-}" ]]; then
+  cat >> "$temporary_config" <<'EOF'
+  - id: muse-spark-1.3
+    provider: meta
+    tier: T4
+    capabilities: [chat, tools, images, json_schema]
+    context_window: 1048576
+    max_output_tokens: 131072
+    available: true
+    input_price: 1.25
+    cached_input_price_usd_per_million: 0.15
+    output_price: 4.25
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
+  - id: muse-spark-1.3-contributor
+    provider: meta
+    tier: T4
+    capabilities: [chat, tools, images, json_schema]
+    context_window: 1048576
+    max_output_tokens: 131072
+    available: true
+    input_price: 0.10
+    cached_input_price_usd_per_million: 0.002
+    output_price: 0.20
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
     task_success_priors: {}
 EOF
+fi
+
+if [[ -n "${DEEPSEEK_API_TOKEN:-}" ]]; then
+  cat >> "$temporary_config" <<'EOF'
+  - id: deepseek-v4-flash
+    provider: deepseek
+    tier: T3
+    capabilities: [chat, tools, images, json_schema]
+    context_window: 1000000
+    max_output_tokens: 384000
+    available: true
+    input_price: 0.14
+    cached_input_price_usd_per_million: 0.028
+    output_price: 0.28
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
+  - id: deepseek-v4-pro
+    provider: deepseek
+    tier: T5
+    capabilities: [chat, tools, json_schema]
+    context_window: 1000000
+    max_output_tokens: 384000
+    available: true
+    input_price: 1.74
+    cached_input_price_usd_per_million: 0.145
+    output_price: 3.48
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+EOF
+fi
 chmod 600 "$temporary_config"
 mv -f "$temporary_config" "$config_file"
 touch "$managed_marker"

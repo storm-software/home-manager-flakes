@@ -137,7 +137,7 @@ let
       upstream_args=()
       case "$(storm-agent-setup-mode)" in
         mindctl)
-          # Mindctl v0.1.5 exposes the OpenAI Responses contract only.
+          # Mindctl v0.1.13 exposes the OpenAI Responses contract only.
           upstream_args+=(--openai-api-url http://127.0.0.1:8080)
           ;;
         weave)

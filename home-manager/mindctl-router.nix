@@ -2,16 +2,17 @@
   config,
   lib,
   pkgs,
+  pkgsUnstable,
   ...
 }:
 
 let
-  version = "0.1.7";
+  version = "0.1.13";
   source = pkgs.fetchFromGitHub {
     owner = "storm-software";
     repo = "mindctl";
     rev = "v${version}";
-    hash = "sha256-uMxsJKUcx+7meTyW5D1v8JOI5iRYZ1NgddUl1lZk194=";
+    hash = "sha256-Jm9+FHz8kYt526hw+//Iw92agPWTGUA2DeVpKmcV6BI=";
   };
   mindctl = pkgs.buildGoModule {
     pname = "mindctl";
@@ -41,6 +42,32 @@ let
       export MINDCTL_CONFIG_HOME=${lib.escapeShellArg config.xdg.configHome}
       export MINDCTL_STATE_HOME=${lib.escapeShellArg config.xdg.stateHome}
       exec bash ${./scripts/mindctl-router-setup.sh} "$@"
+    '';
+  };
+  secretspecPassCli = pkgs.writeShellApplication {
+    name = "secretspec-pass-cli";
+    runtimeInputs = [
+      pkgs.bash
+      pkgsUnstable.proton-pass-cli
+    ];
+    text = ''
+      exec bash ${./scripts/secretspec-pass-cli.sh} "$@"
+    '';
+  };
+  mindctlSecretsEnv = pkgs.writeShellApplication {
+    name = "mindctl-secrets-env";
+    runtimeInputs = [
+      pkgs.bash
+      pkgs.coreutils
+      pkgs.secretspec
+      secretspecPassCli
+      mindctl
+    ];
+    text = ''
+      export SECRETSPEC_FILE=${lib.escapeShellArg "${../secretspec.toml}"}
+      export SECRETSPEC_PROTONPASS_CLI_PATH=${lib.escapeShellArg "${secretspecPassCli}/bin/secretspec-pass-cli"}
+      export MINDCTL_SETUP_COMMAND=${lib.escapeShellArg "${setup}/bin/mindctl-router-setup"}
+      exec bash ${./scripts/mindctl-secrets-env.sh} ${mindctl}/bin/mindctl "$@"
     '';
   };
   laya = pkgs.writeShellApplication {
@@ -137,7 +164,7 @@ in
         ];
         EnvironmentFile = "${state}/secrets.env";
         ExecCondition = "${mindctlEnabled}/bin/mindctl-router-enabled";
-        ExecStart = "${mindctl}/bin/mindctl";
+        ExecStart = "${mindctlSecretsEnv}/bin/mindctl-secrets-env";
         Restart = "on-failure";
         RestartSec = 5;
         UMask = "0077";
