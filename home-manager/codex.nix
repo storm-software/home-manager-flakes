@@ -247,6 +247,14 @@ in
       installCodexConfig
     ];
 
+    # Orca launches this standalone-install path directly instead of resolving
+    # Codex from PATH. Route it through the managed wrapper so local router
+    # credentials are loaded for every newly started Orca session.
+    home.file.".local/bin/codex" = {
+      source = "${codex}/bin/codex";
+      force = true;
+    };
+
     home.activation.installCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       case "''${STORM_AGENT_ROUTER_MODE:-mindctl}" in
         mindctl) codex_config=${mindctlCodexConfig} ;;
