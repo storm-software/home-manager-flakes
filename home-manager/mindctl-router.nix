@@ -7,7 +7,7 @@
 }:
 
 let
-  version = "0.1.13";
+  version = "0.1.15";
   source = pkgs.fetchFromGitHub {
     owner = "storm-software";
     repo = "mindctl";
