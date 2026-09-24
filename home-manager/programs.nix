@@ -117,6 +117,4 @@
   };
 
   kodi = import ./kodi.nix { inherit user pkgs; };
-
-  npm.enable = true;
 }

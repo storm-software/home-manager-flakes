@@ -6,12 +6,12 @@
 }:
 
 let
-  version = "0.1.6";
+  version = "0.1.7";
   source = pkgs.fetchFromGitHub {
     owner = "storm-software";
     repo = "mindctl";
-    rev = "7ca5657";
-    hash = "sha256-EEZvoT9F/CElGVVY3tpVsGoEIMGbsJSBmhFnd3SbWYQ=";
+    rev = "v${version}";
+    hash = "sha256-uMxsJKUcx+7meTyW5D1v8JOI5iRYZ1NgddUl1lZk194=";
   };
   mindctl = pkgs.buildGoModule {
     pname = "mindctl";
@@ -19,9 +19,6 @@ let
     src = source;
     subPackages = [ "cmd/mindctl" ];
     vendorHash = "sha256-8MCbBdii/V+mase7ZNNs3j4jX34MSp59ImKJlYDlHuI=";
-    # v0.1.6's provider command test expects the later --all CLI flag; keep
-    # source builds reproducible until the next release carries that test fix.
-    doCheck = false;
     meta = {
       description = "LLM router with deterministic policy and System 1 classification";
       homepage = "https://github.com/storm-software/mindctl";
