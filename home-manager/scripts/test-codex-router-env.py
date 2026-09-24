@@ -50,7 +50,8 @@ class CodexRouterEnvTests(unittest.TestCase):
             "calls.append({"
             "'args': sys.argv[1:], "
             "'router_key': os.environ.get('WEAVE_ROUTER_KEY'), "
-            "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID')})\n"
+            "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID'), "
+            "'mindctl_gateway_token': os.environ.get('MINDCTL_GATEWAY_TOKEN')})\n"
             "record.write_text(json.dumps(calls))\n"
             "state = pathlib.Path(os.environ['SYSTEMCTL_STATE'])\n"
             "values = json.loads(state.read_text()) if state.exists() else {}\n"
@@ -289,6 +290,9 @@ class CodexRouterEnvTests(unittest.TestCase):
 
     def test_import_passes_names_not_values_on_argv(self):
         self.write_credentials()
+        (self.state / "mindctl" / "secrets.env").write_text(
+            "MINDCTL_GATEWAY_TOKEN=mindctl-test-token\n"
+        )
 
         result = self.run_helper("import")
 
@@ -301,12 +305,44 @@ class CodexRouterEnvTests(unittest.TestCase):
                 "import-environment",
                 "WEAVE_ROUTER_KEY",
                 "CODEX_CHATGPT_ACCOUNT_ID",
+                "MINDCTL_GATEWAY_TOKEN",
             ],
         )
         self.assertEqual(recorded["router_key"], "rk_test")
         self.assertEqual(recorded["account_id"], "acct_test")
+        self.assertEqual(recorded["mindctl_gateway_token"], "mindctl-test-token")
         self.assertNotIn("rk_test", " ".join(recorded["args"]))
         self.assertNotIn("acct_test", " ".join(recorded["args"]))
+        self.assertNotIn("mindctl-test-token", " ".join(recorded["args"]))
+
+    def test_repeated_import_clears_missing_mindctl_gateway_token(self):
+        secrets_file = self.state / "mindctl" / "secrets.env"
+        secrets_file.write_text("MINDCTL_GATEWAY_TOKEN=mindctl-test-token\n")
+
+        initial = self.run_helper("import")
+        self.assertEqual(initial.returncode, 0, initial.stderr)
+        self.assertEqual(
+            json.loads(self.systemctl_state.read_text()),
+            {"MINDCTL_GATEWAY_TOKEN": "mindctl-test-token"},
+        )
+
+        secrets_file.unlink()
+        result = self.run_helper("import")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(self.systemctl_state.read_text()), {})
+        recorded = json.loads(self.systemctl_record.read_text())
+        self.assertEqual(
+            recorded[-1]["args"],
+            [
+                "--user",
+                "unset-environment",
+                "WEAVE_ROUTER_KEY",
+                "CODEX_CHATGPT_ACCOUNT_ID",
+                "MINDCTL_GATEWAY_TOKEN",
+            ],
+        )
+        self.assert_safe_systemctl_argv(recorded)
 
     def test_repeated_import_clears_missing_or_unusable_sources(self):
         cases = {
@@ -341,7 +377,8 @@ class CodexRouterEnvTests(unittest.TestCase):
                     self.assertEqual(json.loads(self.systemctl_state.read_text()), {"UNRELATED": "keep"})
                 recorded = json.loads(self.systemctl_record.read_text())
                 self.assertEqual(recorded[-1]["args"], [
-                    "--user", "unset-environment", "WEAVE_ROUTER_KEY", "CODEX_CHATGPT_ACCOUNT_ID",
+                    "--user", "unset-environment", "WEAVE_ROUTER_KEY",
+                    "CODEX_CHATGPT_ACCOUNT_ID", "MINDCTL_GATEWAY_TOKEN",
                 ])
                 self.assert_safe_systemctl_argv(recorded)
 
@@ -362,7 +399,7 @@ class CodexRouterEnvTests(unittest.TestCase):
                 self.assertEqual(json.loads(self.systemctl_state.read_text()), {present: value})
                 recorded = json.loads(self.systemctl_record.read_text())
                 self.assertEqual([call["args"] for call in recorded[-2:]], [
-                    ["--user", "unset-environment", missing],
+                    ["--user", "unset-environment", missing, "MINDCTL_GATEWAY_TOKEN"],
                     ["--user", "import-environment", present],
                 ])
                 self.assert_safe_systemctl_argv(recorded)
@@ -370,9 +407,17 @@ class CodexRouterEnvTests(unittest.TestCase):
     def assert_safe_systemctl_argv(self, calls):
         for call in calls:
             self.assertIn(call["args"][1], ("import-environment", "unset-environment"))
-            self.assertTrue(set(call["args"][2:]) <= {"WEAVE_ROUTER_KEY", "CODEX_CHATGPT_ACCOUNT_ID"})
+            self.assertTrue(
+                set(call["args"][2:])
+                <= {
+                    "WEAVE_ROUTER_KEY",
+                    "CODEX_CHATGPT_ACCOUNT_ID",
+                    "MINDCTL_GATEWAY_TOKEN",
+                }
+            )
             self.assertNotIn("rk_test", " ".join(call["args"]))
             self.assertNotIn("acct_test", " ".join(call["args"]))
+            self.assertNotIn("mindctl-test-token", " ".join(call["args"]))
 
     def test_malformed_auth_warns_and_still_executes(self):
         (self.codex_home / "auth.json").write_text("{invalid")

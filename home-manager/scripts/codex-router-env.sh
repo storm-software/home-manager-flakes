@@ -84,7 +84,7 @@ case "${1:-}" in
   import)
     names=()
     absent_names=()
-    for name in WEAVE_ROUTER_KEY CODEX_CHATGPT_ACCOUNT_ID; do
+    for name in WEAVE_ROUTER_KEY CODEX_CHATGPT_ACCOUNT_ID MINDCTL_GATEWAY_TOKEN; do
       if [[ -n "${!name:-}" ]]; then
         names+=("$name")
       else
