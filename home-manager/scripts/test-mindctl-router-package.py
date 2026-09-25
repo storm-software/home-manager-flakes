@@ -10,7 +10,7 @@ class MindctlRouterPackageTests(unittest.TestCase):
     def test_builds_responses_gateway_from_the_pinned_compatibility_source(self):
         source = SOURCE.read_text()
 
-        self.assertIn('version = "0.1.17";', source)
+        self.assertIn('version = "0.1.19";', source)
         self.assertIn("pkgs.buildGoModule", source)
         self.assertIn('rev = "v${version}";', source)
         self.assertRegex(source, r'hash = "sha256-[A-Za-z0-9+/]{43}=";')

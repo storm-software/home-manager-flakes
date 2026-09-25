@@ -1,6 +1,6 @@
 # Local Mindctl Router
 
-Home Manager installs Mindctl v0.1.15 and the matching local Laya System 1
+Home Manager installs Mindctl v0.1.19 and the matching local Laya System 1
 classifier. The activation wrapper selects Mindctl by default, writes
 `$XDG_CONFIG_HOME/mindctl/config.yaml`, starts Laya on `127.0.0.1:8091`, starts
 Mindctl on `127.0.0.1:8080`, and routes Codex through `mindctl-auto` while
