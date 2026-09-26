@@ -36,6 +36,8 @@ def configure(home: Path) -> None:
     # A configured API key switches it to API-key billing instead.
     env.pop("ANTHROPIC_API_KEY", None)
     env["ANTHROPIC_BASE_URL"] = HEADROOM_URL
+    env["ANTHROPIC_CUSTOM_MODEL_OPTION"] = "mindctl-auto"
+    env["ANTHROPIC_CUSTOM_MODEL_OPTION_NAME"] = "Mindctl Auto"
     env["ENABLE_TOOL_SEARCH"] = "true"
     path.write_text(json.dumps(settings, indent=2) + "\n")
 

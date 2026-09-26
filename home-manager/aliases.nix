@@ -29,8 +29,9 @@
   };
 
   shell = {
-    # Headroom owns the Claude and Codex provider paths. Caveman covers the
-    # remaining agents so one request never traverses both proxy layers.
+    # Headroom (managed by Mindctl in the default mode) compresses the Claude
+    # and Codex provider paths. Caveman covers the remaining agents so one
+    # request never traverses both proxy layers.
     gemini = "caveman gemini";
     aider = "caveman aider";
     opencode = "caveman opencode";

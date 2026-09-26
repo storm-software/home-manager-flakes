@@ -1,6 +1,6 @@
 # Local Mindctl Router
 
-Home Manager installs Mindctl v0.1.24 and the matching local Laya System 1
+Home Manager installs Mindctl v0.1.26 and the matching local Laya System 1
 classifier. The activation wrapper selects Mindctl by default, writes
 `$XDG_CONFIG_HOME/mindctl/config.yaml`, starts Laya on `127.0.0.1:8091`, starts
 Mindctl on `127.0.0.1:8080`, and routes Codex through `mindctl-auto` while
@@ -31,9 +31,28 @@ corresponding key is absent. They remain outside the Nix store and enable
 Mindctl's DeepSeek and Muse providers; if Proton Pass is unavailable, the
 ChatGPT OAuth route still starts without those providers.
 Anthropic's Claude subscription models are also cataloged with caller-managed
-OAuth passthrough. They can be selected only when a request supplies a valid
-`X-Mindctl-Claude-Token` header; Codex requests without it continue to use
-their ChatGPT OAuth route.
+OAuth passthrough. Responses requests require a valid `X-Mindctl-Claude-Token`
+header to select them; Codex requests without it continue to use their ChatGPT
+OAuth route. Claude Code's Messages requests use its own OAuth bearer instead.
+Claude Code sends Messages requests through Headroom to Mindctl in the default
+router mode. Headroom reads the private Mindctl gateway token at startup and
+adds `X-Mindctl-Token` to requests for its configured Mindctl upstream; it forwards
+Claude Code's own OAuth bearer separately. The `mindctl-auto` option is added
+to Claude Code's model picker without replacing its subscription credentials.
+All Claude models in this mode use Mindctl's catalog; unlisted model IDs are
+rejected by the router.
+In direct and Weave modes, Claude Code still follows their existing Anthropic
+upstreams; `mindctl-auto` requires Mindctl mode.
+
+Mindctl performs context compression itself (`headroom.enabled: true`, cache
+mode) for both Codex and Claude Code. On first start it downloads a pinned
+Headroom runtime into `$XDG_CACHE_HOME/mindctl`, which requires network
+access. In this mode the standalone Headroom proxy runs with `--no-optimize`,
+`--no-cache`, and `--no-ccr` so it only relays Claude Code and injects the
+gateway token; requests are never compressed twice. Compression is
+fail-closed: if the managed runtime is unavailable, Mindctl returns HTTP 503
+`headroom_unavailable` instead of forwarding uncompressed input. Direct and
+Weave modes keep compression in the standalone Headroom proxy.
 
 Use `--skip-mindctl-router` to stop Mindctl and Laya and run standalone
 Headroom. Use `--weave-router` to stop Mindctl and Laya and select Weave; Weave

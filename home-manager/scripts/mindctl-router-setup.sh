@@ -67,6 +67,15 @@ client_auth:
   header: X-Mindctl-Token
   max_body_bytes: 16777216
 
+claude_messages:
+  enabled: true
+
+# Mindctl owns context compression. Headroom's proxy only relays Claude Code in
+# this mode, with optimization disabled, so requests are compressed once.
+headroom:
+  enabled: true
+  mode: cache
+
 classifier:
   endpoint: http://127.0.0.1:8091
   token_env: LAYA_CLASSIFIER_TOKEN

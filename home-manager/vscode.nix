@@ -29,6 +29,7 @@ in
       enableUpdateCheck = false;
       enableExtensionUpdateCheck = false;
       extensions = with pkgs.unstable.vscode-extensions; [
+        anthropic.claude-code
         bbenoist.nix
         bierner.markdown-mermaid
         davidanson.vscode-markdownlint

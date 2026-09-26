@@ -7,12 +7,12 @@
 }:
 
 let
-  version = "0.1.24";
+  version = "0.1.26";
   source = pkgs.fetchFromGitHub {
     owner = "storm-software";
     repo = "mindctl";
     rev = "v${version}";
-    hash = "sha256-kj77m5ofcYdxRE2D8ZFIVXRCyHTwjhc34tRuYN2KkJ4=";
+    hash = "sha256-n9iibGwvwSm2I88okY5NB+UXAqhWHUJaXw2+ZGQ4nzQ=";
   };
   mindctl = pkgs.buildGoModule {
     pname = "mindctl";
@@ -168,6 +168,8 @@ in
         Environment = [
           "XDG_CONFIG_HOME=${config.xdg.configHome}"
           "XDG_STATE_HOME=${config.xdg.stateHome}"
+          # Managed Headroom provisions its pinned runtime under here.
+          "XDG_CACHE_HOME=${config.xdg.cacheHome}"
         ];
         EnvironmentFile = "${state}/secrets.env";
         ExecCondition = "${mindctlEnabled}/bin/mindctl-router-enabled";
