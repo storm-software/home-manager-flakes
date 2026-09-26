@@ -39,6 +39,8 @@ class MindctlRouterSetupTests(unittest.TestCase):
         }
         environment.pop("DEEPSEEK_API_TOKEN", None)
         environment.pop("MUSE_API_TOKEN", None)
+        environment.pop("DEEPSEEK_API_KEY", None)
+        environment.pop("MUSE_API_KEY", None)
         if provider_tokens:
             environment.update(provider_tokens)
         return subprocess.run(
@@ -88,12 +90,14 @@ class MindctlRouterSetupTests(unittest.TestCase):
             self.assertNotIn("MINDCTL_GATEWAY_TOKEN", laya_secrets_path.read_text())
             self.assertNotIn("MINDCTL_ENCRYPTION_KEY", laya_secrets_path.read_text())
 
-    def test_includes_each_optional_provider_only_when_its_token_is_available(self):
+    def test_includes_each_optional_provider_only_when_its_credential_is_available(self):
         token_cases = [
             ({"DEEPSEEK_API_TOKEN": "deepseek-token"}, "deepseek", DEEPSEEK_MODEL_IDS),
             ({"MUSE_API_TOKEN": "muse-token"}, "meta", MUSE_MODEL_IDS),
+            ({"DEEPSEEK_API_KEY": "deepseek-key"}, "deepseek", DEEPSEEK_MODEL_IDS),
+            ({"MUSE_API_KEY": "muse-key"}, "meta", MUSE_MODEL_IDS),
             (
-                {"DEEPSEEK_API_TOKEN": "deepseek-token", "MUSE_API_TOKEN": "muse-token"},
+                {"DEEPSEEK_API_KEY": "deepseek-key", "MUSE_API_KEY": "muse-key"},
                 "deepseek",
                 DEEPSEEK_MODEL_IDS,
             ),
@@ -106,17 +110,50 @@ class MindctlRouterSetupTests(unittest.TestCase):
 
                 self.assertEqual(result.returncode, 0, result.stderr)
                 config = yaml.safe_load((root / "config" / "mindctl" / "config.yaml").read_text())
-                self.assertIn(provider_id, {provider["id"] for provider in config["providers"]})
+                provider = next(provider for provider in config["providers"] if provider["id"] == provider_id)
+                credential_name = "DEEPSEEK" if provider_id == "deepseek" else "MUSE"
+                suffix = "API_KEY" if credential_name + "_API_KEY" in provider_tokens else "API_TOKEN"
+                self.assertEqual(provider["api_key_env"], credential_name + "_" + suffix)
                 self.assertEqual(
                     [model["id"] for model in config["models"] if model["provider"] == provider_id],
                     provider_model_ids,
                 )
                 expected_model_ids = OPENAI_MODEL_IDS + ANTHROPIC_MODEL_IDS
-                if "MUSE_API_TOKEN" in provider_tokens:
+                if "MUSE_API_TOKEN" in provider_tokens or "MUSE_API_KEY" in provider_tokens:
                     expected_model_ids += MUSE_MODEL_IDS
-                if "DEEPSEEK_API_TOKEN" in provider_tokens:
+                if "DEEPSEEK_API_TOKEN" in provider_tokens or "DEEPSEEK_API_KEY" in provider_tokens:
                     expected_model_ids += DEEPSEEK_MODEL_IDS
                 self.assertEqual([model["id"] for model in config["models"]], expected_model_ids)
+
+    def test_prefers_api_keys_over_tokens_when_both_are_available(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = self.run_setup(Path(directory), {
+                "DEEPSEEK_API_KEY": "deepseek-key",
+                "DEEPSEEK_API_TOKEN": "deepseek-token",
+                "MUSE_API_KEY": "muse-key",
+                "MUSE_API_TOKEN": "muse-token",
+            })
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = yaml.safe_load((Path(directory) / "config" / "mindctl" / "config.yaml").read_text())
+            providers = {provider["id"]: provider for provider in config["providers"]}
+            self.assertEqual(providers["deepseek"]["api_key_env"], "DEEPSEEK_API_KEY")
+            self.assertEqual(providers["meta"]["api_key_env"], "MUSE_API_KEY")
+
+    def test_falls_back_to_tokens_when_api_keys_are_empty(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = self.run_setup(Path(directory), {
+                "DEEPSEEK_API_KEY": "",
+                "DEEPSEEK_API_TOKEN": "deepseek-token",
+                "MUSE_API_KEY": "",
+                "MUSE_API_TOKEN": "muse-token",
+            })
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = yaml.safe_load((Path(directory) / "config" / "mindctl" / "config.yaml").read_text())
+            providers = {provider["id"]: provider for provider in config["providers"]}
+            self.assertEqual(providers["deepseek"]["api_key_env"], "DEEPSEEK_API_TOKEN")
+            self.assertEqual(providers["meta"]["api_key_env"], "MUSE_API_TOKEN")
 
     def test_reactivation_preserves_secrets_and_backs_up_manual_config_once(self):
         with tempfile.TemporaryDirectory() as directory:

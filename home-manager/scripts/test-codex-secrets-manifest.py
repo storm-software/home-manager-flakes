@@ -13,7 +13,7 @@ SECRET_NAMES = {
     "FIRECRAWL_API_KEY",
     "GITHUB_TOKEN",
 }
-MINDCTL_SECRET_NAMES = {"DEEPSEEK_API_TOKEN", "MUSE_API_TOKEN"}
+MINDCTL_SECRET_NAMES = {"DEEPSEEK_API_TOKEN", "MUSE_API_TOKEN", "DEEPSEEK_API_KEY", "MUSE_API_KEY"}
 
 
 class CodexSecretSpecManifestTests(unittest.TestCase):
@@ -30,7 +30,7 @@ class CodexSecretSpecManifestTests(unittest.TestCase):
             self.assertFalse(secret["required"])
             self.assertEqual(secret["ref"]["item"], ITEM_PREFIX + name)
 
-    def test_mindctl_profile_limits_vault_access_to_optional_provider_tokens(self):
+    def test_mindctl_profile_limits_vault_access_to_optional_provider_credentials(self):
         with MANIFEST.open("rb") as stream:
             manifest = tomllib.load(stream)
 

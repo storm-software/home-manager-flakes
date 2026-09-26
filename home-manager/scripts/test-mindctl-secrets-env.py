@@ -25,8 +25,8 @@ class MindctlSecretsEnvTests(unittest.TestCase):
             "#!/usr/bin/env python3\n"
             "import json, os, pathlib\n"
             "pathlib.Path(os.environ['MINDCTL_SETUP_RECORD']).write_text(json.dumps({\n"
-            "  'deepseek': os.environ.get('DEEPSEEK_API_TOKEN'),\n"
-            "  'muse': os.environ.get('MUSE_API_TOKEN'),\n"
+            "  'deepseek': os.environ.get('DEEPSEEK_API_KEY') or os.environ.get('DEEPSEEK_API_TOKEN'),\n"
+            "  'muse': os.environ.get('MUSE_API_KEY') or os.environ.get('MUSE_API_TOKEN'),\n"
             "}))\n"
         )
         self.setup.chmod(0o755)
@@ -36,8 +36,8 @@ class MindctlSecretsEnvTests(unittest.TestCase):
             "#!/usr/bin/env python3\n"
             "import json, os, pathlib\n"
             "pathlib.Path(os.environ['MINDCTL_RECORD']).write_text(json.dumps({\n"
-            "  'deepseek': os.environ.get('DEEPSEEK_API_TOKEN'),\n"
-            "  'muse': os.environ.get('MUSE_API_TOKEN'),\n"
+            "  'deepseek': os.environ.get('DEEPSEEK_API_KEY') or os.environ.get('DEEPSEEK_API_TOKEN'),\n"
+            "  'muse': os.environ.get('MUSE_API_KEY') or os.environ.get('MUSE_API_TOKEN'),\n"
             "}))\n"
         )
         self.router.chmod(0o755)
@@ -51,7 +51,10 @@ class MindctlSecretsEnvTests(unittest.TestCase):
             "if args[2] == 'check': sys.exit(int(os.environ.get('CHECK_EXIT', '0')))\n"
             "if args[2] != 'run': raise AssertionError(args)\n"
             "command = args[args.index('--') + 1:]\n"
-            "env = os.environ | {'DEEPSEEK_API_TOKEN': 'vault-deepseek', 'MUSE_API_TOKEN': 'vault-muse'}\n"
+            "if os.environ.get('INJECT_API_KEYS') == '1':\n"
+            "  env = os.environ | {'DEEPSEEK_API_KEY': 'vault-deepseek-key', 'MUSE_API_KEY': 'vault-muse-key'}\n"
+            "else:\n"
+            "  env = os.environ | {'DEEPSEEK_API_TOKEN': 'vault-deepseek', 'MUSE_API_TOKEN': 'vault-muse'}\n"
             "os.execvpe(command[0], command, env)\n"
         )
         secretspec.chmod(0o755)
@@ -67,6 +70,8 @@ class MindctlSecretsEnvTests(unittest.TestCase):
             "MINDCTL_SETUP_COMMAND": str(self.setup),
             "MINDCTL_SETUP_RECORD": str(self.setup_record),
         }
+        for name in ("DEEPSEEK_API_KEY", "MUSE_API_KEY", "DEEPSEEK_API_TOKEN", "MUSE_API_TOKEN"):
+            env.pop(name, None)
         if extra_env:
             env.update(extra_env)
         return subprocess.run(
@@ -89,6 +94,14 @@ class MindctlSecretsEnvTests(unittest.TestCase):
             json.loads(self.setup_record.read_text()),
             {"deepseek": "vault-deepseek", "muse": "vault-muse"},
         )
+
+    def test_runs_mindctl_with_optional_vault_provider_keys(self):
+        result = self.run_launcher({"INJECT_API_KEYS": "1"})
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        expected = {"deepseek": "vault-deepseek-key", "muse": "vault-muse-key"}
+        self.assertEqual(json.loads(self.record.read_text()), expected)
+        self.assertEqual(json.loads(self.setup_record.read_text()), expected)
 
     def test_starts_without_provider_tokens_when_the_vault_is_unavailable(self):
         result = self.run_launcher({"CHECK_EXIT": "1"})

@@ -108,21 +108,35 @@ providers:
     auth: claude_oauth_passthrough
 EOF
 
-if [[ -n "${DEEPSEEK_API_TOKEN:-}" ]]; then
-  cat >> "$temporary_config" <<'EOF'
+deepseek_credential_env=""
+if [[ -n "${DEEPSEEK_API_KEY:-}" ]]; then
+  deepseek_credential_env="DEEPSEEK_API_KEY"
+elif [[ -n "${DEEPSEEK_API_TOKEN:-}" ]]; then
+  deepseek_credential_env="DEEPSEEK_API_TOKEN"
+fi
+
+muse_credential_env=""
+if [[ -n "${MUSE_API_KEY:-}" ]]; then
+  muse_credential_env="MUSE_API_KEY"
+elif [[ -n "${MUSE_API_TOKEN:-}" ]]; then
+  muse_credential_env="MUSE_API_TOKEN"
+fi
+
+if [[ -n "$deepseek_credential_env" ]]; then
+  cat >> "$temporary_config" <<EOF
   - id: deepseek
     base_url: https://api.deepseek.com
     auth: api_key
-    api_key_env: DEEPSEEK_API_TOKEN
+    api_key_env: $deepseek_credential_env
 EOF
 fi
 
-if [[ -n "${MUSE_API_TOKEN:-}" ]]; then
-  cat >> "$temporary_config" <<'EOF'
+if [[ -n "$muse_credential_env" ]]; then
+  cat >> "$temporary_config" <<EOF
   - id: meta
     base_url: https://api.meta.ai/v1
     auth: api_key
-    api_key_env: MUSE_API_TOKEN
+    api_key_env: $muse_credential_env
 EOF
 fi
 
@@ -315,7 +329,7 @@ models:
     task_success_priors: {}
 EOF
 
-if [[ -n "${MUSE_API_TOKEN:-}" ]]; then
+if [[ -n "$muse_credential_env" ]]; then
   cat >> "$temporary_config" <<'EOF'
   - id: muse-spark-1.3
     provider: meta
@@ -349,7 +363,7 @@ if [[ -n "${MUSE_API_TOKEN:-}" ]]; then
 EOF
 fi
 
-if [[ -n "${DEEPSEEK_API_TOKEN:-}" ]]; then
+if [[ -n "$deepseek_credential_env" ]]; then
   cat >> "$temporary_config" <<'EOF'
   - id: deepseek-v4-flash
     provider: deepseek

@@ -24,10 +24,12 @@ The managed `mindctl` shell command reads the existing encryption key from
 not exported into the interactive shell. The router service continues to use
 its own systemd `EnvironmentFile`.
 
-Optional `DEEPSEEK_API_TOKEN` and `MUSE_API_TOKEN` values are resolved from the
-`mindctl` SecretSpec profile when the service starts. They remain outside the
-Nix store and enable Mindctl's DeepSeek and Muse providers; if Proton Pass is
-unavailable, the ChatGPT OAuth route still starts without those providers.
+Optional `DEEPSEEK_API_KEY` and `MUSE_API_KEY` values are resolved from the
+`mindctl` SecretSpec profile when the service starts. The legacy
+`DEEPSEEK_API_TOKEN` and `MUSE_API_TOKEN` names remain supported when the
+corresponding key is absent. They remain outside the Nix store and enable
+Mindctl's DeepSeek and Muse providers; if Proton Pass is unavailable, the
+ChatGPT OAuth route still starts without those providers.
 Anthropic's Claude subscription models are also cataloged with caller-managed
 OAuth passthrough. They can be selected only when a request supplies a valid
 `X-Mindctl-Claude-Token` header; Codex requests without it continue to use
