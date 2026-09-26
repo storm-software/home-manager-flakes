@@ -7,12 +7,12 @@
 }:
 
 let
-  version = "0.1.21";
+  version = "0.1.22";
   source = pkgs.fetchFromGitHub {
     owner = "storm-software";
     repo = "mindctl";
     rev = "v${version}";
-    hash = "sha256-KIf7dh2T+DQ/v5ZguZDv5U340OCXrOv+Elhw/FZ7UeU=";
+    hash = "sha256-kj77m5ofcYdxRE2D8ZFIVXRCyHTwjhc34tRuYN2KkJ4=";
   };
   mindctl = pkgs.buildGoModule {
     pname = "mindctl";
