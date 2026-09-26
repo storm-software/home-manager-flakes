@@ -27,6 +27,14 @@ class MindctlRouterPackageTests(unittest.TestCase):
         self.assertIn('SECRETSPEC_PROTONPASS_CLI_PATH=', source)
         self.assertIn('ExecStart = "${mindctlSecretsEnv}/bin/mindctl-secrets-env', source)
 
+    def test_installs_the_history_aware_cli_without_changing_the_service(self):
+        source = SOURCE.read_text()
+
+        self.assertIn('name = "mindctl";', source)
+        self.assertIn('scripts/mindctl-cli.sh', source)
+        self.assertIn('home.packages = [ mindctlCli ];', source)
+        self.assertIn('ExecStart = "${mindctlSecretsEnv}/bin/mindctl-secrets-env', source)
+
 
 if __name__ == "__main__":
     unittest.main()

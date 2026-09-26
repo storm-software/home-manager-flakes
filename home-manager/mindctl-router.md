@@ -19,6 +19,10 @@ Generated gateway, classifier, and encryption values live only in the private
 Laya container receives a separate `laya.env` containing only its classifier
 token.
 SQLite data is stored in `$XDG_STATE_HOME/mindctl/mindctl.db`.
+The managed `mindctl` shell command reads the existing encryption key from
+`secrets.env` only for `mindctl history`; the key is passed to that process,
+not exported into the interactive shell. The router service continues to use
+its own systemd `EnvironmentFile`.
 
 Optional `DEEPSEEK_API_TOKEN` and `MUSE_API_TOKEN` values are resolved from the
 `mindctl` SecretSpec profile when the service starts. They remain outside the

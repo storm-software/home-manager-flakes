@@ -31,6 +31,13 @@ let
   sourceFingerprint = builtins.substring 0 32 (builtins.baseNameOf "${source}");
   layaImage = "mindctl-laya:${version}-${sourceFingerprint}";
   state = "${config.xdg.stateHome}/mindctl";
+  mindctlCli = pkgs.writeShellApplication {
+    name = "mindctl";
+    runtimeInputs = [ pkgs.bash ];
+    text = ''
+      exec bash ${./scripts/mindctl-cli.sh} ${mindctl}/bin/mindctl ${lib.escapeShellArg "${state}/secrets.env"} "$@"
+    '';
+  };
   setup = pkgs.writeShellApplication {
     name = "mindctl-router-setup";
     runtimeInputs = [
@@ -121,7 +128,7 @@ in
   };
 
   config = {
-    home.packages = [ mindctl ];
+    home.packages = [ mindctlCli ];
     xdg.configFile."mindctl/README.md".source = ./mindctl-router.md;
 
     # WantedBy may start the router during Home Manager's systemd reload. Make
