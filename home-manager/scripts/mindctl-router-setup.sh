@@ -59,6 +59,7 @@ fi
 
 temporary_config="$(mktemp "${config_file}.XXXXXX")"
 cat > "$temporary_config" <<EOF
+debug: true
 listen: 127.0.0.1:8080
 
 client_auth:
