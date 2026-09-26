@@ -94,6 +94,8 @@ let
           "/home/development/repos/storm-ops"
           "/home/development/repos/stryke"
           "/home/development/repos/telepathic"
+          "/home/development/repos/mindctl"
+          "/home/development/repos/trading"
         ]
         (_path: {
           trust_level = "trusted";

@@ -24,6 +24,7 @@ in
     ./syncthing-tray.nix
     ./clamav.nix
     ./agents.nix
+    ./claude.nix
     ./codex.nix
     ./dircolors.nix
     (import ./github-copilot-cli.nix { inherit pkgs; })
