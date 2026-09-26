@@ -1,3 +1,6 @@
+# AI Agents Configuration
+
+Do not create tests for changes to this repository. Since these are just configuration changes, we will not use test-driven development methods.
 
 ## Key Features
 - All AI agents should have their requests routed through weave router to ensure consistent handling and monitoring. Unless specified, Weave router should automatically determine the appropriate routing and handling for each request **(do not use the `force-model` option)**.

@@ -24,6 +24,7 @@
     Browser = {
       Enabled = true;
       Browser_AllowLocalhostWithPasskeys = true;
+      UpdateBinaryPath = false;
     };
     GUI = {
       AdvancedSettings = true;

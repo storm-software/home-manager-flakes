@@ -30,6 +30,7 @@ in
     (import ./github-copilot-cli.nix { inherit pkgs; })
     ./proton-pass-cli.nix
     ./intelli-shell.nix
+    ./keepassxc-native-messaging.nix
     ./mcp.nix
     ./zed.nix
   ];

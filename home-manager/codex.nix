@@ -74,6 +74,13 @@ let
       generate_memories = true;
       use_memories = true;
     };
+    tui = {
+      status_line = [
+        "model"
+        "context-window-size"
+        "context-remaining"
+      ];
+    };
     mcp_servers = codexMcpServers;
     plugins."prisma@plugins-cli".enabled = true;
 
