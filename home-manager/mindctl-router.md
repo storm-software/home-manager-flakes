@@ -24,6 +24,10 @@ Optional `DEEPSEEK_API_TOKEN` and `MUSE_API_TOKEN` values are resolved from the
 `mindctl` SecretSpec profile when the service starts. They remain outside the
 Nix store and enable Mindctl's DeepSeek and Muse providers; if Proton Pass is
 unavailable, the ChatGPT OAuth route still starts without those providers.
+Anthropic's Claude subscription models are also cataloged with caller-managed
+OAuth passthrough. They can be selected only when a request supplies a valid
+`X-Mindctl-Claude-Token` header; Codex requests without it continue to use
+their ChatGPT OAuth route.
 
 Use `--skip-mindctl-router` to stop Mindctl and Laya and run standalone
 Headroom. Use `--weave-router` to stop Mindctl and Laya and select Weave; Weave

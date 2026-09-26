@@ -102,6 +102,9 @@ providers:
   - id: openai
     base_url: https://chatgpt.com/backend-api/codex
     auth: chatgpt_oauth_passthrough
+  - id: anthropic
+    base_url: https://api.anthropic.com
+    auth: claude_oauth_passthrough
 EOF
 
 if [[ -n "${DEEPSEEK_API_TOKEN:-}" ]]; then
@@ -247,6 +250,68 @@ models:
     success_prior: 1
     task_success_priors:
       coding: 1
+
+  - id: claude-fable-5-1
+    provider: anthropic
+    tier: T6
+    capabilities: [chat, tools, images, json_schema]
+    context_window: 1000000
+    max_output_tokens: 128000
+    available: true
+    input_price: 10
+    cached_input_price_usd_per_million: 0.25
+    output_price: 50
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
+
+  - id: claude-opus-5-5
+    provider: anthropic
+    tier: T5
+    capabilities: [chat, tools, images, json_schema]
+    context_window: 1000000
+    max_output_tokens: 128000
+    available: true
+    input_price: 4
+    cached_input_price_usd_per_million: 0.2
+    output_price: 20
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors:
+      coding: 1
+
+  - id: claude-sonnet-5
+    provider: anthropic
+    tier: T4
+    capabilities: [chat, tools, images, json_schema]
+    context_window: 1000000
+    max_output_tokens: 128000
+    available: true
+    input_price: 2
+    cached_input_price_usd_per_million: 0.2
+    output_price: 10
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors:
+      coding: 1
+
+  - id: claude-haiku-4-5
+    provider: anthropic
+    tier: T2
+    capabilities: [chat, tools, images, json_schema]
+    context_window: 200000
+    max_output_tokens: 64000
+    available: true
+    input_price: 1
+    cached_input_price_usd_per_million: 0.1
+    output_price: 5
+    per_request_price_usd: 0
+    latency_p95: 0s
+    success_prior: 1
+    task_success_priors: {}
 EOF
 
 if [[ -n "${MUSE_API_TOKEN:-}" ]]; then

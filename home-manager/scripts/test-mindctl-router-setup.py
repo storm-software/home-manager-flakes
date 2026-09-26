@@ -19,6 +19,12 @@ OPENAI_MODEL_IDS = [
     "gpt-5.3-codex",
     "gpt-5.3-codex-spark",
 ]
+ANTHROPIC_MODEL_IDS = [
+    "claude-fable-5-1",
+    "claude-opus-5-5",
+    "claude-sonnet-5",
+    "claude-haiku-4-5",
+]
 MUSE_MODEL_IDS = ["muse-spark-1.3", "muse-spark-1.3-contributor"]
 DEEPSEEK_MODEL_IDS = ["deepseek-v4-flash", "deepseek-v4-pro"]
 
@@ -58,8 +64,12 @@ class MindctlRouterSetupTests(unittest.TestCase):
             self.assertEqual(config["classifier"]["endpoint"], "http://127.0.0.1:8091")
             self.assertEqual(config["classifier"]["token_env"], "LAYA_CLASSIFIER_TOKEN")
             self.assertEqual(config["sqlite"]["path"], str(root / "state" / "mindctl" / "mindctl.db"))
-            self.assertEqual(config["providers"], [{"id": "openai", "base_url": "https://chatgpt.com/backend-api/codex", "auth": "chatgpt_oauth_passthrough"}])
-            self.assertEqual([model["id"] for model in config["models"]], OPENAI_MODEL_IDS)
+            self.assertEqual(config["providers"], [
+                {"id": "openai", "base_url": "https://chatgpt.com/backend-api/codex", "auth": "chatgpt_oauth_passthrough"},
+                {"id": "anthropic", "base_url": "https://api.anthropic.com", "auth": "claude_oauth_passthrough"},
+            ])
+            self.assertEqual([model["id"] for model in config["models"]], OPENAI_MODEL_IDS + ANTHROPIC_MODEL_IDS)
+            self.assertTrue(all(model["available"] for model in config["models"] if model["provider"] == "anthropic"))
             self.assertIn("web_search", config["models"][0]["capabilities"])
             self.assertIn("images", config["models"][0]["capabilities"])
             spark = next(model for model in config["models"] if model["id"] == "gpt-5.3-codex-spark")
@@ -101,7 +111,7 @@ class MindctlRouterSetupTests(unittest.TestCase):
                     [model["id"] for model in config["models"] if model["provider"] == provider_id],
                     provider_model_ids,
                 )
-                expected_model_ids = OPENAI_MODEL_IDS.copy()
+                expected_model_ids = OPENAI_MODEL_IDS + ANTHROPIC_MODEL_IDS
                 if "MUSE_API_TOKEN" in provider_tokens:
                     expected_model_ids += MUSE_MODEL_IDS
                 if "DEEPSEEK_API_TOKEN" in provider_tokens:
