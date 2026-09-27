@@ -1,37 +1,41 @@
 { user, pkgs }:
 
+let
+  reposDirectory = "${user.system.homeDirectory}/repos/";
+
+  # Only the git checkouts under ~/repos are synced; other trusted workspaces
+  # (e.g. the home directory itself) are not repositories.
+  syncedProjects = builtins.filter (
+    path: builtins.substring 0 (builtins.stringLength reposDirectory) path == reposDirectory
+  ) (import ./trusted-projects.nix);
+
+  # Repositories hosted outside the storm-software GitHub organization.
+  repositoryOwners = {
+    trading = "blackfunction";
+  };
+in
 {
-  # git-sync = {
-  #     enable = true;
-  #     package = pkgs.git-sync;
-  #     repositories = {
-  #         storm-ops = {
-  #             path = "${homeDirectory}/repos/storm-ops";
-  #             uri = "git@github.com:storm-software/storm-ops.git";
-  #             interval = 1000;
-  #         };
-  #         stryke = {
-  #             path = "${homeDirectory}/repos/stryke";
-  #             uri = "git@github.com:storm-software/stryke.git";
-  #             interval = 1000;
-  #         };
-  #         powerlines = {
-  #             path = "${homeDirectory}/repos/powerlines";
-  #             uri = "git@github.com:storm-software/powerlines.git";
-  #             interval = 1000;
-  #         };
-  #         earthquake = {
-  #             path = "${homeDirectory}/repos/earthquake";
-  #             uri = "git@github.com:storm-software/earthquake.git";
-  #             interval = 1000;
-  #         };
-  #         acidic = {
-  #             path = "${homeDirectory}/repos/acidic";
-  #             uri = "git@github.com:storm-software/acidic.git";
-  #             interval = 1000;
-  #         };
-  #     };
-  # };
+  git-sync = {
+    enable = true;
+    package = pkgs.git-sync;
+    repositories = builtins.listToAttrs (
+      map (
+        path:
+        let
+          name = baseNameOf path;
+        in
+        {
+          inherit name;
+          value = {
+            inherit path;
+            uri = "https://github.com/${repositoryOwners.${name} or "storm-software"}/${name}.git";
+            # Seconds between syncs (15 minutes).
+            interval = 900;
+          };
+        }
+      ) syncedProjects
+    );
+  };
 
   gpg-agent = {
     enable = true;

@@ -53,21 +53,40 @@ let
     autoMemoryEnabled = true;
     enabledPlugins."prisma@prisma" = true;
     includeCoAuthoredBy = false;
+    attribution = {
+      commit = "Co-Authored-By: Mindctl Router <bot@stormsoftware.com>";
+      pr = "🤖 Generated with [Mindctl Router](https://stormsoftware.com/projects/mindctl)";
+    };
     permissions = {
       allow = [
         "Bash(git diff:*)"
         "Bash(curl:*)"
         "Bash(nix build *)"
         "Bash(nix flake *)"
-        "Bash(nix-build *)"
-        "Bash(home-manager switch *)"
         "Bash(nix eval *)"
-        "Bash(nix-prefetch-url *"
-        "Bash(python3 *)"
+        "Bash(nix-build *)"
+        "Bash(nix-prefetch-url *)"
+        "Bash(devenv *)"
+        "Bash(home-manager switch *)"
         "Bash(tar *)"
         "Bash(go mod *)"
+        "Bash(go test *)"
+        "Bash(go build *)"
+        "Bash(gofmt *)"
+        "Bash(npm *)"
+        "Bash(npx *)"
+        "Bash(pnpm *)"
+        "Bash(pnpx *)"
+        "Bash(bun *)"
+        "Bash(bunx *)"
+        "Bash(cargo *)"
+        "Bash(python3 *)"
+        "Bash(sqlite3 *)"
         "Bash(echo *)"
+        "Bash(jq *)"
+        "Bash(curl *)"
         "Bash(awk *)"
+        "Bash(secretspec *)"
         "Bash(xxd -r -p)"
         "Bash(grep *)"
         "Bash(pkill -f \"http.server *\")"

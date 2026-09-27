@@ -40,6 +40,7 @@
     Security = {
       HideTotpPreviewPanel = true;
       IconDownloadFallback = true;
+      LockDatabaseIdleSeconds = 7200;
     };
     KeeShare = {
       QuietSuccess = true;

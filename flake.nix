@@ -128,6 +128,15 @@
                 $DRY_RUN_CMD chmod 600 "${user.system.homeDirectory}/.cert/nix/access-tokens.conf"
               fi
             '';
+
+            # git-sync (services.nix) only syncs branches that opt in via branch.<name>.sync.
+            home.activation.enableGitSyncBranches = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+              for repo in ${lib.escapeShellArgs (import ./home-manager/trusted-projects.nix)}; do
+                if [ -e "$repo/.git" ]; then
+                  $DRY_RUN_CMD ${pkgs.stable.git}/bin/git -C "$repo" config branch.main.sync true
+                fi
+              done
+            '';
           })
           (import ./home-manager { inherit pkgs user; })
           (
