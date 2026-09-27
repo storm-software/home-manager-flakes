@@ -11,7 +11,8 @@
       "Bash(nix-shell '<nixpkgs-unstable>' -A go --run 'go version')",
       "Bash(nix run *)",
       "Bash(timeout 300 bash -c ' *)",
-      "Bash(git update-index *)"
+      "Bash(git update-index *)",
+      "Bash(git reset *)"
     ]
   }
 }
