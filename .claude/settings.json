@@ -10,7 +10,8 @@
       "Bash(timeout 300 bash /tmp/build-mindctl.sh)",
       "Bash(nix-shell '<nixpkgs-unstable>' -A go --run 'go version')",
       "Bash(nix run *)",
-      "Bash(timeout 300 bash -c ' *)"
+      "Bash(timeout 300 bash -c ' *)",
+      "Bash(git update-index *)"
     ]
   }
 }
