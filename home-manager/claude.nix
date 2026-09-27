@@ -68,6 +68,7 @@ let
         "Bash(nix flake *)"
         "Bash(nix eval *)"
         "Bash(nix hash *)"
+        "Bash(nix run *)"
         "Bash(nix-build *)"
         "Bash(nix-shell *)"
         "Bash(nix-prefetch-url *)"
