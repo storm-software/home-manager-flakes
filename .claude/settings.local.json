@@ -20,7 +20,9 @@
       "Bash(timeout 60 home-manager build --flake .)",
       "Bash(git -C /home/development/repos/home-manager-flakes diff overlays/default.nix)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(cd /nix/store/da7apr6rx9mpa0ljpircmwwsxnmrjb43-source/modules/programs/claude-code && cat options.nix; grep -n \"mcp\\\\|settings\\\\|home.file\\\\|wrapProgram\\\\|makeWrapper\\\\|finalPackage\" default.nix | head -60)",
+      "Read(//nix/store/da7apr6rx9mpa0ljpircmwwsxnmrjb43-source/modules/programs/claude-code/**)"
     ]
   }
 }
