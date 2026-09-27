@@ -69,6 +69,7 @@ let
         "Bash(nix eval *)"
         "Bash(nix hash *)"
         "Bash(nix-build *)"
+        "Bash(nix-shell *)"
         "Bash(nix-prefetch-url *)"
         "Bash(devenv *)"
         "Bash(home-manager switch *)"
