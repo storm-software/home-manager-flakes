@@ -97,8 +97,6 @@
     ];
   };
 
-  #   atuin = import ./atuin.nix;
-
   carapace = {
     enable = true;
     enableZshIntegration = true;
@@ -117,4 +115,9 @@
   };
 
   kodi = import ./kodi.nix { inherit user pkgs; };
+
+  go = {
+    enable = true;
+    telemetry.mode = "off";
+  };
 }
