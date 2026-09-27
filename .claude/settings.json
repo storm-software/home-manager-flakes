@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(nix-prefetch-url --unpack https://github.com/storm-software/mindctl/archive/refs/tags/v0.1.33.tar.gz)",
-      "Bash(xargs -I{} nix hash to-sri --type sha256 {})"
+      "Bash(xargs -I{} nix hash to-sri --type sha256 {})",
+      "Bash(nix hash *)"
     ]
   }
 }
