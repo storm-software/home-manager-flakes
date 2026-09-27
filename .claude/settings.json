@@ -13,7 +13,9 @@
       "Bash(timeout 300 bash -c ' *)",
       "Bash(git update-index *)",
       "Bash(git reset *)",
-      "Bash(git fetch *)"
+      "Bash(git fetch *)",
+      "Bash(ls -la /nix/store | grep -i mdbook | head -20)",
+      "Read(//nix/store/**)"
     ]
   }
 }
