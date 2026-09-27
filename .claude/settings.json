@@ -16,7 +16,9 @@
       "Bash(git fetch *)",
       "Bash(ls -la /nix/store | grep -i mdbook | head -20)",
       "Read(//nix/store/**)",
-      "Bash(nix derivation *)"
+      "Bash(nix derivation *)",
+      "Bash(git pull *)",
+      "Bash(nix-store -qR /nix/store/zc1l30li4zsxdjxfvlj0pmamnj7l0dir-home-manager-generation.drv)"
     ]
   }
 }
