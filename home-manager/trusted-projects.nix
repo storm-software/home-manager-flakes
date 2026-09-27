@@ -1,7 +1,5 @@
 # Workspaces that coding agents (Codex, Claude Code) treat as trusted.
 [
-  "/home/development"
-  "/home/development/.config/orca/rate-limit-pty-cwd"
   "/home/development/repos/cyclone-ui"
   "/home/development/repos/home-manager-flakes"
   "/home/development/repos/media-kit"
