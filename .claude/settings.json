@@ -12,7 +12,8 @@
       "Bash(nix run *)",
       "Bash(timeout 300 bash -c ' *)",
       "Bash(git update-index *)",
-      "Bash(git reset *)"
+      "Bash(git reset *)",
+      "Bash(git fetch *)"
     ]
   }
 }
