@@ -103,7 +103,7 @@ let
         "Bash(git push:*)"
         "Bash(git commit:*)"
       ];
-      "defaultMode": "auto";
+      defaultMode = "auto";
     };
   };
 
