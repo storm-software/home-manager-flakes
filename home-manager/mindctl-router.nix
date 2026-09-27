@@ -12,7 +12,7 @@ let
     owner = "storm-software";
     repo = "mindctl";
     rev = "v${version}";
-    hash = "sha256-PT8EicOXF8cX6+vzk0I8LkaRbCyoQ64x/OobOAdjnbk=";
+    hash = "sha256-rgFrSOtWJ5Oj2Bb4U6n/zLjx0rrhZcOA0MbCOx5YyhA=";
   };
   mindctl = pkgs.buildGoModule {
     pname = "mindctl";
