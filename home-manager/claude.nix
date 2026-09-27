@@ -59,7 +59,9 @@ let
     };
     permissions = {
       allow = [
-        "Bash(git diff:*)"
+        "Bash(git diff *)"
+        "Bash(git log *)"
+        "Bash(git show *)"
         "Bash(curl:*)"
         "Bash(nix build *)"
         "Bash(nix flake *)"
