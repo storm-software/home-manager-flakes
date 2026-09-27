@@ -9,7 +9,8 @@
       "Bash(nix-shell '<nixpkgs>' -A go_1_26 --run 'cd /tmp/mindctl-0.1.36 && go mod vendor && sha256sum go.sum')",
       "Bash(timeout 300 bash /tmp/build-mindctl.sh)",
       "Bash(nix-shell '<nixpkgs-unstable>' -A go --run 'go version')",
-      "Bash(nix run *)"
+      "Bash(nix run *)",
+      "Bash(timeout 300 bash -c ' *)"
     ]
   }
 }
