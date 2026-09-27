@@ -20,7 +20,7 @@ let
     src = source;
     subPackages = [ "cmd/mindctl" ];
     go = pkgsUnstable.go;
-    vendorHash = "sha256-8MCbBdii/V+mase7ZNNs3j4jX34MSp59ImKJlYDlHuI=";
+    vendorHash = lib.fakeHash;
     meta = {
       description = "LLM router with deterministic policy and System 1 classification";
       homepage = "https://github.com/storm-software/mindctl";

@@ -5,7 +5,8 @@
       "Bash(xargs -I{} nix hash to-sri --type sha256 {})",
       "Bash(nix hash *)",
       "Bash(cat)",
-      "Bash(nix-shell -p go --run 'cd /tmp/mindctl-0.1.36 && go mod graph | head -20')"
+      "Bash(nix-shell -p go --run 'cd /tmp/mindctl-0.1.36 && go mod graph | head -20')",
+      "Bash(nix-shell '<nixpkgs>' -A go_1_26 --run 'cd /tmp/mindctl-0.1.36 && go mod vendor && sha256sum go.sum')"
     ]
   }
 }
