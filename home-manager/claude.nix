@@ -49,9 +49,38 @@ let
   # Manager must not replace it with a read-only store symlink.
   claudeSettings = {
     forceLoginMethod = "claudeai";
-    effortLevel = "high";
+    effortLevel = "medium";
     autoMemoryEnabled = true;
     enabledPlugins."prisma@prisma" = true;
+    includeCoAuthoredBy = false;
+    permissions = {
+      allow = [
+        "Bash(git diff:*)"
+        "Bash(curl:*)"
+        "Bash(nix build *)"
+        "Bash(nix flake *)"
+        "Bash(nix-build *)"
+        "Bash(home-manager switch *)"
+        "Bash(nix eval *)"
+        "Bash(nix-prefetch-url *"
+        "Read(//tmp/**)"
+        "Bash(nix-build *)"
+        "Bash(python3 *)"
+        "Bash(tar *)"
+        "Bash(go mod *)"
+        "Bash(echo *)"
+        "Bash(awk *)"
+        "Bash(xxd -r -p)"
+        "WebFetch"
+        "Read(./.env)"
+        "Edit"
+      ];
+      ask = [
+        "Bash(git push:*)"
+        "Bash(git commit:*)"
+      ];
+      defaultMode = "acceptEdits";
+    };
   };
 
   jsonFormat = pkgs.formats.json { };
