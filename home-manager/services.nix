@@ -74,7 +74,7 @@ in
             inherit path;
             uri = "https://github.com/${repositoryOwners.${name} or "storm-software"}/${name}.git";
             # Seconds between syncs (15 minutes).
-            interval = 900;
+            interval = 1800;
           };
         }
       ) syncedProjects
