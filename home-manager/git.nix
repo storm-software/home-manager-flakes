@@ -7,18 +7,10 @@
 
   maintenance = {
     enable = true;
-    repositories = [
-      "${user.system.homeDirectory}/repos/storm-ops"
-      "${user.system.homeDirectory}/repos/stryke"
-      "${user.system.homeDirectory}/repos/power-plant"
-      "${user.system.homeDirectory}/repos/powerlines"
-      "${user.system.homeDirectory}/repos/earthquake"
-      "${user.system.homeDirectory}/repos/acidic"
-      "${user.system.homeDirectory}/repos/shell-shock"
-      "${user.system.homeDirectory}/repos/storm-dev"
-      "${user.system.homeDirectory}/repos/media-kit"
-      "${user.system.homeDirectory}/repos/home-manager-flakes"
-    ];
+    # Only the git repos from the trusted list (skips the home directory and other non-repo paths).
+    repositories = builtins.filter (
+      path: pkgs.lib.hasPrefix "${user.system.homeDirectory}/repos/" path
+    ) (import ./trusted-projects.nix);
   };
 
   signing = {
