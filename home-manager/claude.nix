@@ -84,6 +84,8 @@ let
         "Bash(sqlite3 *)"
         "Bash(echo *)"
         "Bash(jq *)"
+        "Bash(ls *)"
+        "Bash(grep *)"
         "Bash(curl *)"
         "Bash(awk *)"
         "Bash(secretspec *)"
