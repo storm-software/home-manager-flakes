@@ -62,6 +62,7 @@ let
         "Bash(git diff *)"
         "Bash(git log *)"
         "Bash(git show *)"
+        "Bash(git clone *)"
         "Bash(curl:*)"
         "Bash(nix build *)"
         "Bash(nix flake *)"
