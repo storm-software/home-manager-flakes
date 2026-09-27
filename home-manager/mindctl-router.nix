@@ -21,6 +21,7 @@ let
     subPackages = [ "cmd/mindctl" ];
     go = pkgsUnstable.go;
     vendorHash = null;
+    env.GOTOOLCHAIN = "auto";
     meta = {
       description = "LLM router with deterministic policy and System 1 classification";
       homepage = "https://github.com/storm-software/mindctl";
