@@ -10,7 +10,7 @@
   };
 
   go = final: prev: {
-    go = prev.go_1_25;
+    go = prev.go_1_26 or prev.go_1_25;
   };
 
   node = final: prev: rec {
