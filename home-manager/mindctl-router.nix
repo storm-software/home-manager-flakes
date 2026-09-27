@@ -7,18 +7,19 @@
 }:
 
 let
-  version = "0.1.29";
+  version = "0.1.30";
   source = pkgs.fetchFromGitHub {
     owner = "storm-software";
     repo = "mindctl";
     rev = "v${version}";
-    hash = "sha256-KlY7tHr5BCAJ1ph9YpwA6NcX/1LCOZXHQEokqkaIvVY=";
+    hash = "sha256-vKZKIfoBD7mSSa4b+192BgwDcvxPt7y8I0ir2gqg1eI=";
   };
   mindctl = pkgs.buildGoModule {
     pname = "mindctl";
     inherit version;
     src = source;
     subPackages = [ "cmd/mindctl" ];
+    go = pkgsUnstable.go;
     vendorHash = "sha256-8MCbBdii/V+mase7ZNNs3j4jX34MSp59ImKJlYDlHuI=";
     meta = {
       description = "LLM router with deterministic policy and System 1 classification";
