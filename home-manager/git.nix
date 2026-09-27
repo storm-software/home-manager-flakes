@@ -9,7 +9,7 @@
     enable = true;
     # Only the git repos from the trusted list (skips the home directory and other non-repo paths).
     repositories = builtins.filter (
-      path: pkgs.lib.hasPrefix "${user.system.homeDirectory}/repos/" path
+      path: pkgs.stable.lib.hasPrefix "${user.system.homeDirectory}/repos/" path
     ) (import ./trusted-projects.nix);
   };
 
