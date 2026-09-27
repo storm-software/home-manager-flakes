@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//tmp/**)",
+      "Bash(nix eval --impure --expr ' *)",
+      "Bash(python3)",
+      "Bash(nix-build -A home-manager.activation-script --keep-failed)",
+      "Bash(nix build *)",
+      "Bash(nix flake *)",
+      "Bash(nix-build -E ' *)",
+      "Bash(nix eval *)",
+      "Bash(timeout 30 nix-env -qaP 'go-*' -A nixpkgs)",
+      "Bash(pkill -f \"nix eval\")",
+      "Bash(pkill -f \"nix-build\")",
+      "Bash(timeout 60 bash -c ' *)",
+      "Bash(timeout 300 nix-build --keep-failed -E ' *)",
+      "Bash(timeout 300 bash -c ' *)",
+      "Bash(timeout 120 home-manager build --flake .)",
+      "Bash(timeout 300 home-manager build --flake .)",
+      "Bash(timeout 60 home-manager build --flake .)",
+      "Bash(git -C /home/development/repos/home-manager-flakes diff overlays/default.nix)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
