@@ -16,7 +16,7 @@ let
 in
 {
   git-sync = {
-    enable = true;
+    enable = false;
     package = pkgs.stable.git-sync;
     repositories = builtins.listToAttrs (
       map (
