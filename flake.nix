@@ -73,10 +73,7 @@
         overlays = [
           (import rust-overlay)
           # nixGL still reads pkgs.system; pass hostPlatform.system to avoid the alias warning.
-          (
-            final: prev:
-            nixgl.overlay (final // { inherit (final.stdenv.hostPlatform) system; }) prev
-          )
+          (final: prev: nixgl.overlay (final // { inherit (final.stdenv.hostPlatform) system; }) prev)
         ];
       };
 
@@ -111,6 +108,7 @@
         extraSpecialArgs = {
           pkgsUnstable = pkgs.unstable;
         };
+
         modules = [
           ({ lib, ... }: {
             home.activation.ensureNixAccessTokensFile = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
