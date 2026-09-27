@@ -103,7 +103,7 @@ let
         "Bash(git push:*)"
         "Bash(git commit:*)"
       ];
-      defaultMode = "acceptEdits";
+      "defaultMode": "auto"
     };
   };
 
