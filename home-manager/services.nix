@@ -13,11 +13,55 @@ let
   repositoryOwners = {
     trading = "blackfunction";
   };
+
+  # Pull-only replacement for upstream git-sync, which auto-commits (`git add -A`)
+  # and pushes local work. This only fast-forwards opted-in branches
+  # (branch.<name>.sync) and never commits, pushes, stashes, or rebases; git
+  # refuses the fast-forward if it would overwrite pending changes.
+  gitSyncPull = pkgs.stable.writeShellApplication {
+    name = "git-sync";
+    runtimeInputs = with pkgs.stable; [
+      git
+      openssh
+    ];
+    text = ''
+      branch=$(git symbolic-ref --quiet --short HEAD) || {
+        echo "git-sync: detached HEAD, skipping"
+        exit 0
+      }
+      if [ "$(git config --get --bool "branch.$branch.sync" || true)" != "true" ]; then
+        echo "git-sync: branch $branch not enabled via branch.$branch.sync, skipping"
+        exit 0
+      fi
+      git fetch --quiet
+      git merge --ff-only "@{upstream}"
+    '';
+  };
+
+  # The home-manager module runs `git-sync-on-inotify`; poll on the interval
+  # instead of on every file change, since nothing local is ever synced.
+  gitSyncLoop = pkgs.stable.writeShellApplication {
+    name = "git-sync-on-inotify";
+    runtimeInputs = with pkgs.stable; [ coreutils ];
+    text = ''
+      cd "$GIT_SYNC_DIRECTORY"
+      while true; do
+        "$GIT_SYNC_COMMAND" || echo "git-sync: pull failed, retrying in ''${GIT_SYNC_INTERVAL}s" >&2
+        sleep "$GIT_SYNC_INTERVAL"
+      done
+    '';
+  };
 in
 {
   git-sync = {
-    enable = false;
-    package = pkgs.stable.git-sync;
+    enable = true;
+    package = pkgs.stable.symlinkJoin {
+      name = "git-sync-pull-only";
+      paths = [
+        gitSyncPull
+        gitSyncLoop
+      ];
+    };
     repositories = builtins.listToAttrs (
       map (
         path:
