@@ -16,7 +16,6 @@ fi
 if [[ "$from_secretspec" == true ]]; then
   secretspec_router_key="${WEAVE_ROUTER_KEY:-}"
   secretspec_account_id="${CODEX_CHATGPT_ACCOUNT_ID:-}"
-  secretspec_context7_authorization="${CONTEXT7_AUTHORIZATION:-}"
   secretspec_context7_api_key="${CONTEXT7_API_KEY:-}"
   secretspec_firecrawl_api_key="${FIRECRAWL_API_KEY:-}"
   secretspec_github_token="${GITHUB_TOKEN:-}"
@@ -24,7 +23,7 @@ fi
 
 unset WEAVE_ROUTER_KEY CODEX_CHATGPT_ACCOUNT_ID \
   MINDCTL_GATEWAY_TOKEN \
-  CONTEXT7_AUTHORIZATION CONTEXT7_API_KEY FIRECRAWL_API_KEY GITHUB_TOKEN \
+  CONTEXT7_API_KEY FIRECRAWL_API_KEY GITHUB_TOKEN \
   CODEX_GITHUB_PERSONAL_ACCESS_TOKEN
 
 if [[ -r "$mindctl_secrets_file" ]]; then
@@ -58,7 +57,6 @@ elif [[ -e "$auth_file" ]]; then
 fi
 
 if [[ "$from_secretspec" == true ]]; then
-  [[ -n "$secretspec_context7_authorization" ]] && export CONTEXT7_AUTHORIZATION="$secretspec_context7_authorization"
   [[ -n "$secretspec_context7_api_key" ]] && export CONTEXT7_API_KEY="$secretspec_context7_api_key"
   [[ -n "$secretspec_firecrawl_api_key" ]] && export FIRECRAWL_API_KEY="$secretspec_firecrawl_api_key"
   [[ -n "$secretspec_github_token" ]] && export CODEX_GITHUB_PERSONAL_ACCESS_TOKEN="$secretspec_github_token"
@@ -72,7 +70,6 @@ case "${1:-}" in
       exit 64
     fi
     if [[ "$from_secretspec" == true ]] && {
-      [[ -z "${CONTEXT7_AUTHORIZATION:-}" ]] ||
       [[ -z "${CONTEXT7_API_KEY:-}" ]] ||
       [[ -z "${FIRECRAWL_API_KEY:-}" ]] ||
       [[ -z "${CODEX_GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]]

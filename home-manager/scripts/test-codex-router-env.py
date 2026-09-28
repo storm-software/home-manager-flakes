@@ -29,7 +29,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             "'args': sys.argv[1:], "
             "'router_key': os.environ.get('WEAVE_ROUTER_KEY'), "
             "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID'), "
-            "'context7_authorization': os.environ.get('CONTEXT7_AUTHORIZATION'), "
             "'context7_api_key': os.environ.get('CONTEXT7_API_KEY'), "
             "'firecrawl_api_key': os.environ.get('FIRECRAWL_API_KEY')}\n"
             "mindctl_token = os.environ.get('MINDCTL_GATEWAY_TOKEN')\n"
@@ -80,7 +79,6 @@ class CodexRouterEnvTests(unittest.TestCase):
         }
         env.pop("WEAVE_ROUTER_KEY", None)
         env.pop("CODEX_CHATGPT_ACCOUNT_ID", None)
-        env.pop("CONTEXT7_AUTHORIZATION", None)
         env.pop("CONTEXT7_API_KEY", None)
         env.pop("FIRECRAWL_API_KEY", None)
         env.pop("GITHUB_TOKEN", None)
@@ -114,7 +112,6 @@ class CodexRouterEnvTests(unittest.TestCase):
                 "args": ["--version"],
                 "router_key": "rk_test",
                 "account_id": "acct_test",
-                "context7_authorization": None,
                 "context7_api_key": None,
                 "firecrawl_api_key": None,
             },
@@ -144,7 +141,6 @@ class CodexRouterEnvTests(unittest.TestCase):
         recorded = json.loads(result.stdout)
         self.assertEqual(recorded["args"], ["login"])
         self.assertIsNone(recorded["account_id"])
-        self.assertIsNone(recorded["context7_authorization"])
         self.assertIsNone(recorded["context7_api_key"])
         self.assertIsNone(recorded["firecrawl_api_key"])
 
@@ -157,7 +153,6 @@ class CodexRouterEnvTests(unittest.TestCase):
         recorded = json.loads(result.stdout)
         self.assertEqual(recorded["args"], ["login"])
         self.assertEqual(recorded["router_key"], "rk_test")
-        self.assertIsNone(recorded["context7_authorization"])
         self.assertIsNone(recorded["context7_api_key"])
         self.assertIsNone(recorded["firecrawl_api_key"])
 
@@ -176,7 +171,6 @@ class CodexRouterEnvTests(unittest.TestCase):
         recorded = json.loads(result.stdout)
         self.assertIsNone(recorded["router_key"])
         self.assertIsNone(recorded["account_id"])
-        self.assertIsNone(recorded["context7_authorization"])
         self.assertIsNone(recorded["context7_api_key"])
         self.assertIsNone(recorded["firecrawl_api_key"])
 
@@ -191,7 +185,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             inherited={
                 "WEAVE_ROUTER_KEY": "vault-router-key",
                 "CODEX_CHATGPT_ACCOUNT_ID": "vault-account-id",
-                "CONTEXT7_AUTHORIZATION": "Bearer vault-context7",
                 "CONTEXT7_API_KEY": "vault-context7-key",
                 "FIRECRAWL_API_KEY": "vault-firecrawl-key",
                 "GITHUB_TOKEN": "vault-github-token",
@@ -205,7 +198,6 @@ class CodexRouterEnvTests(unittest.TestCase):
                 "args": ["--version"],
                 "router_key": "vault-router-key",
                 "account_id": "vault-account-id",
-                "context7_authorization": "Bearer vault-context7",
                 "context7_api_key": "vault-context7-key",
                 "firecrawl_api_key": "vault-firecrawl-key",
                 "github_personal_access_token": "vault-github-token",
@@ -233,7 +225,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             str(self.mock_codex),
             "--version",
             inherited={
-                "CONTEXT7_AUTHORIZATION": "stale-context7-authorization",
                 "CONTEXT7_API_KEY": "stale-context7-key",
                 "FIRECRAWL_API_KEY": "stale-firecrawl-key",
             },
@@ -241,7 +232,6 @@ class CodexRouterEnvTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
         recorded = json.loads(result.stdout)
-        self.assertIsNone(recorded["context7_authorization"])
         self.assertIsNone(recorded["context7_api_key"])
         self.assertIsNone(recorded["firecrawl_api_key"])
 
@@ -254,7 +244,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             str(self.mock_codex),
             "--version",
             inherited={
-                "CONTEXT7_AUTHORIZATION": "Bearer vault-context7",
                 "CONTEXT7_API_KEY": "vault-context7-key",
                 "FIRECRAWL_API_KEY": "vault-firecrawl-key",
             },
@@ -267,7 +256,6 @@ class CodexRouterEnvTests(unittest.TestCase):
                 "args": ["--version"],
                 "router_key": "rk_test",
                 "account_id": "acct_test",
-                "context7_authorization": "Bearer vault-context7",
                 "context7_api_key": "vault-context7-key",
                 "firecrawl_api_key": "vault-firecrawl-key",
             },

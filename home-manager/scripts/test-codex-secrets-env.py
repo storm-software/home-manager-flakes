@@ -27,7 +27,6 @@ class CodexSecretsEnvTests(unittest.TestCase):
             "  'args': sys.argv[1:],\n"
             "  'router_key': os.environ.get('WEAVE_ROUTER_KEY'),\n"
             "  'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID'),\n"
-            "  'context7_authorization': os.environ.get('CONTEXT7_AUTHORIZATION'),\n"
             "  'context7_api_key': os.environ.get('CONTEXT7_API_KEY'),\n"
             "  'firecrawl_api_key': os.environ.get('FIRECRAWL_API_KEY'),\n"
             "}\n"
@@ -49,7 +48,6 @@ class CodexSecretsEnvTests(unittest.TestCase):
             "env = os.environ | {\n"
             "  'WEAVE_ROUTER_KEY': 'vault-router-key',\n"
             "  'CODEX_CHATGPT_ACCOUNT_ID': 'vault-account-id',\n"
-            "  'CONTEXT7_AUTHORIZATION': 'Bearer vault-context7',\n"
             "  'CONTEXT7_API_KEY': 'vault-context7-key',\n"
             "  'FIRECRAWL_API_KEY': 'vault-firecrawl-key',\n"
             "  'GITHUB_TOKEN': 'vault-github-token',\n"
@@ -88,7 +86,6 @@ class CodexSecretsEnvTests(unittest.TestCase):
                 "args": ["--from-secretspec", "exec", "probe"],
                 "router_key": "vault-router-key",
                 "account_id": "vault-account-id",
-                "context7_authorization": "Bearer vault-context7",
                 "context7_api_key": "vault-context7-key",
                 "firecrawl_api_key": "vault-firecrawl-key",
             },
@@ -106,7 +103,6 @@ class CodexSecretsEnvTests(unittest.TestCase):
                 "args": ["exec", "probe"],
                 "router_key": None,
                 "account_id": None,
-                "context7_authorization": None,
                 "context7_api_key": None,
                 "firecrawl_api_key": None,
             },

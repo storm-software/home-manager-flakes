@@ -72,6 +72,8 @@ let
     keychain
     gnupg
     pinentry-gnome3
+    fontforge
+    blender
   ];
 
 in
