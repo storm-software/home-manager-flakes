@@ -49,6 +49,8 @@ in
   news.display = "show";
 
   fonts.fontconfig = import ./fontconfig.nix;
+  xdg.configFile."fontconfig/conf.d/10-hm-fonts.conf".force = true;
+
   editorconfig = import ./editorconfig.nix;
 
   home = {
