@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-SETTING = "chatgpt.cliExecutable"
+DEFAULT_SETTING = "chatgpt.cliExecutable"
 
 
 def without_comments(source: str) -> str:
@@ -96,7 +96,7 @@ def skip_space_and_comments(source: str, start: int) -> int:
     return index
 
 
-def find_setting_value(source: str) -> tuple[int, int] | None:
+def find_setting_value(source: str, setting: str) -> tuple[int, int] | None:
     index = 0
     depth = 0
     while index < len(source):
@@ -104,13 +104,13 @@ def find_setting_value(source: str) -> tuple[int, int] | None:
             index = skip_space_and_comments(source, index)
         elif source[index] == '"':
             end = scan_string(source, index)
-            if depth == 1 and json.loads(source[index:end]) == SETTING:
+            if depth == 1 and json.loads(source[index:end]) == setting:
                 colon = skip_space_and_comments(source, end)
                 if colon >= len(source) or source[colon] != ":":
-                    raise ValueError(f"{SETTING} is not a property")
+                    raise ValueError(f"{setting} is not a property")
                 value_start = skip_space_and_comments(source, colon + 1)
                 if value_start >= len(source) or source[value_start] != '"':
-                    raise ValueError(f"{SETTING} must be a string")
+                    raise ValueError(f"{setting} must be a string")
                 return value_start, scan_string(source, value_start)
             index = end
         elif source[index] in "[{":
@@ -135,10 +135,10 @@ def closing_brace_and_last_token(source: str) -> tuple[int, int | None]:
     return closing, last if last >= 0 and masked[last] != "{" else None
 
 
-def updated_source(source: str, launcher: str) -> str:
+def updated_source(source: str, launcher: str, setting: str = DEFAULT_SETTING) -> str:
     validate_jsonc(source)
     encoded = json.dumps(launcher)
-    existing = find_setting_value(source)
+    existing = find_setting_value(source, setting)
     if existing is not None:
         start, end = existing
         return source[:start] + encoded + source[end:]
@@ -149,12 +149,12 @@ def updated_source(source: str, launcher: str) -> str:
         before = source[: last + 1] + "," + source[last + 1 : closing]
     if before and not before.endswith("\n"):
         before += "\n"
-    return before + f'  "{SETTING}": {encoded}\n' + source[closing:]
+    return before + f'  {json.dumps(setting)}: {encoded}\n' + source[closing:]
 
 
-def configure(settings: Path, launcher: str) -> None:
+def configure(settings: Path, launcher: str, setting: str = DEFAULT_SETTING) -> None:
     source = settings.read_text() if settings.exists() else "{}\n"
-    updated = updated_source(source, launcher)
+    updated = updated_source(source, launcher, setting)
     if updated == source:
         return
     settings.parent.mkdir(parents=True, exist_ok=True)
@@ -169,11 +169,11 @@ def configure(settings: Path, launcher: str) -> None:
 
 
 def main() -> int:
-    if len(sys.argv) != 3:
-        print(f"usage: {sys.argv[0]} SETTINGS_FILE CODEX_VSCODE", file=sys.stderr)
+    if len(sys.argv) not in (3, 4):
+        print(f"usage: {sys.argv[0]} SETTINGS_FILE LAUNCHER [SETTING]", file=sys.stderr)
         return 2
     try:
-        configure(Path(sys.argv[1]), sys.argv[2])
+        configure(Path(sys.argv[1]), sys.argv[2], *sys.argv[3:])
     except (OSError, ValueError, json.JSONDecodeError) as error:
         print(f"configure-codex-vscode: {error}", file=sys.stderr)
         return 1

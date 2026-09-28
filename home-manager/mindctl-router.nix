@@ -7,12 +7,12 @@
 }:
 
 let
-  version = "0.1.37";
+  version = "0.1.40";
   source = pkgs.fetchFromGitHub {
     owner = "storm-software";
     repo = "mindctl";
     rev = "v${version}";
-    hash = "sha256-BpMgj7jVmitEPwtjvt9X8LhO+bt9k29fFPiUm6Hxr3w=";
+    hash = "sha256-AucOxdiwf2BHONBfC2mZ5OfEaxvE2iQiMn9uGaTlkS8=";
   };
   mindctl = pkgs.buildGoModule {
     pname = "mindctl";
@@ -175,7 +175,7 @@ in
         ];
         EnvironmentFile = "${state}/secrets.env";
         ExecCondition = "${mindctlEnabled}/bin/mindctl-router-enabled";
-        ExecStart = "${mindctlSecretsEnv}/bin/mindctl-secrets-env";
+        ExecStart = "${mindctlSecretsEnv}/bin/mindctl-secrets-env serve";
         Restart = "on-failure";
         RestartSec = 5;
         UMask = "0077";

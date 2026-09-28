@@ -60,6 +60,8 @@ fi
 temporary_config="$(mktemp "${config_file}.XXXXXX")"
 cat > "$temporary_config" <<EOF
 debug: true
+# Raw failed-request bodies contain prompt content; keep them off.
+debug_bodies: false
 listen: 127.0.0.1:8080
 
 client_auth:
@@ -75,6 +77,10 @@ claude_messages:
 headroom:
   enabled: true
   mode: cache
+
+# Empty compares automatic routing against the highest eligible tier.
+savings:
+  baseline_model: ""
 
 classifier:
   endpoint: http://127.0.0.1:8091
@@ -107,6 +113,14 @@ routing:
   coding_floors: []
   risk_floors: []
   underspecification_floors: []
+  expected_output_tokens: 0
+  # Keep each Claude Code or Codex session on one model so the provider
+  # prompt cache stays warm.
+  session:
+    enabled: true
+    idle_ttl: 1h
+    horizon_turns: 3
+    default_cache_hit_ratio: 0.8
 
 providers:
   - id: openai
@@ -284,6 +298,7 @@ models:
     available: true
     input_price: 10
     cached_input_price_usd_per_million: 0.25
+    cache_write_input_price_usd_per_million: 12.5
     output_price: 50
     per_request_price_usd: 0
     latency_p95: 0s
@@ -299,6 +314,7 @@ models:
     available: true
     input_price: 4
     cached_input_price_usd_per_million: 0.2
+    cache_write_input_price_usd_per_million: 5
     output_price: 20
     per_request_price_usd: 0
     latency_p95: 0s
@@ -315,6 +331,7 @@ models:
     available: true
     input_price: 2
     cached_input_price_usd_per_million: 0.2
+    cache_write_input_price_usd_per_million: 2.5
     output_price: 10
     per_request_price_usd: 0
     latency_p95: 0s
@@ -331,6 +348,7 @@ models:
     available: true
     input_price: 1
     cached_input_price_usd_per_million: 0.1
+    cache_write_input_price_usd_per_million: 1.25
     output_price: 5
     per_request_price_usd: 0
     latency_p95: 0s

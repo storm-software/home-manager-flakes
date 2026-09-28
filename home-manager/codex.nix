@@ -18,27 +18,25 @@ let
     name: server:
     if server.url != null then
       let
-        remoteEnvHeaders =
-          if name == "upstash/context7" then
-            { Authorization = "CONTEXT7_AUTHORIZATION"; }
-          else
-            lib.mapAttrs (_header: stripDollar) server.headers;
+        # `$VAR` headers carry secrets and are read from the environment;
+        # anything else is a literal, non-secret header value.
+        remoteEnvHeaders = lib.mapAttrs (_header: stripDollar) (
+          lib.filterAttrs (_header: lib.hasPrefix "$") server.headers
+        );
+        remoteLiteralHeaders = lib.filterAttrs (_header: value: !lib.hasPrefix "$" value) server.headers;
       in
       {
         url = server.url;
       }
+      // lib.optionalAttrs (remoteLiteralHeaders != { }) {
+        http_headers = remoteLiteralHeaders;
+      }
       // lib.optionalAttrs (remoteEnvHeaders != { }) {
         env_http_headers = remoteEnvHeaders;
       }
-      //
-        lib.optionalAttrs
-          (lib.elem name [
-            "github/github-mcp-server"
-            "io.github.github/github-mcp-server"
-          ])
-          {
-            bearer_token_env_var = "CODEX_GITHUB_PERSONAL_ACCESS_TOKEN";
-          }
+      // lib.optionalAttrs (name == "github") {
+        bearer_token_env_var = "CODEX_GITHUB_PERSONAL_ACCESS_TOKEN";
+      }
     else
       let
         inheritedEnv = lib.filterAttrs (

@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  claudeCodeNixPlugin,
   ...
 }:
 
@@ -21,18 +22,13 @@ let
       {
         type = "http";
         url = server.url;
+        # `$VAR` headers carry secrets and are expanded from the environment;
+        # anything else is a literal, non-secret header value.
         headers =
-          if name == "upstash/context7" then
-            { Authorization = envRef "$CONTEXT7_AUTHORIZATION"; }
-          else if
-            lib.elem name [
-              "github/github-mcp-server"
-              "io.github.github/github-mcp-server"
-            ]
-          then
-            { Authorization = "Bearer ${envRef "$CODEX_GITHUB_PERSONAL_ACCESS_TOKEN"}"; }
-          else
-            lib.mapAttrs (_header: envRef) server.headers;
+          lib.mapAttrs (_header: value: if lib.hasPrefix "$" value then envRef value else value) server.headers
+          // lib.optionalAttrs (name == "github") {
+            Authorization = "Bearer ${envRef "$CODEX_GITHUB_PERSONAL_ACCESS_TOKEN"}";
+          };
       }
     else
       {
@@ -136,6 +132,24 @@ let
     '';
   };
 
+  # The VS Code extension launches its bundled Claude directly, so MCP
+  # credentials never reach it. As its process wrapper, this receives that
+  # binary's path first and runs it with the same secrets as terminal sessions.
+  claudeVscode = pkgs.writeShellApplication {
+    name = "claude-vscode";
+    runtimeInputs = [ config.storm.codex.secretsEnvPackage ];
+    text = ''
+      exec ${config.storm.codex.secretsEnvPackage}/bin/codex-secrets-env exec "$@"
+    '';
+  };
+  configureClaudeVscode = pkgs.writeShellApplication {
+    name = "configure-claude-vscode";
+    runtimeInputs = [ pkgs.python3 ];
+    text = ''
+      exec python3 ${./scripts/configure-codex-vscode.py} "$@"
+    '';
+  };
+
   # Load the same Proton Pass MCP credentials as Codex. The version is kept so
   # the Home Manager module still loads MCP servers as a personal plugin.
   claude =
@@ -168,6 +182,7 @@ in
     package = claude;
     enableMcpIntegration = true;
     mcpServers = lib.mapAttrs claudeMcpServer config.programs.mcp.servers;
+    plugins.nix = claudeCodeNixPlugin;
   };
 
   home.packages = [
@@ -184,5 +199,12 @@ in
 
   home.activation.installClaudeVscode = lib.hm.dag.entryAfter [ "configureClaude" ] ''
     $DRY_RUN_CMD ${installClaudeVscode}/bin/install-claude-vscode
+  '';
+
+  home.activation.configureClaudeVscode = lib.hm.dag.entryAfter [ "installClaudeVscode" ] ''
+    $DRY_RUN_CMD ${configureClaudeVscode}/bin/configure-claude-vscode \
+      ${lib.escapeShellArg "${config.xdg.configHome}/Code - Insiders/User/settings.json"} \
+      ${lib.escapeShellArg "${claudeVscode}/bin/claude-vscode"} \
+      claudeCode.claudeProcessWrapper
   '';
 }

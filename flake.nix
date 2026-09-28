@@ -20,6 +20,12 @@
     # nixGL provides OpenGL/EGL/Vulkan wrappers so Nix-built GUI apps can use
     # the host GPU driver on foreign (non-NixOS) distros. Required for Kodi.
     nixgl.url = "github:nix-community/nixGL";
+    # Claude Code plugin for Nix: nixd LSP, post-edit nixfmt/statix/deadnix,
+    # and guards against hand-editing flake.lock or imperative installs.
+    claude-code-nix-plugin = {
+      url = "github:pdmtt/claude-code-nix-plugin/v0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -31,6 +37,7 @@
       nixpkgs-unstable,
       rust-overlay,
       nixgl,
+      claude-code-nix-plugin,
     }:
     let
       # User specific settings
@@ -107,6 +114,7 @@
         pkgs = pkgs.stable;
         extraSpecialArgs = {
           pkgsUnstable = pkgs.unstable;
+          claudeCodeNixPlugin = claude-code-nix-plugin.packages.${system}.default;
         };
 
         modules = [
