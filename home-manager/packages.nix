@@ -37,6 +37,7 @@ let
     tree
     direnv
     comma
+    nixd
     nix-direnv
     nixfmt
     vulnix
