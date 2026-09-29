@@ -73,7 +73,6 @@ let
     keychain
     gnupg
     pinentry-gnome3
-    blender
   ];
 
 in
