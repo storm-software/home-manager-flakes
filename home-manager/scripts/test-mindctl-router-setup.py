@@ -22,7 +22,7 @@ OPENAI_MODEL_IDS = [
 ANTHROPIC_MODEL_IDS = [
     "claude-fable-5-1",
     "claude-opus-5-5",
-    "claude-sonnet-5",
+    "claude-sonnet-5-5",
     "claude-haiku-4-5",
 ]
 MUSE_MODEL_IDS = ["muse-spark-1.3", "muse-spark-1.3-contributor"]
