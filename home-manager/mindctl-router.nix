@@ -90,8 +90,13 @@ let
       : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
       export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
       mkdir -p ${lib.escapeShellArg "${state}/laya-model-cache"}
-      if ! docker image inspect ${lib.escapeShellArg layaImage} >/dev/null 2>&1; then
-        docker build --file ${source}/Dockerfile.laya --tag ${lib.escapeShellArg layaImage} ${source}
+      # Inspect succeeds for images whose layers are missing from the content
+      # store, so probe that the image actually starts before trusting it.
+      if ! docker run --rm --entrypoint true ${lib.escapeShellArg layaImage} >/dev/null 2>&1; then
+        docker image rm --force ${lib.escapeShellArg layaImage} >/dev/null 2>&1 || true
+        # Stale cache entries can reference the same missing snapshots.
+        docker builder prune --all --force >/dev/null
+        docker build --pull --file ${source}/Dockerfile.laya --tag ${lib.escapeShellArg layaImage} ${source}
       fi
       exec docker run --rm --name mindctl-laya \
         --publish 127.0.0.1:8091:8091 \
