@@ -64,6 +64,12 @@ def configure(home: Path, baseline: dict | None = None, trusted_projects: list[s
     if not isinstance(env, dict):
         raise SystemExit(f"{path} has a non-object env value; refusing to overwrite it")
 
+    model_overrides = settings.setdefault("modelOverrides", {})
+    if not isinstance(model_overrides, dict):
+        raise SystemExit(f"{path} has a non-object modelOverrides value; refusing to overwrite it")
+    # Claude Code's Auto permission classifier requests Sonnet 5, which is not in the Mindctl catalog.
+    model_overrides.setdefault("claude-sonnet-5", "claude-sonnet-5-5")
+
     backup_once(path)
     # Claude Code's native account session supplies subscription credentials.
     # A configured API key switches it to API-key billing instead.
