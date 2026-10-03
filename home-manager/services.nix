@@ -92,11 +92,13 @@ in
       package = pkgs.unstable.pinentry-gnome3;
       program = "pinentry-gnome3";
     };
-    # SSH_AUTH_SOCK is provided by services.proton-pass-agent.
+    # SSH_AUTH_SOCK is provided by services.yubikey-agent.
     enableSshSupport = false;
     enableScDaemon = true;
     enableZshIntegration = true;
   };
+
+  yubikey-agent.enable = true;
 
   home-manager.autoExpire = {
     enable = true;

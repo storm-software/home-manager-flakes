@@ -1,13 +1,9 @@
 { pkgsUnstable, ... }:
 
-# Proton Pass CLI (`pass-cli`) is a user tool. The nixpkgs wrapper already
-# sets PROTON_PASS_NO_UPDATE_CHECK. The SSH agent owns SSH_AUTH_SOCK
-# (gpg-agent SSH is disabled in services.nix).
+# Proton Pass CLI (`pass-cli`) remains available for vault access. The nixpkgs
+# wrapper sets PROTON_PASS_NO_UPDATE_CHECK; yubikey-agent owns SSH_AUTH_SOCK.
 {
-  services.proton-pass-agent = {
-    enable = true;
-    package = pkgsUnstable.proton-pass-cli;
-  };
+  home.packages = [ pkgsUnstable.proton-pass-cli ];
 
   home.sessionVariables = {
     # Use the default Linux kernel keyring so the session expires on reboot.

@@ -45,7 +45,8 @@
         name = "sullivanpj";
         displayName = "Pat Sullivan";
         email = "pat@patsullivan.org";
-        signingKey = "67216ED35A5544A9";
+        # Pin the existing RSA4096 signing subkey, including after its move to OpenPGP.1.
+        signingKey = "AED95ED34F81B0549D6E970767216ED35A5544A9!";
         system = {
           username = "development";
           homeDirectory = self.lib.getHomeDirectory "development";
@@ -142,6 +143,18 @@
                   $DRY_RUN_CMD ${pkgs.stable.git}/bin/git -C "$repo" config branch.main.sync true
                 fi
               done
+            '';
+
+            # ~/.gitconfig is read after the managed XDG Git config. Remove the
+            # old or matching signing-key override, preserving unrelated entries.
+            home.activation.removeLegacyGitSigningKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+              legacy_gitconfig=${lib.escapeShellArg "${user.system.homeDirectory}/.gitconfig"}
+              if [ -f "$legacy_gitconfig" ]; then
+                legacy_key=$(${pkgs.stable.git}/bin/git config --file "$legacy_gitconfig" --get user.signingkey || true)
+                if [ "$legacy_key" = 67216ED35A5544A9 ] || [ "$legacy_key" = ${lib.escapeShellArg user.signingKey} ]; then
+                  $DRY_RUN_CMD ${pkgs.stable.git}/bin/git config --file "$legacy_gitconfig" --unset-all --fixed-value user.signingkey "$legacy_key"
+                fi
+              fi
             '';
           })
           (import ./home-manager { inherit pkgs user; })
