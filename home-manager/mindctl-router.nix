@@ -98,11 +98,14 @@ let
         docker builder prune --all --force >/dev/null
         docker build --pull --file ${source}/Dockerfile.laya --tag ${lib.escapeShellArg layaImage} ${source}
       fi
+      # The image's /home/laya is private to its built-in UID, not our host UID.
+      # Mount the cache below /tmp so the runtime user can traverse to it.
       exec docker run --rm --name mindctl-laya \
         --publish 127.0.0.1:8091:8091 \
         --user "$(id -u):$(id -g)" \
         --env-file ${lib.escapeShellArg "${state}/laya.env"} \
-        --volume ${lib.escapeShellArg "${state}/laya-model-cache:/home/laya/.cache/huggingface"} \
+        --env HF_HOME=/tmp/huggingface \
+        --volume ${lib.escapeShellArg "${state}/laya-model-cache:/tmp/huggingface"} \
         ${lib.escapeShellArg layaImage}
     '';
   };
