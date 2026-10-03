@@ -73,6 +73,8 @@ let
     keychain
     gnupg
     pinentry-gnome3
+    yubikey-manager
+    yubikey-personalization
   ];
 
 in

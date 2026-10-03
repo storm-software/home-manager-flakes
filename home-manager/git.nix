@@ -47,6 +47,7 @@
       whitespace = "trailing-space,space-before-tab";
       #   askPass = ""; # needs to be empty to use terminal for ask password prompt
     };
+    gpg.program = "${pkgs.stable.gnupg}/bin/gpg";
     merge.tool = "vscode";
     help.autocorrect = "true";
     branch.autosetuprebase = "always";
