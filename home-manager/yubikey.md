@@ -1,4 +1,4 @@
-# YubiKey setup for KeePassXC and Git signing
+# YubiKey setup for Proton Pass, KeePassXC, and Git signing
 
 The Home Manager configuration installs `ykman` and the YubiKey personalization
 tools, enables GnuPG smartcard access, and points Git at the managed GnuPG
@@ -18,6 +18,18 @@ Run `gpg --card-status` to check that GnuPG can see the OpenPGP application.
 Do not move the current Git signing key until its secret-key backup has been
 made and tested. The configured key ID in `flake.nix` remains unchanged until
 the intended on-card signing subkey is verified.
+
+## Proton Pass CLI
+
+Register the YubiKey with the Proton account in Proton's account settings before
+relying on it for login. After each reboot, run `pass-cli login` and complete the
+browser sign-in with the YubiKey. Proton Pass CLI supports hardware-key
+authentication only through this web login flow; do not use `--interactive` for
+this purpose. The CLI uses the default Linux kernel keyring, which clears its
+vault key on reboot. The Proton account controls whether its web sign-in asks
+for a passkey or uses the key as a second factor. On the first login after
+switching from D-Bus key storage, if the CLI reports an encryption-key mismatch,
+run `pass-cli logout --force` to reset its local session, then `pass-cli login`.
 
 ## KeePassXC database
 
@@ -50,4 +62,4 @@ the card inserted. If a new public key is created, register it with GitHub and
 update `user.signingKey` in `flake.nix`. Keep the GnuPG SSH agent disabled;
 Proton Pass remains the SSH agent.
 
-Sources: [KeePassXC database credentials](https://github.com/keepassxreboot/keepassxc/blob/develop/docs/topics/DatabaseOperations.adoc), [KeePassXC challenge-response recovery](https://github.com/keepassxreboot/keepassxc/blob/develop/utils/keepassxc-cr-recovery/README.md), and [YubiKey Manager CLI](https://github.com/yubico/yubikey-manager/blob/main/_autodocs/api-reference/ykman.cli.md).
+Sources: [Proton Pass CLI login](https://github.com/protonpass/pass-cli/blob/main/docs/public/docs/commands/login.md), [Proton Pass CLI logout](https://github.com/protonpass/pass-cli/blob/main/docs/public/docs/commands/logout.md), [Proton Pass CLI keyring configuration](https://github.com/protonpass/pass-cli/blob/main/docs/public/docs/get-started/configuration.md), [KeePassXC database credentials](https://github.com/keepassxreboot/keepassxc/blob/develop/docs/topics/DatabaseOperations.adoc), [KeePassXC challenge-response recovery](https://github.com/keepassxreboot/keepassxc/blob/develop/utils/keepassxc-cr-recovery/README.md), and [YubiKey Manager CLI](https://github.com/yubico/yubikey-manager/blob/main/_autodocs/api-reference/ykman.cli.md).

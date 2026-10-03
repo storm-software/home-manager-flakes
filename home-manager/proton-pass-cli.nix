@@ -10,10 +10,8 @@
   };
 
   home.sessionVariables = {
-    # Persist the vault encryption key across reboots via Secret Service
-    # (GNOME Keyring). The default kernel keyring is wiped on reboot and
-    # forces another `pass-cli login`.
-    PROTON_PASS_LINUX_KEYRING = "dbus";
+    # Use the default Linux kernel keyring so the session expires on reboot.
+    # `pass-cli login` then uses Proton's browser flow for YubiKey authentication.
 
     PROTON_PASS_DISABLE_TELEMETRY = "true";
   };
