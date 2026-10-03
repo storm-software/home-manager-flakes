@@ -6,9 +6,8 @@
   home.packages = [ pkgsUnstable.proton-pass-cli ];
 
   home.sessionVariables = {
-    # Use the default Linux kernel keyring so the session expires on reboot.
-    # `pass-cli login` then uses Proton's browser flow for YubiKey authentication.
-
+    # Store the vault key with the desktop's persistent Secret Service keyring.
+    PROTON_PASS_LINUX_KEYRING = "dbus";
     PROTON_PASS_DISABLE_TELEMETRY = "true";
   };
 }

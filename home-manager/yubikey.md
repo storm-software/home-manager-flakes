@@ -36,14 +36,16 @@ that should accept it. A FIDO-only Security Key cannot provide this PIV key.
 ## Proton Pass CLI
 
 Register the YubiKey with the Proton account in Proton's account settings before
-relying on it for login. After each reboot, run `pass-cli login` and complete the
-browser sign-in with the YubiKey. Proton Pass CLI supports hardware-key
-authentication only through this web login flow; do not use `--interactive` for
-this purpose. The CLI uses the default Linux kernel keyring, which clears its
-vault key on reboot. The Proton account controls whether its web sign-in asks
-for a passkey or uses the key as a second factor. On the first login after
-switching from D-Bus key storage, if the CLI reports an encryption-key mismatch,
-run `pass-cli logout --force` to reset its local session, then `pass-cli login`.
+relying on it for login. The CLI uses the desktop's D-Bus Secret Service
+(GNOME Keyring) to keep its vault key across reboots. Unlock the desktop keyring
+when signing in; a CLI login is only needed when setting up the account or if
+the Proton session expires. Proton Pass CLI supports hardware-key authentication
+through its browser login flow; do not use `--interactive` for this purpose. The
+Proton account controls whether web sign-in asks for a passkey or uses the key as
+a second factor. After switching from the kernel keyring, run `pass-cli login`
+once if the existing session cannot be unlocked. If the CLI reports an
+encryption-key mismatch, run `pass-cli logout --force` to reset its local
+session, then `pass-cli login` again.
 
 ## KeePassXC database
 
