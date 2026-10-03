@@ -3,8 +3,6 @@
 # See: https://wiki.nixos.org/wiki/Displaylink
 set -euo pipefail
 
-readonly DISPLAYLINK_NAME="displaylink-620.zip"
-readonly DISPLAYLINK_URL="https://www.synaptics.com/sites/default/files/exe_files/2025-09/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.2-EXE.zip"
 readonly DOWNLOAD_TIMEOUT_SECONDS=120
 readonly BUILD_TIMEOUT_SECONDS=300
 readonly EVDI_CONF="/etc/modules-load.d/evdi.conf"
@@ -49,7 +47,13 @@ build_displaylink() {
   nixpkgs="$(nixpkgs_path)"
 
   NIXPKGS_ALLOW_UNFREE=1 timeout --kill-after=10s "$BUILD_TIMEOUT_SECONDS" \
-    nix-build "$nixpkgs" -A displaylink --no-out-link 2>/dev/null
+    nix-build "$nixpkgs" -A displaylink --no-out-link 2>"${BUILD_LOG:-/dev/null}"
+}
+
+# The nixpkgs requireFile message ends with the exact prefetch command for the
+# pinned driver version; extract its --name and URL so they never go stale.
+prefetch_args_from_log() {
+  sed -n 's/^.*nix-prefetch-url --name \([^ ]*\) \(https:[^ ]*\).*$/\1 \2/p' "$1" | head -n 1
 }
 
 ensure_displaylink_blob() {
@@ -59,7 +63,9 @@ ensure_displaylink_blob() {
 
   log "Checking whether the DisplayLink driver is already available (up to ${BUILD_TIMEOUT_SECONDS}s)..."
   local build_status=0
-  build_displaylink >/dev/null || build_status=$?
+  build_log="$(mktemp)"
+  trap 'rm -f "$build_log"' EXIT
+  BUILD_LOG="$build_log" build_displaylink >/dev/null || build_status=$?
   if [ "$build_status" -eq 0 ]; then
     log "DisplayLink driver already available in the Nix store"
     return 0
@@ -69,14 +75,24 @@ ensure_displaylink_blob() {
     die "DisplayLink package check timed out after ${BUILD_TIMEOUT_SECONDS}s"
   fi
 
-  log "Downloading the DisplayLink driver into the Nix store (up to ${DOWNLOAD_TIMEOUT_SECONDS}s)..."
+  local prefetch_name="" prefetch_url=""
+  read -r prefetch_name prefetch_url < <(prefetch_args_from_log "$build_log") || true
+  if [ -z "$prefetch_name" ] || [ -z "$prefetch_url" ]; then
+    tail -n 30 "$build_log" >&2
+    die "displaylink package build failed and no prefetch command was found in its output"
+  fi
+
+  log "Downloading ${prefetch_name} into the Nix store (up to ${DOWNLOAD_TIMEOUT_SECONDS}s)..."
   if ! timeout --kill-after=10s "$DOWNLOAD_TIMEOUT_SECONDS" \
-    nix-prefetch-url --name "$DISPLAYLINK_NAME" "$DISPLAYLINK_URL" >/dev/null; then
+    nix-prefetch-url --name "$prefetch_name" "$prefetch_url" >/dev/null; then
     die "DisplayLink driver download failed or timed out after ${DOWNLOAD_TIMEOUT_SECONDS}s"
   fi
 
   log "Building the DisplayLink package (up to ${BUILD_TIMEOUT_SECONDS}s)..."
-  build_displaylink >/dev/null || die "displaylink package build failed or timed out after prefetch"
+  if ! BUILD_LOG="$build_log" build_displaylink >/dev/null; then
+    tail -n 30 "$build_log" >&2
+    die "displaylink package build failed or timed out after prefetch"
+  fi
   log "DisplayLink driver added to the Nix store"
 }
 
