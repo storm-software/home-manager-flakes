@@ -13,10 +13,12 @@
     ) (import ./trusted-projects.nix);
   };
 
+  # Sign with the yubikey-agent PIV key. yubikey-agent holds the YubiKey
+  # exclusively, so OpenPGP signing through scdaemon cannot share the card.
   signing = {
-    key = user.signingKey;
+    key = null;
     signByDefault = true;
-    format = "openpgp";
+    format = "ssh";
   };
 
   ignores = [
@@ -47,7 +49,13 @@
       whitespace = "trailing-space,space-before-tab";
       #   askPass = ""; # needs to be empty to use terminal for ask password prompt
     };
+    # Still used to verify older OpenPGP-signed commits.
     gpg.program = "${pkgs.stable.gnupg}/bin/gpg";
+    # Git requires a key:: prefix, which ssh-add -L does not print for ECDSA keys.
+    gpg.ssh.defaultKeyCommand = "${pkgs.stable.writeShellScript "git-ssh-signing-key" ''
+      key=$(${pkgs.stable.openssh}/bin/ssh-add -L) || exit 1
+      printf 'key::%s\n' "''${key%%$'\n'*}"
+    ''}";
     merge.tool = "vscode";
     help.autocorrect = "true";
     branch.autosetuprebase = "always";

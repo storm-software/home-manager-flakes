@@ -45,7 +45,8 @@
         name = "sullivanpj";
         displayName = "Pat Sullivan";
         email = "pat@patsullivan.org";
-        # Pin the existing RSA4096 signing subkey, including after its move to OpenPGP.1.
+        # Former RSA4096 OpenPGP signing subkey. Git now signs over SSH, so this
+        # only matches a leftover override to remove from ~/.gitconfig.
         signingKey = "AED95ED34F81B0549D6E970767216ED35A5544A9!";
         system = {
           username = "development";

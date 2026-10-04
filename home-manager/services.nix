@@ -106,13 +106,15 @@ in
     # The host pcscd uses a newer protocol than Nix's bundled PC/SC client.
     # Link against the host client library so the agent can reach the YubiKey.
     # The host wrapper dlopens libpcsclite_real.so.1 by soname, which Nix's
-    # loader cannot find in /usr/lib, so load it up front as well.
+    # loader cannot find in /usr/lib, so name it explicitly.
     package = pkgs.stable.yubikey-agent.overrideAttrs (old: {
+      nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.stable.makeWrapper ];
       postFixup = (old.postFixup or "") + ''
         patchelf \
           --replace-needed libpcsclite.so.1 /usr/lib/libpcsclite.so.1 \
-          --add-needed /usr/lib/libpcsclite_real.so.1 \
           $out/bin/yubikey-agent
+        wrapProgram $out/bin/yubikey-agent \
+          --set-default LIBPCSCLITE_DELEGATE /usr/lib/libpcsclite_real.so.1
       '';
     });
   };
