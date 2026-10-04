@@ -30,7 +30,6 @@ let
     coreutils
     findutils
     libiconv
-    cmake
     pkg-config
     skopeo
     stow
