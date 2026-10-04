@@ -3,7 +3,6 @@ set -euo pipefail
 
 state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 codex_home="${CODEX_HOME:-$HOME/.codex}"
-key_file="$state_home/weave-router/router-key"
 mindctl_secrets_file="$state_home/mindctl/secrets.env"
 auth_file="$codex_home/auth.json"
 
@@ -14,14 +13,13 @@ if [[ "${1:-}" == "--from-secretspec" ]]; then
 fi
 
 if [[ "$from_secretspec" == true ]]; then
-  secretspec_router_key="${WEAVE_ROUTER_KEY:-}"
   secretspec_account_id="${CODEX_CHATGPT_ACCOUNT_ID:-}"
   secretspec_context7_api_key="${CONTEXT7_API_KEY:-}"
   secretspec_firecrawl_api_key="${FIRECRAWL_API_KEY:-}"
   secretspec_github_token="${GITHUB_TOKEN:-}"
 fi
 
-unset WEAVE_ROUTER_KEY CODEX_CHATGPT_ACCOUNT_ID \
+unset CODEX_CHATGPT_ACCOUNT_ID \
   MINDCTL_GATEWAY_TOKEN \
   CONTEXT7_API_KEY FIRECRAWL_API_KEY GITHUB_TOKEN \
   CODEX_GITHUB_PERSONAL_ACCESS_TOKEN
@@ -33,17 +31,6 @@ if [[ -r "$mindctl_secrets_file" ]]; then
       break
     fi
   done < "$mindctl_secrets_file"
-fi
-
-if [[ "$from_secretspec" == true && -n "$secretspec_router_key" ]]; then
-  export WEAVE_ROUTER_KEY="$secretspec_router_key"
-elif [[ -s "$key_file" ]]; then
-  if ! IFS= read -r WEAVE_ROUTER_KEY < "$key_file"; then
-    : # read returns EOF for a key file without a trailing newline.
-  fi
-  if [[ -n "$WEAVE_ROUTER_KEY" ]]; then
-    export WEAVE_ROUTER_KEY
-  fi
 fi
 
 if [[ "$from_secretspec" == true && -n "$secretspec_account_id" ]]; then
@@ -81,7 +68,7 @@ case "${1:-}" in
   import)
     names=()
     absent_names=()
-    for name in WEAVE_ROUTER_KEY CODEX_CHATGPT_ACCOUNT_ID MINDCTL_GATEWAY_TOKEN; do
+    for name in CODEX_CHATGPT_ACCOUNT_ID MINDCTL_GATEWAY_TOKEN; do
       if [[ -n "${!name:-}" ]]; then
         names+=("$name")
       else

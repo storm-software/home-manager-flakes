@@ -45,8 +45,8 @@ Claude Code's own OAuth bearer separately. The `mindctl-auto` option is added
 to Claude Code's model picker without replacing its subscription credentials.
 All Claude models in this mode use Mindctl's catalog; unlisted model IDs are
 rejected by the router.
-In direct and Weave modes, Claude Code still follows their existing Anthropic
-upstreams; `mindctl-auto` requires Mindctl mode.
+In direct mode, Claude Code still follows its existing Anthropic upstream;
+`mindctl-auto` requires Mindctl mode.
 
 Mindctl performs context compression itself (`headroom.enabled: true`, cache
 mode) for both Codex and Claude Code. On first start it downloads a pinned
@@ -55,17 +55,16 @@ access. In this mode the standalone Headroom proxy runs with `--no-optimize`,
 `--no-cache`, and `--no-ccr` so it only relays Claude Code and injects the
 gateway token; requests are never compressed twice. Compression is
 fail-closed: if the managed runtime is unavailable, Mindctl returns HTTP 503
-`headroom_unavailable` instead of forwarding uncompressed input. Direct and
-Weave modes keep compression in the standalone Headroom proxy.
+`headroom_unavailable` instead of forwarding uncompressed input. Direct mode
+keeps compression in the standalone Headroom proxy.
 
 Use `--skip-mindctl-router` to stop Mindctl and Laya and run standalone
-Headroom. Use `--weave-router` to stop Mindctl and Laya and select Weave; Weave
-wins if both flags are present.
+Headroom.
 
 Useful checks:
 
 ```sh
-systemctl --user status mindctl-router mindctl-laya weave-docker
+systemctl --user status mindctl-router mindctl-laya agent-docker
 journalctl --user -u mindctl-router -u mindctl-laya
 curl --fail http://127.0.0.1:8080/readyz
 curl --fail http://127.0.0.1:8091/readyz

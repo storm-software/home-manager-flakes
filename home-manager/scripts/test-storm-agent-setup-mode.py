@@ -37,25 +37,15 @@ class StormAgentSetupModeTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(result.stdout, "direct\n")
 
-    def test_legacy_disabled_weave_state_migrates_to_new_mindctl_default(self):
-        with tempfile.TemporaryDirectory() as directory:
-            state = Path(directory) / "agent-setup.env"
-            state.write_text("STORM_SETUP_WEAVE_ROUTER=0\n")
-
-            result = self.run_mode(state)
-
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(result.stdout, "mindctl\n")
-
     def test_explicit_activation_mode_takes_precedence_over_saved_mode(self):
         with tempfile.TemporaryDirectory() as directory:
             state = Path(directory) / "agent-setup.env"
             state.write_text("STORM_AGENT_ROUTER_MODE=direct\n")
 
-            result = self.run_mode(state, STORM_AGENT_ROUTER_MODE="weave")
+            result = self.run_mode(state, STORM_AGENT_ROUTER_MODE="mindctl")
 
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(result.stdout, "weave\n")
+            self.assertEqual(result.stdout, "mindctl\n")
 
     def test_write_persists_mindctl_mode_privately(self):
         with tempfile.TemporaryDirectory() as directory:

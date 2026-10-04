@@ -3,8 +3,8 @@
 Do not create tests for changes to this repository. Since these are just configuration changes, we will not use test-driven development methods.
 
 ## Key Features
-- All AI agents should have their requests routed through weave router to ensure consistent handling and monitoring. Unless specified, Weave router should automatically determine the appropriate routing and handling for each request **(do not use the `force-model` option)**.
-- Codex should be configured so that it's requests still go through Weave Router, but each request still uses the ChatGPT Pro subscription (ChatGPT OAuth token). As a result, **we should not require the OPENAI_API_KEY for Codex requests**.
+- All AI agents should have their requests routed through Mindctl to ensure consistent handling and monitoring. Unless specified, Mindctl should automatically determine the appropriate routing and handling for each request (`mindctl-auto`). When Mindctl is disabled (`--skip-mindctl-router`), agents use the standalone Headroom proxy directly.
+- Codex should be configured so that its requests still go through Mindctl (or Headroom), but each request still uses the ChatGPT Pro subscription (ChatGPT OAuth token). As a result, **we should not require the OPENAI_API_KEY for Codex requests**.
 
 <!-- storm configuration start-->
  ## External packages — DO NOT PATCH

@@ -90,23 +90,6 @@ let
         });
   };
 
-  weaveCodexSettings = codexSettings // {
-    model_provider = "weave";
-    openai_base_url = "http://127.0.0.1:8080/v1";
-    model_providers.weave = {
-      name = "Weave Router";
-      base_url = "http://127.0.0.1:8080/v1";
-      wire_api = "responses";
-      requires_openai_auth = true;
-      supports_websockets = false;
-      http_headers.X-App = "codex";
-      env_http_headers = {
-        X-Weave-Router-Key = "WEAVE_ROUTER_KEY";
-        ChatGPT-Account-ID = "CODEX_CHATGPT_ACCOUNT_ID";
-      };
-    };
-  };
-
   mindctlCodexSettings = codexSettings // {
     model = "mindctl-auto";
     model_provider = "mindctl";
@@ -127,7 +110,6 @@ let
 
   directCodexConfig = tomlFormat.generate "codex-config-direct.toml" codexSettings;
   mindctlCodexConfig = tomlFormat.generate "codex-config-mindctl.toml" mindctlCodexSettings;
-  weaveCodexConfig = tomlFormat.generate "codex-config-weave.toml" weaveCodexSettings;
 
   installCodexConfig = pkgs.writeShellApplication {
     name = "install-codex-config";
@@ -230,16 +212,8 @@ in
         message = "Codex MCP translation currently requires string env references";
       }
       {
-        assertion = weaveCodexSettings.model == "gpt-5.6-terra";
+        assertion = codexSettings.model == "gpt-5.6-terra";
         message = "Codex must use gpt-5.6-terra as its request model";
-      }
-      {
-        assertion = !(weaveCodexSettings.model_providers.weave.http_headers ? X-Weave-Force-Model);
-        message = "Codex must not force a Weave model";
-      }
-      {
-        assertion = !(weaveCodexSettings.model_providers.weave ? env_key);
-        message = "Codex must use ChatGPT OAuth, not OPENAI_API_KEY";
       }
       {
         assertion = !(mindctlCodexSettings.model_providers.mindctl ? env_key);
@@ -247,7 +221,7 @@ in
       }
       {
         assertion = !(codexSettings ? hooks);
-        message = "The Weave installer owns Codex hook registrations; the Nix baseline must not duplicate them";
+        message = "Orca owns Codex hook registrations; the Nix baseline must not duplicate them";
       }
     ];
 
@@ -271,7 +245,6 @@ in
     home.activation.installCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       case "''${STORM_AGENT_ROUTER_MODE:-mindctl}" in
         mindctl) codex_config=${mindctlCodexConfig} ;;
-        weave) codex_config=${weaveCodexConfig} ;;
         direct) codex_config=${directCodexConfig} ;;
         *)
           echo "Unknown agent router mode: ''${STORM_AGENT_ROUTER_MODE}" >&2

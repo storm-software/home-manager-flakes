@@ -110,7 +110,7 @@ let
     text = ''
       : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
       mkdir -p ${lib.escapeShellArg headroomHome}
-      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
+      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/agent-docker/docker.sock"
       exec docker run --rm --entrypoint headroom \
         --network host \
         --user "$(id -u):$(id -g)" \
@@ -134,7 +134,7 @@ let
     text = ''
       : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
       mkdir -p ${lib.escapeShellArg headroomHome}
-      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
+      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/agent-docker/docker.sock"
       upstream_args=()
       docker_env_args=()
       case "$(storm-agent-setup-mode)" in
@@ -164,12 +164,6 @@ let
             --no-ccr
           )
           ;;
-        weave)
-          upstream_args+=(
-            --openai-api-url http://127.0.0.1:8080
-            --anthropic-api-url http://127.0.0.1:8080
-          )
-          ;;
         direct) ;;
       esac
       exec docker run --rm --name headroom-proxy \
@@ -194,7 +188,7 @@ in
 {
   imports = [
     ./mindctl-router.nix
-    ./weave-router.nix
+    ./agent-docker.nix
   ];
 
   home.packages = [
@@ -226,14 +220,13 @@ in
   '';
 
   # Headroom uses the shared rootless Docker daemon. It sends requests through
-  # Mindctl by default, through Weave when explicitly selected, or directly to
-  # native providers when activation disables Mindctl. In Mindctl mode it is a
-  # passthrough relay because Mindctl runs its own managed Headroom compression.
+  # Mindctl by default, or directly to native providers when activation
+  # disables Mindctl. In Mindctl mode it is a passthrough relay because Mindctl runs its own managed Headroom compression.
   systemd.user.services.headroom = {
     Unit = {
       Description = "Headroom context-optimization proxy";
-      Requires = [ "weave-docker.service" ];
-      After = [ "weave-docker.service" ];
+      Requires = [ "agent-docker.service" ];
+      After = [ "agent-docker.service" ];
     };
     Service = {
       ExecStartPre = "${configureHeadroomClients}/bin/configure-headroom-clients";

@@ -40,9 +40,9 @@ let
         ) server.env;
       };
 
-  # Baseline merged into the mutable settings.json. The Weave installer and
-  # Orca also write there (router headers, status line, hooks), so Home
-  # Manager must not replace it with a read-only store symlink.
+  # Baseline merged into the mutable settings.json. Orca also writes there
+  # (status line, hooks), so Home Manager must not replace it with a
+  # read-only store symlink.
   claudeSettings = {
     forceLoginMethod = "claudeai";
     effortLevel = "medium";
@@ -173,7 +173,7 @@ in
     }
     {
       assertion = !(claudeSettings ? hooks) && !(claudeSettings ? statusLine);
-      message = "The Weave and Orca installers own Claude hooks and status line; the Nix baseline must not duplicate them";
+      message = "The Orca installer owns Claude hooks and status line; the Nix baseline must not duplicate them";
     }
   ];
 

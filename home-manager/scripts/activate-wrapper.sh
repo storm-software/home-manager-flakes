@@ -5,7 +5,6 @@ set -o pipefail
 inner="$(cd "$(dirname "$0")" && pwd)/activate-inner"
 remaining=()
 setup_displaylink=true
-setup_weave_router=false
 skip_mindctl_router=false
 
 # Back up colliding files by default (equivalent to `-b backup`) unless the
@@ -39,15 +38,12 @@ while (( $# > 0 )); do
     --skip-displaylink)
       setup_displaylink=false
       ;;
-    --weave-router)
-      setup_weave_router=true
-      ;;
     --skip-mindctl-router)
       skip_mindctl_router=true
       ;;
     -h|--help)
       cat <<'USAGE'
-Usage: activate [backup options] [--skip-displaylink] [--skip-mindctl-router] [--weave-router] [--driver-version N]
+Usage: activate [backup options] [--skip-displaylink] [--skip-mindctl-router] [--driver-version N]
 
 Backup options (same as home-manager switch):
   -b EXT           Move colliding files to <path>.EXT before linking
@@ -58,7 +54,6 @@ Other options:
   --skip-displaylink   Skip displaylink-setup after successful activation
   --skip-mindctl-router
                    Run Headroom without Mindctl
-  --weave-router       Use Weave Router instead of Mindctl
   --driver-version N
                    Activation driver version (0 or 1)
   -h, --help       Show this help message
@@ -71,15 +66,10 @@ USAGE
   esac
 done
 
-if [[ "$setup_weave_router" == true ]]; then
-  router_mode=weave
-  export STORM_SETUP_WEAVE_ROUTER=1
-elif [[ "$skip_mindctl_router" == true ]]; then
+if [[ "$skip_mindctl_router" == true ]]; then
   router_mode=direct
-  export STORM_SETUP_WEAVE_ROUTER=0
 else
   router_mode=mindctl
-  export STORM_SETUP_WEAVE_ROUTER=0
 fi
 export STORM_AGENT_ROUTER_MODE="$router_mode"
 
@@ -150,7 +140,7 @@ case "$storm_marker_count" in
 esac
 
 @storm_agent_setup_mode@ write "$STORM_AGENT_ROUTER_MODE"
-systemctl --user import-environment STORM_AGENT_ROUTER_MODE STORM_SETUP_WEAVE_ROUTER
+systemctl --user import-environment STORM_AGENT_ROUTER_MODE
 
 if [[ "$setup_displaylink" == true ]]; then
   setup="$HOME/.nix-profile/bin/displaylink-setup"
@@ -163,36 +153,13 @@ if [[ "$setup_displaylink" == true ]]; then
   "$setup"
 fi
 
-if [[ "$setup_weave_router" == true ]]; then
-  systemctl --user stop mindctl-router.service mindctl-laya.service
-  systemctl --user restart weave-router.service
+if [[ "$router_mode" == mindctl ]]; then
+  @mindctl_router_setup@
+  systemctl --user restart mindctl-laya.service
+  systemctl --user restart mindctl-router.service
 else
-  systemctl --user stop weave-router.service
-  weave_compose="$HOME/.nix-profile/bin/weave-router-compose"
-  weave_secrets="$HOME/.local/state/weave-router/secrets.env"
-  # weave-router is a oneshot unit, so systemd does not run ExecStop when the
-  # unit is already inactive. Stop a managed Compose stack explicitly before
-  # starting Mindctl, otherwise its server can retain port 8080.
-  if [[ -s "$weave_secrets" && -x "$weave_compose" ]]; then
-    "$weave_compose" stop
-  fi
-  if [[ "$router_mode" == mindctl ]]; then
-    @mindctl_router_setup@
-    systemctl --user restart mindctl-laya.service
-    systemctl --user restart mindctl-router.service
-  else
-    systemctl --user stop mindctl-router.service mindctl-laya.service
-  fi
+  systemctl --user stop mindctl-router.service mindctl-laya.service
 fi
 
 @codex_secrets_env@ import
 systemctl --user restart headroom.service
-
-if [[ "$setup_weave_router" == true ]]; then
-  login="$HOME/.nix-profile/bin/weave-router-login-codex"
-  if [[ ! -x "$login" ]]; then
-    echo "$0: weave-router-login-codex was not installed by activation" >&2
-    exit 1
-  fi
-  "$login"
-fi

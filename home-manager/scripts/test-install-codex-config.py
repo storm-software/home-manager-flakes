@@ -5,7 +5,7 @@ import unittest
 
 
 SCRIPT = Path(__file__).with_name("install-codex-config.sh")
-TEMPLATE_TEXT = 'model = "gpt-5.6-terra"\nmodel_provider = "weave"\n'
+TEMPLATE_TEXT = 'model = "mindctl-auto"\nmodel_provider = "mindctl"\n'
 
 
 def run_installer(template: Path, home: Path) -> subprocess.CompletedProcess[str]:
@@ -28,7 +28,7 @@ class InstallCodexConfigTests(unittest.TestCase):
             template.write_text(TEMPLATE_TEXT)
             legacy = codex_dir / "config.toml"
             legacy.write_text(
-                '[model_providers.weave]\nhttp_headers = { X = "secret" }\n'
+                '[model_providers.mindctl]\nhttp_headers = { X = "secret" }\n'
             )
 
             result = run_installer(template, home)
@@ -83,7 +83,7 @@ class InstallCodexConfigTests(unittest.TestCase):
             codex_dir.mkdir(parents=True)
             template = root / "template.toml"
             template.write_text(TEMPLATE_TEXT)
-            backup = codex_dir / "config.toml.pre-weave"
+            backup = codex_dir / "config.toml.pre-mindctl"
             backup.write_text("historical-private-config\n")
 
             result = run_installer(template, home)

@@ -49,14 +49,12 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             path = config_dir / "config.toml"
             path.write_text(
                 'model = "gpt-5.6-luna"\n'
-                '[model_providers.weave]\n'
+                '[model_providers.headroom]\n'
                 'env_key = "OPENAI_API_KEY"\n'
                 'experimental_bearer_token = "legacy-bearer"\n'
-                'http_headers = { "X-Weave-Router-Key" = "rk_test", '
+                'http_headers = { "X-Mindctl-Token" = "legacy-token", '
                 '"ChatGPT-Account-ID" = "legacy-account", "Authorization" = "Bearer old", '
-                '"X-App" = "codex", "X-Weave-Force-Model" = "gpt-5.6-terra" }\n'
-                '[model_providers.weave.env_http_headers]\n'
-                'X-Weave-Force-Model = "WEAVE_FORCE_MODEL"\n'
+                '"X-App" = "codex" }\n'
             )
 
             clients.configure_codex(home, router_mode="direct")
@@ -82,30 +80,11 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             clients.configure_codex(home, router_mode="direct")
             reparsed = tomllib.loads(path.read_text())
             self.assertEqual(reparsed["model"], "gpt-5.6-luna")
-            self.assertNotIn(
-                "X-Weave-Force-Model",
+            self.assertEqual(
                 reparsed["model_providers"]["headroom"]["http_headers"],
+                {"X-App": "codex"},
             )
             self.assertFalse((config_dir / "config.toml.pre-headroom").exists())
-
-    def test_codex_does_not_copy_a_preexisting_force_model_to_headroom(self):
-        with tempfile.TemporaryDirectory() as directory:
-            home = Path(directory)
-            config_dir = home / ".codex"
-            config_dir.mkdir()
-            path = config_dir / "config.toml"
-            path.write_text(
-                'model = "gpt-6-astra"\n'
-                '[model_providers.weave]\n'
-                'http_headers = { "X-Weave-Router-Key" = "rk_test", '
-                '"X-Weave-Force-Model" = "gpt-5.6-terra" }\n'
-            )
-
-            clients.configure_codex(home, router_mode="direct")
-
-            config = tomlkit.parse(path.read_text())
-            headers = config["model_providers"]["headroom"]["http_headers"]
-            self.assertNotIn("X-Weave-Force-Model", headers)
 
     def test_codex_creates_environment_backed_headroom_provider(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -124,29 +103,6 @@ class ConfigureHeadroomClientsTests(unittest.TestCase):
             self.assertEqual(
                 dict(provider["env_http_headers"]),
                 {
-                    "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
-                },
-            )
-
-    def test_codex_uses_weave_when_enabled(self):
-        with tempfile.TemporaryDirectory() as directory:
-            home = Path(directory)
-            path = home / ".codex" / "config.toml"
-            path.parent.mkdir()
-            path.write_text('model = "gpt-5.6-terra"\n')
-
-            clients.configure_codex(home, router_mode="weave")
-
-            config = tomlkit.parse(path.read_text())
-            provider = config["model_providers"]["weave"]
-            self.assertEqual(config["model_provider"], "weave")
-            self.assertEqual(provider["name"], "Weave Router")
-            self.assertEqual(config["openai_base_url"], "http://127.0.0.1:8080/v1")
-            self.assertEqual(provider["base_url"], "http://127.0.0.1:8080/v1")
-            self.assertEqual(
-                dict(provider["env_http_headers"]),
-                {
-                    "X-Weave-Router-Key": "WEAVE_ROUTER_KEY",
                     "ChatGPT-Account-ID": "CODEX_CHATGPT_ACCOUNT_ID",
                 },
             )

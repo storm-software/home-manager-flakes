@@ -5,9 +5,9 @@ state_file="${STORM_AGENT_SETUP_STATE:-${XDG_STATE_HOME:-$HOME/.local/state}/sto
 
 validate_mode() {
   case "$1" in
-    mindctl|weave|direct) ;;
+    mindctl|direct) ;;
     *)
-      echo "storm-agent-setup-mode: expected mindctl, weave, or direct, got '$1'" >&2
+      echo "storm-agent-setup-mode: expected mindctl or direct, got '$1'" >&2
       exit 1
       ;;
   esac
@@ -20,8 +20,6 @@ read_mode() {
     IFS= read -r assignment < "$state_file" || true
     case "$assignment" in
       STORM_AGENT_ROUTER_MODE=*) mode="${assignment#STORM_AGENT_ROUTER_MODE=}" ;;
-      STORM_SETUP_WEAVE_ROUTER=1) mode=weave ;;
-      STORM_SETUP_WEAVE_ROUTER=0) mode=mindctl ;;
       *)
         echo "storm-agent-setup-mode: invalid state file '$state_file'" >&2
         exit 1
@@ -56,7 +54,7 @@ case "${1:-read}" in
     write_mode "${2:-}"
     ;;
   *)
-    echo "usage: storm-agent-setup-mode [read|write mindctl|weave|direct]" >&2
+    echo "usage: storm-agent-setup-mode [read|write mindctl|direct]" >&2
     exit 2
     ;;
 esac

@@ -11,14 +11,12 @@ import tomlkit
 
 
 HEADROOM_URL = "http://127.0.0.1:8787"
-WEAVE_URL = "http://127.0.0.1:8080"
+MINDCTL_URL = "http://127.0.0.1:8080"
 
 
 FORBIDDEN_STATIC_HEADERS = {
     "authorization",
     "chatgpt-account-id",
-    "x-weave-force-model",
-    "x-weave-router-key",
     "x-mindctl-token",
 }
 
@@ -34,20 +32,10 @@ def normalize_codex_provider(
     provider.pop("env_key", None)
     provider.pop("experimental_bearer_token", None)
 
-    router_key = next(
-        (
-            str(value)
-            for name, value in provider.get("http_headers", {}).items()
-            if name.casefold() == "x-weave-router-key" and str(value)
-        ),
-        None,
-    )
     static_headers = tomlkit.inline_table()
     for name, value in provider.get("http_headers", {}).items():
         if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
             static_headers[name] = str(value)
-    if router_mode == "weave" and router_key is not None:
-        static_headers["X-Weave-Router-Key"] = router_key
     static_headers["X-App"] = "codex"
     provider["http_headers"] = static_headers
 
@@ -55,8 +43,6 @@ def normalize_codex_provider(
     for name, value in provider.get("env_http_headers", {}).items():
         if name.casefold() not in FORBIDDEN_STATIC_HEADERS:
             env_headers[name] = str(value)
-    if router_mode == "weave" and router_key is None:
-        env_headers["X-Weave-Router-Key"] = "WEAVE_ROUTER_KEY"
     if router_mode == "mindctl":
         env_headers["X-Mindctl-Token"] = "MINDCTL_GATEWAY_TOKEN"
     env_headers["ChatGPT-Account-ID"] = "CODEX_CHATGPT_ACCOUNT_ID"
@@ -73,16 +59,10 @@ def configure_codex(home: Path, *, router_mode: str) -> None:
         raise SystemExit(f"{path} is invalid TOML: {error}; refusing to overwrite it") from error
 
     providers = config.setdefault("model_providers", tomlkit.table())
-    if router_mode == "weave":
-        # Keep Codex directly on Weave when the router is enabled. Headroom
-        # remains in front of Claude and relays that traffic to Weave.
-        provider_name = "weave"
-        provider_display_name = "Weave Router"
-        base_url = f"{WEAVE_URL}/v1"
-    elif router_mode == "mindctl":
+    if router_mode == "mindctl":
         provider_name = "mindctl"
         provider_display_name = "Mindctl"
-        base_url = f"{WEAVE_URL}/v1"
+        base_url = f"{MINDCTL_URL}/v1"
         config["model"] = "mindctl-auto"
     else:
         # Both keys are needed for ChatGPT subscription users: model_provider

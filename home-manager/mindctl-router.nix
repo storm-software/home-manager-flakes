@@ -88,7 +88,7 @@ let
     ];
     text = ''
       : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
-      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
+      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/agent-docker/docker.sock"
       mkdir -p ${lib.escapeShellArg "${state}/laya-model-cache"}
       # Inspect succeeds for images whose layers are missing from the content
       # store, so probe that the image actually starts before trusting it.
@@ -114,7 +114,7 @@ let
     runtimeInputs = [ pkgs.docker ];
     text = ''
       : "''${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is required for the rootless Docker socket}"
-      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/weave-docker/docker.sock"
+      export DOCKER_HOST="unix://''${XDG_RUNTIME_DIR}/agent-docker/docker.sock"
       docker stop mindctl-laya >/dev/null 2>&1 || true
     '';
   };
@@ -153,8 +153,8 @@ in
     systemd.user.services.mindctl-laya = {
       Unit = {
         Description = "Local Laya System 1 classifier for Mindctl";
-        Requires = [ "weave-docker.service" ];
-        After = [ "weave-docker.service" ];
+        Requires = [ "agent-docker.service" ];
+        After = [ "agent-docker.service" ];
       };
       Service = {
         ExecCondition = "${mindctlEnabled}/bin/mindctl-router-enabled";

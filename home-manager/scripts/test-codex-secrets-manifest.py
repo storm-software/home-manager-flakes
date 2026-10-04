@@ -6,7 +6,6 @@ import unittest
 MANIFEST = Path(__file__).parents[2] / "secretspec.toml"
 ITEM_PREFIX = "storm-software/agents/"
 SECRET_NAMES = {
-    "WEAVE_ROUTER_KEY",
     "CODEX_CHATGPT_ACCOUNT_ID",
     "CONTEXT7_API_KEY",
     "FIRECRAWL_API_KEY",

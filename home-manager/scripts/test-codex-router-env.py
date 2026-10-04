@@ -18,7 +18,6 @@ class CodexRouterEnvTests(unittest.TestCase):
         self.codex_home = self.home / ".codex"
         self.bin = self.root / "bin"
         self.codex_home.mkdir(parents=True)
-        (self.state / "weave-router").mkdir(parents=True)
         (self.state / "mindctl").mkdir(parents=True)
         self.bin.mkdir()
         self.mock_codex = self.bin / "mock-codex"
@@ -27,7 +26,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             "import json, os, sys\n"
             "record = {"
             "'args': sys.argv[1:], "
-            "'router_key': os.environ.get('WEAVE_ROUTER_KEY'), "
             "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID'), "
             "'context7_api_key': os.environ.get('CONTEXT7_API_KEY'), "
             "'firecrawl_api_key': os.environ.get('FIRECRAWL_API_KEY')}\n"
@@ -48,7 +46,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             "calls = json.loads(record.read_text()) if record.exists() else []\n"
             "calls.append({"
             "'args': sys.argv[1:], "
-            "'router_key': os.environ.get('WEAVE_ROUTER_KEY'), "
             "'account_id': os.environ.get('CODEX_CHATGPT_ACCOUNT_ID'), "
             "'mindctl_gateway_token': os.environ.get('MINDCTL_GATEWAY_TOKEN')})\n"
             "record.write_text(json.dumps(calls))\n"
@@ -77,7 +74,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             "SYSTEMCTL_RECORD": str(self.systemctl_record),
             "SYSTEMCTL_STATE": str(self.systemctl_state),
         }
-        env.pop("WEAVE_ROUTER_KEY", None)
         env.pop("CODEX_CHATGPT_ACCOUNT_ID", None)
         env.pop("CONTEXT7_API_KEY", None)
         env.pop("FIRECRAWL_API_KEY", None)
@@ -95,12 +91,11 @@ class CodexRouterEnvTests(unittest.TestCase):
         )
 
     def write_credentials(self):
-        (self.state / "weave-router/router-key").write_text("rk_test\n")
         (self.codex_home / "auth.json").write_text(
             json.dumps({"tokens": {"account_id": "acct_test"}})
         )
 
-    def test_exec_loads_both_private_values(self):
+    def test_exec_loads_account_id(self):
         self.write_credentials()
 
         result = self.run_helper("exec", str(self.mock_codex), "--version")
@@ -110,7 +105,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             json.loads(result.stdout),
             {
                 "args": ["--version"],
-                "router_key": "rk_test",
                 "account_id": "acct_test",
                 "context7_api_key": None,
                 "firecrawl_api_key": None,
@@ -133,8 +127,6 @@ class CodexRouterEnvTests(unittest.TestCase):
         self.assertNotIn("encryption-test-key", result.stdout)
 
     def test_exec_allows_login_when_account_id_is_missing(self):
-        (self.state / "weave-router/router-key").write_text("rk_test\n")
-
         result = self.run_helper("exec", str(self.mock_codex), "login")
 
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -144,32 +136,18 @@ class CodexRouterEnvTests(unittest.TestCase):
         self.assertIsNone(recorded["context7_api_key"])
         self.assertIsNone(recorded["firecrawl_api_key"])
 
-    def test_exec_loads_router_key_without_trailing_newline(self):
-        (self.state / "weave-router/router-key").write_text("rk_test")
-
-        result = self.run_helper("exec", str(self.mock_codex), "login")
-
-        self.assertEqual(result.returncode, 0, result.stderr)
-        recorded = json.loads(result.stdout)
-        self.assertEqual(recorded["args"], ["login"])
-        self.assertEqual(recorded["router_key"], "rk_test")
-        self.assertIsNone(recorded["context7_api_key"])
-        self.assertIsNone(recorded["firecrawl_api_key"])
-
     def test_exec_clears_inherited_values_when_sources_are_absent(self):
         result = self.run_helper(
             "exec",
             str(self.mock_codex),
             "login",
             inherited={
-                "WEAVE_ROUTER_KEY": "stale-router-key",
                 "CODEX_CHATGPT_ACCOUNT_ID": "stale-account-id",
             },
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
         recorded = json.loads(result.stdout)
-        self.assertIsNone(recorded["router_key"])
         self.assertIsNone(recorded["account_id"])
         self.assertIsNone(recorded["context7_api_key"])
         self.assertIsNone(recorded["firecrawl_api_key"])
@@ -183,7 +161,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             str(self.mock_codex),
             "--version",
             inherited={
-                "WEAVE_ROUTER_KEY": "vault-router-key",
                 "CODEX_CHATGPT_ACCOUNT_ID": "vault-account-id",
                 "CONTEXT7_API_KEY": "vault-context7-key",
                 "FIRECRAWL_API_KEY": "vault-firecrawl-key",
@@ -196,7 +173,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             json.loads(result.stdout),
             {
                 "args": ["--version"],
-                "router_key": "vault-router-key",
                 "account_id": "vault-account-id",
                 "context7_api_key": "vault-context7-key",
                 "firecrawl_api_key": "vault-firecrawl-key",
@@ -254,7 +230,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             json.loads(result.stdout),
             {
                 "args": ["--version"],
-                "router_key": "rk_test",
                 "account_id": "acct_test",
                 "context7_api_key": "vault-context7-key",
                 "firecrawl_api_key": "vault-firecrawl-key",
@@ -268,7 +243,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             str(self.mock_codex),
             "--version",
             inherited={
-                "WEAVE_ROUTER_KEY": "vault-router-key",
                 "CODEX_CHATGPT_ACCOUNT_ID": "vault-account-id",
             },
         )
@@ -291,15 +265,12 @@ class CodexRouterEnvTests(unittest.TestCase):
             [
                 "--user",
                 "import-environment",
-                "WEAVE_ROUTER_KEY",
                 "CODEX_CHATGPT_ACCOUNT_ID",
                 "MINDCTL_GATEWAY_TOKEN",
             ],
         )
-        self.assertEqual(recorded["router_key"], "rk_test")
         self.assertEqual(recorded["account_id"], "acct_test")
         self.assertEqual(recorded["mindctl_gateway_token"], "mindctl-test-token")
-        self.assertNotIn("rk_test", " ".join(recorded["args"]))
         self.assertNotIn("acct_test", " ".join(recorded["args"]))
         self.assertNotIn("mindctl-test-token", " ".join(recorded["args"]))
 
@@ -325,7 +296,6 @@ class CodexRouterEnvTests(unittest.TestCase):
             [
                 "--user",
                 "unset-environment",
-                "WEAVE_ROUTER_KEY",
                 "CODEX_CHATGPT_ACCOUNT_ID",
                 "MINDCTL_GATEWAY_TOKEN",
             ],
@@ -348,16 +318,12 @@ class CodexRouterEnvTests(unittest.TestCase):
                 initial = self.run_helper("import")
                 self.assertEqual(initial.returncode, 0, initial.stderr)
                 self.assertEqual(json.loads(self.systemctl_state.read_text()), {
-                    "UNRELATED": "keep", "WEAVE_ROUTER_KEY": "rk_test",
-                    "CODEX_CHATGPT_ACCOUNT_ID": "acct_test",
+                    "UNRELATED": "keep", "CODEX_CHATGPT_ACCOUNT_ID": "acct_test",
                 })
-                key_file = self.state / "weave-router/router-key"
                 auth_file = self.codex_home / "auth.json"
                 if auth is None:
-                    key_file.unlink()
                     auth_file.unlink()
                 else:
-                    key_file.write_text("")
                     auth_file.write_text(auth)
                 for _ in range(2):
                     result = self.run_helper("import")
@@ -365,29 +331,31 @@ class CodexRouterEnvTests(unittest.TestCase):
                     self.assertEqual(json.loads(self.systemctl_state.read_text()), {"UNRELATED": "keep"})
                 recorded = json.loads(self.systemctl_record.read_text())
                 self.assertEqual(recorded[-1]["args"], [
-                    "--user", "unset-environment", "WEAVE_ROUTER_KEY",
+                    "--user", "unset-environment",
                     "CODEX_CHATGPT_ACCOUNT_ID", "MINDCTL_GATEWAY_TOKEN",
                 ])
                 self.assert_safe_systemctl_argv(recorded)
 
     def test_import_unsets_absent_name_before_importing_present_name(self):
-        for missing in ("WEAVE_ROUTER_KEY", "CODEX_CHATGPT_ACCOUNT_ID"):
+        secrets_file = self.state / "mindctl" / "secrets.env"
+        for missing in ("MINDCTL_GATEWAY_TOKEN", "CODEX_CHATGPT_ACCOUNT_ID"):
             with self.subTest(missing=missing):
                 self.write_credentials()
+                secrets_file.write_text("MINDCTL_GATEWAY_TOKEN=mindctl-test-token\n")
                 initial = self.run_helper("import")
                 self.assertEqual(initial.returncode, 0, initial.stderr)
-                if missing == "WEAVE_ROUTER_KEY":
-                    (self.state / "weave-router/router-key").unlink()
+                if missing == "MINDCTL_GATEWAY_TOKEN":
+                    secrets_file.unlink()
                     present, value = "CODEX_CHATGPT_ACCOUNT_ID", "acct_test"
                 else:
                     (self.codex_home / "auth.json").write_text("{invalid")
-                    present, value = "WEAVE_ROUTER_KEY", "rk_test"
+                    present, value = "MINDCTL_GATEWAY_TOKEN", "mindctl-test-token"
                 result = self.run_helper("import")
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(json.loads(self.systemctl_state.read_text()), {present: value})
                 recorded = json.loads(self.systemctl_record.read_text())
                 self.assertEqual([call["args"] for call in recorded[-2:]], [
-                    ["--user", "unset-environment", missing, "MINDCTL_GATEWAY_TOKEN"],
+                    ["--user", "unset-environment", missing],
                     ["--user", "import-environment", present],
                 ])
                 self.assert_safe_systemctl_argv(recorded)
@@ -398,12 +366,10 @@ class CodexRouterEnvTests(unittest.TestCase):
             self.assertTrue(
                 set(call["args"][2:])
                 <= {
-                    "WEAVE_ROUTER_KEY",
                     "CODEX_CHATGPT_ACCOUNT_ID",
                     "MINDCTL_GATEWAY_TOKEN",
                 }
             )
-            self.assertNotIn("rk_test", " ".join(call["args"]))
             self.assertNotIn("acct_test", " ".join(call["args"]))
             self.assertNotIn("mindctl-test-token", " ".join(call["args"]))
 
