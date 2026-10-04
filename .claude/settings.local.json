@@ -24,7 +24,11 @@
       "Bash(cd /nix/store/da7apr6rx9mpa0ljpircmwwsxnmrjb43-source/modules/programs/claude-code && cat options.nix; grep -n \"mcp\\\\|settings\\\\|home.file\\\\|wrapProgram\\\\|makeWrapper\\\\|finalPackage\" default.nix | head -60)",
       "Read(//nix/store/da7apr6rx9mpa0ljpircmwwsxnmrjb43-source/modules/programs/claude-code/**)",
       "Bash(nix shell *)",
-      "Bash(sed -n 's/^.*nix-prefetch-url --name \\\\\\([^ ]*\\\\\\) \\\\\\(https:[^ ]*\\\\\\).*$/\\\\1 \\\\2/p' /tmp/claude-1001/-home-development-repos-home-manager-flakes/d9357f6e-37e0-4388-bec9-75c7236a05f4/scratchpad/log)"
+      "Bash(ykman --version)",
+      "Bash(ykman list *)",
+      "Bash(ykman info *)",
+      "Bash(ykman config *)",
+      "Bash(ykman otp *)"
     ]
   }
 }

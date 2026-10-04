@@ -95,6 +95,9 @@ in
     # SSH_AUTH_SOCK is provided by services.yubikey-agent.
     enableSshSupport = false;
     enableScDaemon = true;
+    # The host pcscd uses a newer protocol than Nix's bundled PC/SC client.
+    # Use the host smartcard daemon so OpenPGP signing can reach the YubiKey.
+    extraConfig = "scdaemon-program /usr/lib/gnupg/scdaemon";
     enableZshIntegration = true;
   };
 

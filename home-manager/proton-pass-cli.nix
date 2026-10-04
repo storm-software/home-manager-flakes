@@ -6,8 +6,12 @@
   home.packages = [ pkgsUnstable.proton-pass-cli ];
 
   home.sessionVariables = {
-    # Store the vault key with the desktop's persistent Secret Service keyring.
-    PROTON_PASS_LINUX_KEYRING = "dbus";
+    # Keep the vault key in the session directory (0600) instead of a keyring.
+    # The kernel keyring is cleared on reboot, and the D-Bus Secret Service is
+    # not yet unlocked when session services (mindctl-router, ssh agent) call
+    # pass-cli at login; either case makes pass-cli force-logout and wipe the
+    # session. See https://protonpass.github.io/pass-cli/help/troubleshoot/
+    PROTON_PASS_KEY_PROVIDER = "fs";
     PROTON_PASS_DISABLE_TELEMETRY = "true";
   };
 }
