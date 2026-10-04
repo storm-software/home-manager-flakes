@@ -44,6 +44,12 @@
     homedir = "${user.system.homeDirectory}/.gnupg";
     mutableKeys = true;
     mutableTrust = true;
+    # Go through the host pcscd instead of claiming the YubiKey over USB, so
+    # ykman and yubikey-agent can share the card with scdaemon.
+    scdaemonSettings = {
+      disable-ccid = true;
+      pcsc-shared = true;
+    };
   };
 
   home-manager = {
