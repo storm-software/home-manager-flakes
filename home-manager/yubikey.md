@@ -49,11 +49,15 @@ so the session survives reboots and is available to session services. The
 kernel keyring loses the key on reboot, and the D-Bus Secret Service is not
 unlocked when `mindctl-router` runs `pass-cli` at login (SDDM's PAM stack only
 unlocks KWallet); in both cases `pass-cli` force-logs out and deletes the
-session as a safety measure. A CLI login is only needed when setting up the
-account or if the Proton session expires. Proton Pass CLI supports hardware-key
-authentication through its browser login flow; do not use `--interactive` for
-this purpose. The Proton account controls whether web sign-in asks for a passkey
-or uses the key as a second factor. After switching key providers, run
+session as a safety measure. Home Manager also sets the filesystem provider in
+the systemd user environment: the router can start before shell session
+variables are imported, and a call using the default keyring may erase a
+session created with the filesystem provider. A CLI login is only needed when
+setting up the account or if the Proton session expires. Proton Pass CLI
+supports hardware-key authentication through its browser login flow; do not use
+`--interactive` for this purpose. The Proton account controls whether web
+sign-in asks for a passkey or uses the key as a second factor. After switching
+key providers, run
 `pass-cli logout --force` to reset the local session, then `pass-cli login`.
 
 ## KeePassXC database

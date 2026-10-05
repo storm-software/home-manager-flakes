@@ -1,4 +1,4 @@
-{ pkgsUnstable, ... }:
+{ config, pkgsUnstable, ... }:
 
 # Proton Pass CLI (`pass-cli`) remains available for vault access. The nixpkgs
 # wrapper sets PROTON_PASS_NO_UPDATE_CHECK; yubikey-agent owns SSH_AUTH_SOCK.
@@ -14,4 +14,7 @@
     PROTON_PASS_KEY_PROVIDER = "fs";
     PROTON_PASS_DISABLE_TELEMETRY = "true";
   };
+
+  systemd.user.sessionVariables.PROTON_PASS_KEY_PROVIDER =
+    config.home.sessionVariables.PROTON_PASS_KEY_PROVIDER;
 }
