@@ -82,12 +82,9 @@ let
     mcp_servers = codexMcpServers;
     plugins."prisma@plugins-cli".enabled = true;
 
-    projects =
-      lib.genAttrs
-        (import ./trusted-projects.nix)
-        (_path: {
-          trust_level = "trusted";
-        });
+    projects = lib.genAttrs (import ./trusted-projects.nix) (_path: {
+      trust_level = "trusted";
+    });
   };
 
   mindctlCodexSettings = codexSettings // {
@@ -221,7 +218,7 @@ in
       }
       {
         assertion = !(codexSettings ? hooks);
-        message = "Orca owns Codex hook registrations; the Nix baseline must not duplicate them";
+        message = "Mindctl installs Codex hook registrations; the Nix baseline must not duplicate them";
       }
     ];
 
@@ -275,6 +272,21 @@ in
       $DRY_RUN_CMD ${installCodexConfig}/bin/install-codex-config \
         "$codex_config" ${lib.escapeShellArg config.home.homeDirectory}
     '';
+
+    # Mindctl owns its status/directive hooks and the matching toggle skills.
+    # Run after the declarative template so the hook registrations survive each
+    # activation without making the template itself mutable.
+    home.activation.installMindctlCodexHelpers =
+      lib.hm.dag.entryAfter
+        [
+          "installCodexConfig"
+          "setupMindctlRouter"
+        ]
+        ''
+          if [ "''${STORM_AGENT_ROUTER_MODE:-mindctl}" = mindctl ]; then
+            $DRY_RUN_CMD ${config.storm.mindctl.package}/bin/mindctl --codex
+          fi
+        '';
 
     # The VS Code extension normally launches its bundled Codex directly,
     # bypassing the managed PATH wrapper. Point it at a compatibility launcher

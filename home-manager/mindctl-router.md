@@ -22,11 +22,14 @@ SQLite data is stored in `$XDG_STATE_HOME/mindctl/mindctl.db`.
 The managed `mindctl` shell command reads the existing encryption key from
 `secrets.env` only for `mindctl history` and `mindctl savings`; the key is
 passed to that process, not exported into the interactive shell. The router service runs
-`mindctl serve` and continues to use its own systemd `EnvironmentFile`. Bare
-`mindctl` and its `on`/`off`/`uninstall` subcommands rewrite Claude Code and
-Codex settings that Home Manager already manages, so prefer the activation
-wrapper's router flags. `mindctl savings` summarizes routing and Headroom
-savings.
+`mindctl serve` and continues to use its own systemd `EnvironmentFile`.
+In Mindctl mode activation installs the Mindctl-managed client helpers: Claude
+Code's price-aware `cc-statusline`, and Codex's status and directive hooks plus
+the `mindctl-on`, `mindctl-off`, and `mindctl-status` fallback skills. Claude
+continues to use Headroom as its configured endpoint after helper setup. A
+manual `mindctl on` or `mindctl off` takes effect for the next client launch,
+but the declarative router mode is reasserted at the next Home Manager
+activation. `mindctl savings` summarizes routing and Headroom savings.
 
 Optional `DEEPSEEK_API_KEY` and `MUSE_API_KEY` values are resolved from the
 `mindctl` SecretSpec profile when the service starts. The legacy

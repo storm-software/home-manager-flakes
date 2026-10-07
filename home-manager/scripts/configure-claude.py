@@ -38,6 +38,18 @@ def merge(target: dict, baseline: dict) -> None:
             target[key] = value
 
 
+def remove_legacy_weave_statusline(settings: dict) -> None:
+    """Replace the retired Weave statusline, without touching user-owned ones."""
+    statusline = settings.get("statusLine")
+    if not isinstance(statusline, dict):
+        return
+    if statusline.get("type") != "command":
+        return
+    command = statusline.get("command")
+    if isinstance(command, str) and command.endswith("/.weave/cc-statusline.sh"):
+        settings.pop("statusLine")
+
+
 def trust_projects(home: Path, projects: list[str]) -> None:
     # Claude Code records workspace trust in ~/.claude.json, not settings.json.
     path = home / ".claude.json"
@@ -60,6 +72,7 @@ def configure(home: Path, baseline: dict | None = None, trusted_projects: list[s
     path.parent.mkdir(parents=True, exist_ok=True)
     settings = load_object(path)
     merge(settings, baseline or {})
+    remove_legacy_weave_statusline(settings)
     env = settings.setdefault("env", {})
     if not isinstance(env, dict):
         raise SystemExit(f"{path} has a non-object env value; refusing to overwrite it")

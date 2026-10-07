@@ -25,7 +25,9 @@ let
         # `$VAR` headers carry secrets and are expanded from the environment;
         # anything else is a literal, non-secret header value.
         headers =
-          lib.mapAttrs (_header: value: if lib.hasPrefix "$" value then envRef value else value) server.headers
+          lib.mapAttrs (
+            _header: value: if lib.hasPrefix "$" value then envRef value else value
+          ) server.headers
           // lib.optionalAttrs (name == "github") {
             Authorization = "Bearer ${envRef "$CODEX_GITHUB_PERSONAL_ACCESS_TOKEN"}";
           };
@@ -173,7 +175,7 @@ in
     }
     {
       assertion = !(claudeSettings ? hooks) && !(claudeSettings ? statusLine);
-      message = "The Orca installer owns Claude hooks and status line; the Nix baseline must not duplicate them";
+      message = "Mindctl installs its dynamic Claude status line; the Nix baseline must not duplicate it";
     }
   ];
 
@@ -197,7 +199,23 @@ in
     $DRY_RUN_CMD ${configureClaude}/bin/configure-claude
   '';
 
-  home.activation.installClaudeVscode = lib.hm.dag.entryAfter [ "configureClaude" ] ''
+  # Mindctl writes the price-aware cc-statusline script. Its generic setup
+  # targets the gateway directly, so reapply the Headroom baseline afterwards:
+  # Claude Code must continue through the managed compression relay.
+  home.activation.installMindctlClaudeHelpers =
+    lib.hm.dag.entryAfter
+      [
+        "configureClaude"
+        "setupMindctlRouter"
+      ]
+      ''
+        if [ "''${STORM_AGENT_ROUTER_MODE:-mindctl}" = mindctl ]; then
+          $DRY_RUN_CMD ${config.storm.mindctl.package}/bin/mindctl --claude
+          $DRY_RUN_CMD ${configureClaude}/bin/configure-claude
+        fi
+      '';
+
+  home.activation.installClaudeVscode = lib.hm.dag.entryAfter [ "installMindctlClaudeHelpers" ] ''
     $DRY_RUN_CMD ${installClaudeVscode}/bin/install-claude-vscode
   '';
 

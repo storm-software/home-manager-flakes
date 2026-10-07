@@ -131,10 +131,17 @@ let
   };
 in
 {
-  options.storm.mindctl.setupPackage = lib.mkOption {
-    type = lib.types.package;
-    readOnly = true;
-    internal = true;
+  options.storm.mindctl = {
+    package = lib.mkOption {
+      type = lib.types.package;
+      readOnly = true;
+      internal = true;
+    };
+    setupPackage = lib.mkOption {
+      type = lib.types.package;
+      readOnly = true;
+      internal = true;
+    };
   };
 
   config = {
@@ -191,6 +198,9 @@ in
       Install.WantedBy = [ "default.target" ];
     };
 
-    storm.mindctl.setupPackage = setup;
+    storm.mindctl = {
+      package = mindctl;
+      setupPackage = setup;
+    };
   };
 }
