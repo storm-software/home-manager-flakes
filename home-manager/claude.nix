@@ -68,7 +68,6 @@ let
         "Bash(nix-build *)"
         "Bash(nix-shell *)"
         "Bash(nix-prefetch-url *)"
-        "Bash(devenv *)"
         "Bash(home-manager switch *)"
         "Bash(tar *)"
         "Bash(go mod *)"
@@ -101,6 +100,7 @@ let
         "Edit"
       ];
       ask = [
+        "Bash(devenv *)"
         "Bash(git push:*)"
         "Bash(git commit:*)"
       ];

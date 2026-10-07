@@ -242,6 +242,27 @@ in
       force = true;
     };
 
+    # Devenv can run arbitrary commands with Nix daemon access, which crosses
+    # the normal Codex sandbox boundary. Require approval for every invocation
+    # without replacing Codex's mutable default.rules file.
+    home.file.".codex/rules/devenv.rules" = {
+      force = true;
+      text = ''
+        prefix_rule(
+            pattern = ["devenv"],
+            decision = "prompt",
+            justification = "Review each devenv command requiring Nix daemon access.",
+            match = [
+                "devenv shell -- true",
+                "devenv --no-tui shell -- pnpm test",
+            ],
+            not_match = [
+                "git status --short",
+            ],
+        )
+      '';
+    };
+
     home.activation.installCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       case "''${STORM_AGENT_ROUTER_MODE:-mindctl}" in
         mindctl) codex_config=${mindctlCodexConfig} ;;
