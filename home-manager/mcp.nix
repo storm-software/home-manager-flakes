@@ -1,3 +1,5 @@
+{ lib, pkgs, ... }:
+
 {
   programs.mcp = {
     enable = true;
@@ -15,19 +17,14 @@
         headers.CONTEXT7_API_KEY = "$CONTEXT7_API_KEY";
       };
 
+      # Store binaries rather than `npx`: resolving the npm package on every
+      # launch overran Claude Code's 30s MCP connect timeout.
       playwright = {
-        command = "npx";
-        args = [
-          "@playwright/mcp@latest"
-        ];
+        command = lib.getExe pkgs.playwright-mcp;
       };
 
       firecrawl = {
-        command = "npx";
-        args = [
-          "-y"
-          "firecrawl-mcp"
-        ];
+        command = lib.getExe pkgs.firecrawl-mcp;
         env.FIRECRAWL_API_KEY = "$FIRECRAWL_API_KEY";
       };
 

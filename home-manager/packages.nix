@@ -41,6 +41,9 @@ let
     nixfmt
     vulnix
     statix
+    # Project `.mcp.json` servers (e.g. cyclone-ui's graphify) launch `uv`
+    # outside any devenv shell.
+    uv
   ];
 
   waylandTools = with pkgs.stable; [
