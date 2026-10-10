@@ -30,6 +30,21 @@ credentials on the physical key. After provisioning, use `ssh-add -L` to check
 that the agent exposes the key, then register that public key with SSH services
 that should accept it. A FIDO-only Security Key cannot provide this PIV key.
 
+YubiKeys with firmware 5.7 or later ship with an AES-192 default management
+key, which `yubikey-agent -setup` rejects with "The default Management Key did
+not work" before it changes anything. Check `ykman piv info`; if it reports
+the default management key with algorithm AES192, switch it to TDES with the
+same default value, and setup then replaces it with a random key:
+
+```sh
+k=010203040506070801020304050607080102030405060708
+ykman piv access change-management-key -a tdes -m $k -n $k -f
+```
+
+Signing asks for the PIV PIN in a pinentry window, which gives up after about
+a minute. The agent then logs `smart card error 6982: security status not
+satisfied`, and the signing fails with "agent refused operation".
+
 The service refuses `systemctl --user restart` because it may only be started
 by its socket. To load a new build, run `systemctl --user stop
 yubikey-agent.service`; the socket starts it again on the next connection.
@@ -39,6 +54,39 @@ yubikey-agent.service`; the socket starts it again on the next connection.
 to release it (the PIN is asked for again on next use). The reverse also
 applies: after using the card with GnuPG, run `gpgconf --kill scdaemon` so
 `yubikey-agent` can open it.
+
+## Backup YubiKey
+
+The OpenPGP subkeys (encryption `0x284E334E100F4A2A`, signing
+`0x67216ED35A5544A9`) are on two YubiKeys: a Nano (serial 37603779) and a 5C
+NFC (serial 37522951). Each key has its own PIV SSH signing key, and each one
+is registered on GitHub as a signing key.
+
+The PIV key cannot be copied. On another YubiKey, run `yubikey-agent -setup`
+with only that key plugged in, and register the new `ssh-add -L` key on GitHub.
+
+`keytocard` removes the private subkeys from the local keyring, so copying them
+to another card needs the secret subkey backup exported before the first
+`keytocard`. Import it into a throwaway keyring so the stubs in `~/.gnupg` are
+left alone:
+
+```sh
+systemctl --user stop yubikey-agent.socket yubikey-agent.service
+gpgconf --kill scdaemon
+export GNUPGHOME=$(mktemp -d -p "$XDG_RUNTIME_DIR")
+cp ~/.gnupg/scdaemon.conf ~/.gnupg/gpg-agent.conf "$GNUPGHOME"/
+gpg --import /path/to/secret-subkeys-backup.asc
+gpg --edit-key 0xE6ADC420DA5C4C2D   # keytocard each subkey into its slot, then save
+gpgconf --kill all; rm -rf "$GNUPGHOME"; unset GNUPGHOME
+gpgconf --kill scdaemon
+gpg-connect-agent "scd serialno" "learn --force" /bye
+```
+
+`learn --force` adds the new card to the existing stubs; the stub files under
+`~/.gnupg/private-keys-v1.d/` then list one `Token:` per card, and GnuPG uses
+whichever card is plugged in. `gpg --card-status` reporting `Card error` after
+swapping cards usually means an scdaemon left over from the previous card;
+`gpgconf --kill scdaemon` fixes it.
 
 ## Proton Pass CLI
 
